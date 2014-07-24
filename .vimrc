@@ -5,6 +5,7 @@ set nocompatible           " vi との互換性をオフにする。オフにす
 set encoding=utf8          " エンコーディング設定
 set fileencoding=utf-8     " カレントバッファ内のファイルの文字エンコーディングを設定する
 set clipboard=unnamed      " OSのクリップボードを使用する
+set nobackup
 
 " ヘルプを出さない
 nmap <F1> <nop>
@@ -23,6 +24,15 @@ nnoremap * *zz
 nnoremap # #zz
 nnoremap g* g*zz
 nnoremap g# g#zz
+
+" benri
+" ----------------------
+nmap <F5> <ESC>i<C-R>=strftime("%Y/%m/%d (%a) %H:%M")<CR><CR>
+imap <F5> <ESC>i<C-R>=strftime("%Y/%m/%d (%a) %H:%M")<CR><CR>
+
+" filetype
+" ----------------------
+au BufNewFile,BufRead *.pp setf puppet
 
 " ----------------------------------------------------------------------------------------
 " Move 
@@ -59,6 +69,16 @@ set background=dark
 " タブ、空白、改行を可視化
 set list
 set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
+
+
+" カーソル行を強調表示しない
+set nocursorline
+" 挿入モードの時のみ、カーソル行をハイライトする
+autocmd InsertEnter,InsertLeave * set cursorline!
+
+" iTerm2 でコンソールの形状を変える
+let &t_SI = "\e]50;CursorShape=1\x7"
+let &t_EI = "\e]50;CursorShape=0\x7"
 
 " ----------------------------------------------------------------------------------------
 " appearance (Only GUI)
@@ -157,14 +177,45 @@ NeoBundleCheck
 NeoBundle 'Shougo/neocomplcache'
 " NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'davidoc/taskpaper.vim'
 NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'mattn/gist-vim'
 NeoBundle 'mattn/webapi-vim'
+NeoBundle 'Puppet-Syntax-Highlighting'
+NeoBundle 'scrooloose/syntastic'
 
-" ----------------------------------------------------------------------------------------↲
-"  gist-vim
-"  ----------------------------------------------------------------------------------------↲
+" gist-vim
+"----------------------------------------------------------------------------------------↲
 let g:gist_api_url = 'http://ghe.tokyo.pb/api/v3'
+
+" Unite
+"----------------------------------------------------------------------------------------↲
+" 入力モードで開始する
+" let g:unite_enable_start_insert=1
+" バッファ一覧
+nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
+" ファイル一覧
+nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+" レジスタ一覧
+nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
+" 最近使用したファイル一覧
+nnoremap <silent> ,um :<C-u>Unite file_mru<CR>
+" 常用セット
+nnoremap <silent> ,uu :<C-u>Unite buffer file_mru<CR>
+" 全部乗せ
+nnoremap <silent> ,ua :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
+" ウィンドウを分割して開く
+au FileType unite nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
+au FileType unite inoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
+" ウィンドウを縦に分割して開く
+au FileType unite nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
+au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
+
+" syntastic
+"----------------------------------------------------------------------------------------↲
+let g:syntastic_puppet_puppetlint_args="--no-80chars-check --no-documentation-check --no-unquoted_file_mode-check --no-file_mode-check"
+
+

@@ -2,6 +2,9 @@
 export GOPATH=$HOME/.go
 export PATH=$PATH:$GOPATH/bin
 
+# SSH-KEY
+ssh-add ~/.ssh/id_dsa
+
 # zsh-completions
 # http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03
 fpath=(/usr/local/share/zsh-completions $fpath)
@@ -86,6 +89,15 @@ function echo_rprompt () {
 setopt prompt_subst
 RPROMPT='`echo_rprompt`'
 
+# snippets
+# http://blog.glidenote.com/blog/2014/06/26/snippets-peco-percol/
+function peco-snippets() {
+    local SNIPPETS=$(cat ~/.snippets | peco --query "$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
+#     zle clear-screen
+}
+zle -N peco-snippets
+bindkey '^x' peco-snippets
+
 # history を peco で選択
 # http://blog.kenjiskywalker.org/blog/2014/06/12/peco/
 function peco-select-history() {
@@ -127,8 +139,16 @@ alias g='git'
 ## VAR
 export EDITOR=/usr/bin/vim
 
+## http://shoma2da.hatenablog.com/entry/2014/03/26/222802
+## hub config --global hub.host <ghe.address>
+## https://github.com/github/hub/commit/7944d63edb1373fbbfa806bc108508b7906c8210
+eval "$(hub alias -s)"
+
 ## Other
 ### tmux
 #### http://blog.glidenote.com/blog/2014/02/22/remote-pbcopy/
 # launchctl load ~/Library/LaunchAgents/pbcopy.plist
+
+
+
 
