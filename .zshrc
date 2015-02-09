@@ -1,6 +1,6 @@
 # PATH
 export GOPATH=$HOME/.go
-export PATH=$PATH:$GOPATH/bin
+export PATH=$GOPATH/bin:$PATH
 
 # SSH-KEY
 ssh-add ~/.ssh/id_dsa
@@ -149,6 +149,15 @@ eval "$(hub alias -s)"
 #### http://blog.glidenote.com/blog/2014/02/22/remote-pbcopy/
 # launchctl load ~/Library/LaunchAgents/pbcopy.plist
 
-
-
+#=============================
+# source auto-fu.zsh
+#=============================
+if [ -f ~/.zsh/auto-fu.zsh ]; then
+    source ~/.zsh/auto-fu.zsh
+    function zle-line-init () {
+        auto-fu-init
+    }
+    zle -N zle-line-init
+    zstyle ':completion:*' completer _oldlist _complete
+fi
 
