@@ -11,13 +11,14 @@ brew install tmux
 brew install ansible
 brew install tig
 brew install Caskroom/cask/java  ## jenkins 依存
-brew install jenkins
+brew install jenkin
 # To have launchd start jenkins at login:
 #     ln -sfv /usr/local/opt/jenkins/*.plist ~/Library/LaunchAgents
 # Then to load jenkins now:
 #     launchctl load ~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist
 # Or, if you don't want/need launchctl, you can just run:
-#     jenkins
+#     jenkinss
+brew install fabric
 
 ## 役立ち
 brew install trash
