@@ -6,6 +6,7 @@ set encoding=utf8          " エンコーディング設定
 set fileencoding=utf-8     " カレントバッファ内のファイルの文字エンコーディングを設定する
 set clipboard=unnamed      " OSのクリップボードを使用する
 set nobackup
+set noundofile             " *.un~ なファイルを作らない
 
 " ヘルプを出さない
 nmap <F1> <nop>
@@ -186,6 +187,8 @@ NeoBundle 'mattn/gist-vim'
 NeoBundle 'mattn/webapi-vim'
 NeoBundle 'Puppet-Syntax-Highlighting'
 NeoBundle 'scrooloose/syntastic'
+NeoBundle 'fuenor/qfixgrep'
+NeoBundle 'fuenor/qfixhowm'
 
 " gist-vim
 "----------------------------------------------------------------------------------------↲
@@ -218,4 +221,21 @@ au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vspli
 "----------------------------------------------------------------------------------------↲
 let g:syntastic_puppet_puppetlint_args="--no-80chars-check --no-documentation-check --no-unquoted_file_mode-check --no-file_mode-check"
 
-
+" qfixhowm
+" g,c メモを作成
+" g,<Space> 作成日を元にしたファイル名が開く、追記イメージ
+" g,m 一覧表示 m -> mru, l -> 更新順, L -> 作成順
+" g,g メモを検索
+"----------------------------------------------------------------------------------------↲
+" ファイル拡張子をmdにする
+let howm_filename = '%Y/%m/%Y-%m-%d-%H%M%S.md'
+" ファイルタイプをmarkdownにする
+let QFixHowm_FileType = 'markdown'
+" タイトル記号
+let QFixHowm_Title = '#'
+" タイトル行検索正規表現の辞書を初期化
+let QFixMRU_Title = {}
+" MRUでタイトル行とみなす正規表現(Vimの正規表現で指定)
+let QFixMRU_Title['mkd'] = '^###[^#]'
+" grepでタイトル行とみなす正規表現(使用するgrepによっては変更する必要があります)
+let QFixMRU_Title['mkd_regxp'] = '^###[^#]'
