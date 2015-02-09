@@ -13,5 +13,3 @@ export PATH
 
 # export PS1="$ "
 export HISTIGNORE=ls:history
-alias cd="pushd"
-alias p="popd"
