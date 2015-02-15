@@ -1,6 +1,9 @@
 # include common settings
 source ~/.shellrc
 
+# Ctrl-A, E とか効かせる
+bindkey -e
+
 # zsh-completions
 # http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03
 fpath=(/usr/local/share/zsh-completions $fpath)
@@ -130,7 +133,7 @@ select-word-style bash
 ## http://shoma2da.hatenablog.com/entry/2014/03/26/222802
 ## hub config --global hub.host <ghe.address>
 ## https://github.com/github/hub/commit/7944d63edb1373fbbfa806bc108508b7906c8210
-eval "$(hub alias -s)"
+# eval "$(hub alias -s)"
 
 ## Other
 ### tmux
