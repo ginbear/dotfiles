@@ -1,5 +1,5 @@
 # include common settings
-source ./.shellrc
+source ~/.shellrc
 
 # zsh-completions
 # http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03

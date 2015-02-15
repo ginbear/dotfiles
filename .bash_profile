@@ -15,4 +15,4 @@ export PATH
 export HISTIGNORE=ls:history
 
 # include common settings
-source ./.shellrc
+source ~/.shellrc
