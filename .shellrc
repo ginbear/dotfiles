@@ -7,14 +7,18 @@ alias g='git'
 
 export EDITOR=/usr/bin/vim
 
-# PATH
-export GOPATH=$HOME/.go
-export PATH=$PATH:$GOPATH/bin
-
 # SSH-KEY
 [ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
 
 # anyenv
 # https://github.com/riywo/anyenv
-export PATH="$HOME/.anyenv/bin:$PATH"
-eval "$(anyenv init -)"
+if [ -d $HOME/.anyenv ] ; then
+  export PATH="$HOME/.anyenv/bin:$PATH"
+  eval "$(anyenv init -)"
+fi
+
+# GO 
+if [ -d $HOME/.go ] ; then
+  export GOPATH=$HOME/.go
+  export PATH=$PATH:$GOPATH/bin
+fi
