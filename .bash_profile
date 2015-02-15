@@ -13,3 +13,6 @@ export PATH
 
 # export PS1="$ "
 export HISTIGNORE=ls:history
+
+# include common settings
+source ./.shellrc

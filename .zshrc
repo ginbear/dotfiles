@@ -1,9 +1,5 @@
-# PATH
-export GOPATH=$HOME/.go
-export PATH=$PATH:$GOPATH/bin
-
-# SSH-KEY
-ssh-add ~/.ssh/id_dsa
+# include common settings
+source ./.shellrc
 
 # zsh-completions
 # http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03
@@ -31,7 +27,7 @@ if is-at-least 4.3.10; then
     zstyle ':vcs_info:*' actionformats '%R' '%S' '%b|%a' '%s' '%c' '%u'
 fi
 
-#----- cdr
+# cdr
 autoload -Uz is-at-least
 if is-at-least 4.3.11
 then
@@ -130,14 +126,6 @@ bindkey '^@' peco-cdr
 ## 単語の定義を bash と同じにする
 autoload -U select-word-style
 select-word-style bash
-
-## alias
-alias ll='ls -l'
-alias la='ls -la'
-alias g='git'
-
-## VAR
-export EDITOR=/usr/bin/vim
 
 ## http://shoma2da.hatenablog.com/entry/2014/03/26/222802
 ## hub config --global hub.host <ghe.address>

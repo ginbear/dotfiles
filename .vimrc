@@ -59,12 +59,12 @@ inoremap []5 [% %]<LEFT><LEFT><LEFT>
 " ----------------------------------------------------------------------------------------
 set number
 set ruler 
-
-colorscheme molokai
 syntax on
-let g:molokai_original = 1
-let g:rehash256 = 1
-set background=dark
+
+" colorscheme molokai
+" let g:molokai_original = 1
+" let g:rehash256 = 1
+" set background=dark
 
 " タブ、空白、改行を可視化
 set list
@@ -141,51 +141,60 @@ map <silent> [Tag]p :tabprevious<CR>
 
 " ----------------------------------------------------------------------------------------
 " neobundle
+" install
+" $ mkdir -p ~/.vim/bundle && git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
+" $ curl https://raw.githubusercontent.com/Shougo/neobundle.vim/master/bin/install.sh | sh
 " ----------------------------------------------------------------------------------------
-set nocompatible               " Be iMproved
+
+" Note: Skip initialization for vim-tiny or vim-small.
+if !1 | finish | endif
 
 if has('vim_starting')
-set runtimepath+=~/.vim/bundle/neobundle.vim/
+  if &compatible
+    set nocompatible               " Be iMproved
+  endif
+
+  " Required:
+  set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-call neobundle#rc(expand('~/.vim/bundle/'))
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
 
 " Let NeoBundle manage NeoBundle
+" Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-" Recommended to install
-" After install, turn shell ~/.vim/bundle/vimproc, (n,g)make -f your_machines_makefile
-NeoBundle 'Shougo/vimproc', {
-        \ 'build' : {
-                \ 'windows' : 'make -f make_mingw32.mak',
-                \ 'cygwin' : 'make -f make_cygwin.mak',
-                \ 'mac' : 'make -f make_mac.mak',
-                \ 'unix' : 'make -f make_unix.mak',
-        \ },
-\ }
-
-filetype plugin indent on     " Required!
-
-" Brief help
-" :NeoBundleList          - list configured bundles
-" :NeoBundleInstall(!)    - install(update) bundles
-" :NeoBundleClean(!)      - confirm(or auto-approve) removal of unused bundles
-
-" Installation check.
-NeoBundleCheck
+" My Bundles here:
+" Refer to |:NeoBundle-examples|.
+" Note: You don't set neobundle setting in .gvimrc!
 
 NeoBundle 'Shougo/neocomplcache'
 " NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'davidoc/taskpaper.vim'
 NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'mattn/gist-vim'
 NeoBundle 'mattn/webapi-vim'
 NeoBundle 'Puppet-Syntax-Highlighting'
 NeoBundle 'scrooloose/syntastic'
+
+NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'jeffreyiacono/vim-colors-wombat'
+NeoBundle 'nanotech/jellybeans.vim'
+NeoBundle 'tomasr/molokai'
+
+call neobundle#end()
+
+" Required:
+filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
 
 " gist-vim
 "----------------------------------------------------------------------------------------↲

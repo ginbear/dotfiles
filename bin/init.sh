@@ -13,6 +13,7 @@ FILELIST="
 .zshrc
 .tmux.conf
 .peco
+.shellrc
 "
 
 # 必要ディレクトリの作成
