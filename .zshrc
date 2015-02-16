@@ -91,7 +91,7 @@ RPROMPT='`echo_rprompt`'
 # snippets
 # http://blog.glidenote.com/blog/2014/06/26/snippets-peco-percol/
 function peco-snippets() {
-    local SNIPPETS=$(cat ~/.snippets | peco --query "$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
+    local SNIPPETS=$(cat ~/.snippets ~/.snippets.local | peco --query "$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
 #     zle clear-screen
 }
 zle -N peco-snippets

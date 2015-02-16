@@ -14,6 +14,8 @@ FILELIST="
 .tmux.conf
 .peco
 .shellrc
+.gitconfig
+.snippets
 "
 
 # 必要ディレクトリの作成

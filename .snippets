@@ -1,0 +1,59 @@
+# apache
+wget -q -O - http://127.0.0.1/server-status/?auto ## server-status を CUI で確認したい
+tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $1}'  | sort | uniq -c | sort -gr | head -n 4  ## $1 = IP-Address
+tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $2}'  | sort | uniq -c | sort -gr | head -n 4
+tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $12}' | sort | uniq -c | sort -gr | head -n 4
+tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $13}' | sort | uniq -c | sort -gr | head -n 4
+tail -n 500000 /var/log/lighttpd/access.log| cut -f 4 -d " " | sed -e "s/[0-9]:[0-5][0-9]$//" | sort | uniq -c ## 10 分毎のアクセス数統計
+sudo /usr/local/apache2/bin/httpd -SM  ## いろいろ確認
+sudo /sbin/service httpd configtest    ## config check
+
+# search
+netstat -ltapn | grep ESTABLISHED | more
+netstat -ltan | grep ":80 " | awk '{print $5}' | awk -F : '{print $4}' | sort | uniq -c | sort -nr | head
+netstat -antpo  ## 各ステートの時間が見える、timewait で何秒待ってるとか
+lsof -i:80
+
+# dstat
+dstat -Tclmdrn
+dstat -Tclm
+dstat -Tclr
+dstat -Tclnd
+dstat -Tcldr
+dstat --top-cpu --top-cputime
+dstat --top-io --top-bio
+dstat --top-io-adv --top-bio-adv
+dstat -ta --top-io-adv --top-bio-adv  ## なんか便利！
+
+# find
+find ./ -daystart -ctime +2
+find ./ -daystart -ctime -2
+
+# date
+date +%Y%m%d
+date +%Y%m%d -d '1 days ago'
+
+# tmux
+set-window-option synchronize-panes on ## キーブロードキャスト
+
+# git
+git push origin $(git branch | grep ^\* | cut -f2 -d " ")     ## 現行の Branch を git push
+git diff FETCH_HEAD                                           ## マージ前の差分チェック
+git merge FETCH_HEAD                                          ## マージ
+git branch -d hoge                                            ## ブランチ削除
+git push origin :hoge                                         ## リモートブランチ削除
+git checkout -b other_branch origin/other_branch              ## リモートブランチを取得
+git config --list --global                                    ## git の global config を確認する
+git commit --amend -m "(新しいコミットメッセージ)"            ## 直前のコミットログを編集する
+git fetch ; git merge origin/hoge                             ## リモートブランチが更新されてそれを取り込みたい場合
+git reset --soft HEAD^                                        ## 直前の commit を取り消したい
+git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;  ## remote buranch の更新を local branch にマージしたい場合
+git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
+
+# sar
+sar -W -f /var/log/sa/sa13  ## 13日の Swap I/O 量を見る pswpin/s pswpout/s
+sar -r                      ## メモリ見たい             kbmemfree kbmemused  %memused kbbuffers  kbcached kbswpfree kbswpused  %swpused 
+sar -b 1 0                  ## I/O みたい               tps      rtps      wtps   bread/s   bwrtn/s
+sar -B 1 0                  ## ページングみたい         pgpgin/s pgpgout/s   fault/s  majflt/s
+sar -q 1 0                  ## L/A みたい
+sar -n DEV 1 0              ## トラフィック見たい
