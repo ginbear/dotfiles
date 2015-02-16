@@ -1,0 +1,24 @@
+# commmon shell settings
+
+## alias
+alias ll='ls -l'
+alias la='ls -la'
+alias g='git'
+
+export EDITOR=/usr/bin/vim
+
+# SSH-KEY
+[ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
+
+# anyenv
+# https://github.com/riywo/anyenv
+if [ -d $HOME/.anyenv ] ; then
+  export PATH="$HOME/.anyenv/bin:$PATH"
+  eval "$(anyenv init -)"
+fi
+
+# GO 
+if [ -d $HOME/.go ] ; then
+  export GOPATH=$HOME/.go
+  export PATH=$PATH:$GOPATH/bin
+fi

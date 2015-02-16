@@ -1,9 +1,8 @@
-# PATH
-export GOPATH=$HOME/.go
-export PATH=$GOPATH/bin:$PATH
+# include common settings
+source ~/.shellrc
 
-# SSH-KEY
-ssh-add ~/.ssh/id_dsa
+# Ctrl-A, E とか効かせる
+bindkey -e
 
 # zsh-completions
 # http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03
@@ -31,7 +30,7 @@ if is-at-least 4.3.10; then
     zstyle ':vcs_info:*' actionformats '%R' '%S' '%b|%a' '%s' '%c' '%u'
 fi
 
-#----- cdr
+# cdr
 autoload -Uz is-at-least
 if is-at-least 4.3.11
 then
@@ -131,18 +130,10 @@ bindkey '^@' peco-cdr
 autoload -U select-word-style
 select-word-style bash
 
-## alias
-alias ll='ls -l'
-alias la='ls -la'
-alias g='git'
-
-## VAR
-export EDITOR=/usr/bin/vim
-
 ## http://shoma2da.hatenablog.com/entry/2014/03/26/222802
 ## hub config --global hub.host <ghe.address>
 ## https://github.com/github/hub/commit/7944d63edb1373fbbfa806bc108508b7906c8210
-eval "$(hub alias -s)"
+# eval "$(hub alias -s)"
 
 ## Other
 ### tmux
