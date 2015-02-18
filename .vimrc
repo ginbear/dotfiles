@@ -72,7 +72,6 @@ colorscheme jellybeans
 set list
 set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
 
-
 " カーソル行を強調表示しない
 set nocursorline
 " 挿入モードの時のみ、カーソル行をハイライトする
@@ -172,7 +171,6 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Note: You don't set neobundle setting in .gvimrc!
 
 NeoBundle 'Shougo/neocomplcache'
-" NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'Shougo/neomru.vim'
@@ -249,3 +247,10 @@ let QFixMRU_Title = {}
 let QFixMRU_Title['mkd'] = '^###[^#]'
 " grepでタイトル行とみなす正規表現(使用するgrepによっては変更する必要があります)
 let QFixMRU_Title['mkd_regxp'] = '^###[^#]'
+
+" lightline
+"----------------------------------------------------------------------------------------↲
+set laststatus=2
+let g:lightline = {
+      \ 'colorscheme': 'wombat'
+      \ }
