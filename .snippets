@@ -1,18 +1,66 @@
-# apache
-wget -q -O - http://127.0.0.1/server-status/?auto ## server-status を CUI で確認したい
-tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $1}'  | sort | uniq -c | sort -gr | head -n 4  ## $1 = IP-Address
-tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $2}'  | sort | uniq -c | sort -gr | head -n 4
-tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $12}' | sort | uniq -c | sort -gr | head -n 4
-tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $13}' | sort | uniq -c | sort -gr | head -n 4
-tail -n 500000 /var/log/lighttpd/access.log| cut -f 4 -d " " | sed -e "s/[0-9]:[0-5][0-9]$//" | sort | uniq -c ## 10 分毎のアクセス数統計
-sudo /usr/local/apache2/bin/httpd -SM  ## いろいろ確認
-sudo /sbin/service httpd configtest    ## config check
+# 未振り分け
+stat                                                                         ## file の詳細な情報を表示
+grep -v -E "^\s*#|^\s*$"                                                     ## config だけを見たいんや！
+grep --color=auto                                                            ## grep をカラフルに見たいんや！ 永続的に設定したいとき export GREP_OPTIONS='--color=auto'
+sudo awk '/^# Time: 140218 11:30:56/, /^# Time: 140218 12:15:52/' /var/tmp/z ## awk で範囲を抽出
+cat hoge | perl -nle 'print if $. >= 156514'                                 ## 特定行以降を表示
+cat hoge 2>&1 | tee result_$(hostname -s).$(date +%Y%m%d-%H%M%S).log         ## tee で結果残し
+sudo sh -c 'echo test > test.txt'                                            ## 管理者権限でファイルをリダイレクトする
+while :; do date; df ; sleep 5 ; done                                        ## 永久 Loop . Disk 容量を記録しつづける
+sudo ionice -c 2 -n 7 nice -n 19 du -scm /* | sort -rn                       ## ディスク使用量を確認
+more /etc/stunnel/{pop3,smtp}s.conf | cat                                    ## 複数ファイルでファイル名を入れる
+head -9999 /etc/stunnel/{pop3,smtp}s.conf                                    ## 同じく複数ファイルでファイル名を入れる
+ps auxwwf | grep $TARGET | awk '{print "kill ",$2}' | sudo sh                ## 特定の grep を kill
+ps auxwwf | awk '($3 >- 0.0)'                                                ## CPU 使用率 0.0 以上の対象を出す
+lsof -i:80
+ghq list -p | p cd
 
-# search
+# rpm
+rpm -qV openssh-clients openssh libssh2 openssh-server | awk '$2!="c" {print $0}'  ## rpm でチェックサム確認
+rpm -qa --queryformat \"%{name}-%{version}-%{release}.%{arch}\n\"                  ## arch 情報付きの rpm -qa
+
+# find
+find ./ -daystart -ctime +2
+find ./ -daystart -ctime -2
+find . -maxdepth 1 -type f -name "*.txt" -print0 | xargs -0 rm　             ## カレントディレクトリ内で.txtファイルを探し、ファイル名に空白が含む物も併せて削除する
+find . -maxdepth 1 -type f \! \( -name "*.txt" -o -name "*.rb" \)            ## カレントディレクトリ内で.txt、.rbファイル 「以外」を探す
+
+# date
+date +%Y%m%d
+date +%Y%m%d -d '1 days ago'
+
+# sar
+sar -W -f /var/log/sa/sa13  ## 13日の Swap I/O 量を見る pswpin/s pswpout/s
+sar -r                      ## メモリ見たい             kbmemfree kbmemused  %memused kbbuffers  kbcached kbswpfree kbswpused  %swpused 
+sar -b 1 0                  ## I/O みたい               tps      rtps      wtps   bread/s   bwrtn/s
+sar -B 1 0                  ## ページングみたい         pgpgin/s pgpgout/s   fault/s  majflt/s
+sar -q 1 0                  ## L/A みたい
+sar -n DEV 1 0              ## トラフィック見たい
+
+# rsync
+pkill -STOP rsync && sleep 300 && pkill -CONT rsync &                 ## rsync 一時停止
+sudo rsync -av --progress --bwlimit=1000 /tmp/test.txt 1.1.1.1:/tmp/  ## 1MB/s 制限でファイル転送
+
+# iptables 
+iptables -L -nv                                                                                           ## iptables ヒット数状況を確認する
+/sbin/iptables-save -c | grep -i DROP                                                                ## カウントのチェック、これは DROP だけに絞ってある
+/sbin/iptables -I RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp -s xxx.xxx.xxx.xxx -j DROP  ## 特定 IP を DROP するお！
+/sbin/iptables -L --line-numbers -n                                                                  ## iptables の結果に number を追記, -n は名前解決しない
+/sbin/iptables -D RH-Firewall-1-INPUT <rule num>                                                     ## number から削除
+/sbin/iptables -I RH-Firewall-1-INPUT <rule num> -s $IPADD -p tcp -m state --state NEW -m tcp --dport $TARGET-PORT -j ACCEPT  ## 指定箇所に追加
+diff -BbwE  -u <(cat /etc/sysconfig/iptables | grep -vE "^$|^#") <(sudo /sbin/iptables-save)         ## iptables の設定ファイルとオンメモリ差分を確認したい
+
+# openssl
+openssl x509 -noout -modulus -in *.crt | openssl md5  ## 以下のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
+openssl rsa  -noout -modulus -in *.key | openssl md5  ## 上記のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
+openssl req  -noout -modulus -in *.csr | openssl md5  ## 上記のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
+openssl s_client -connect <DOMAIN>:443 -tls1          ## tls で接続（接続を期待）
+openssl s_client -connect <DOMAIN>:443 -ssl3          ## ssl3 で接続 (接続不可を期待)
+
+# netstat
 netstat -ltapn | grep ESTABLISHED | more
 netstat -ltan | grep ":80 " | awk '{print $5}' | awk -F : '{print $4}' | sort | uniq -c | sort -nr | head
 netstat -antpo  ## 各ステートの時間が見える、timewait で何秒待ってるとか
-lsof -i:80
 
 # dstat
 dstat -Tclmdrn
@@ -25,35 +73,79 @@ dstat --top-io --top-bio
 dstat --top-io-adv --top-bio-adv
 dstat -ta --top-io-adv --top-bio-adv  ## なんか便利！
 
-# find
-find ./ -daystart -ctime +2
-find ./ -daystart -ctime -2
-
-# date
-date +%Y%m%d
-date +%Y%m%d -d '1 days ago'
-
 # tmux
-set-window-option synchronize-panes on ## キーブロードキャスト
+set-window-option synchronize-panes on ## tmux キーブロードキャスト
 
 # git
-git push origin $(git branch | grep ^\* | cut -f2 -d " ")     ## 現行の Branch を git push
-git diff FETCH_HEAD                                           ## マージ前の差分チェック
-git merge FETCH_HEAD                                          ## マージ
-git branch -d hoge                                            ## ブランチ削除
-git push origin :hoge                                         ## リモートブランチ削除
-git checkout -b other_branch origin/other_branch              ## リモートブランチを取得
-git config --list --global                                    ## git の global config を確認する
-git commit --amend -m "(新しいコミットメッセージ)"            ## 直前のコミットログを編集する
-git fetch ; git merge origin/hoge                             ## リモートブランチが更新されてそれを取り込みたい場合
-git reset --soft HEAD^                                        ## 直前の commit を取り消したい
-git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;  ## remote buranch の更新を local branch にマージしたい場合
+git push origin $(git branch | grep ^\* | cut -f2 -d " ")       ## 現行の Branch を git push
+git diff FETCH_HEAD                                             ## マージ前の差分チェック
+git merge FETCH_HEAD                                            ## マージ
+git branch -d hoge                                              ## ブランチ削除
+git push origin :hoge                                           ## リモートブランチ削除
+git checkout -b other_branch origin/other_branch                ## リモートブランチを取得
+git config --list --global                                      ## git の global config を確認する
+git commit --amend -m "(新しいコミットメッセージ)"              ## 直前のコミットログを編集する
+git fetch ; git merge origin/hoge                               ## リモートブランチが更新されてそれを取り込みたい場合
+git reset --soft HEAD^                                          ## 直前の commit を取り消したい
+git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;    ## remote buranch の更新を local branch にマージしたい場合
 git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
 
-# sar
-sar -W -f /var/log/sa/sa13  ## 13日の Swap I/O 量を見る pswpin/s pswpout/s
-sar -r                      ## メモリ見たい             kbmemfree kbmemused  %memused kbbuffers  kbcached kbswpfree kbswpused  %swpused 
-sar -b 1 0                  ## I/O みたい               tps      rtps      wtps   bread/s   bwrtn/s
-sar -B 1 0                  ## ページングみたい         pgpgin/s pgpgout/s   fault/s  majflt/s
-sar -q 1 0                  ## L/A みたい
-sar -n DEV 1 0              ## トラフィック見たい
+# apache
+/usr/local/apache2/bin/httpd -SM                                ## いろいろ確認
+/sbin/service httpd configtest                                  ## config check
+wget -q -O - http://127.0.0.1/server-status/?auto               ## server-status を CUI で確認したい
+tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $1}'  | sort | uniq -c | sort -gr | head -n 4  ## $1 = IP-Address
+
+# lighty
+tail -n 5000 /var/log/lighttpd/access.log | cut -f 4 -d " " | sed -e "s/[0-9]:[0-5][0-9]$//" | sort | uniq -c ## 10 分毎のアクセス数統計
+
+# lb keepalive
+/sbin/ipvsadm -Ln --sort                                        ## 振り分け状況とコネクション状況を参照
+/sbin/ipvsadm -L -n --sort | cut -c-49                          ## 比較用
+
+# mysql
+mysql -e "show processlist"
+mysql -e "show full processlist"
+mysql -e "show slave status" 
+mysql -e "select Host, User from mysql.user;"                            ## user 一覧
+mysql -e "show grants for user-name@192.168.0.1"                         ## grant 文で結果が出るので、ユーザの作成に大変便利
+mysql -e "show processlist\G" | grep State: | sort | uniq -c | sort -rn  ## MySQL State 多い順
+
+# mysql shell
+system hostname;                                                         ## MySQL OS のコマンドを実行
+pager less;                                                              ## MySQL pager 設定 grep も設定可能
+show variables like '%tmp%';                                             ## mysql テンポラリテーブルを大きく使用する際に確認するコマンド。mysql で disk 使用率が上がったら確認するといいかも
+SET GLOBAL sql_slave_skip_counter = 100;                                 ## MySQL エラーを skip
+change master to master_log_file='mysql4-bin.012', master_log_pos=4;     ## ポジションだけ変えたい場合
+CHANGE MASTER TO MASTER_HOST='<Master host IP>', MASTER_USER='<repuser>', MASTER_PASSWORD='xxx', MASTER_PORT=3306, MASTER_LOG_FILE='mysql1000n-bin.123456', MASTER_LOG_POS=4;   ## フルで設定したい場合
+
+# mysql tools
+mysqlbinlog --no-defaults -vv  mysql-bin.017427 | less                                     ## binlog 閲覧
+mk-slave-restart -uroot --password xxx --error-numbers 1062 --verbose >> ~/skip_query.log  ## mk-slave-restart mysql
+
+# mysql watch
+less ~/log/$(ls -t ~/log/ | head -1)                                                                                           ## MySQL 最新の保存した processlist を閲覧
+[ -d ~/log ] || mkdir ~/log ; mysql -e "show full processlist" > ~/log/$(date +%Y%m%d_%H%M%S)_MySQL_show_full_processlist.log  ## MySQL Processlist 保存
+[ -d ~/log ] || mkdir ~/log ; mysql -e "show slave status" > ~/log/$(date +%Y%m%d_%H%M%S)_MySQL_show_slave_status.log          ## MySQL SlaveStatus 保存
+while [ 1 ]; do date "+%Y-%m-%d %H:%M:%S" && mysql -uroot -e "show master status\G" && sleep 1 && echo; done                   ## master status 定期観察
+while [ 1 ]; do echo -n $(date +%Y-%m-%d-%H.%M.%S); mysql -uroot -e "show processlist" | wc -l | awk '{ printf(" %6s ",$1); for (i = 0; i < $1; i++) {printf("*")}; print "" }'; sleep 1; done ## プロセス数定期観察
+mysqladmin ext -i1 | awk '/Queries/{q=$4-qp;qp=$4} /Threads_connected/{tc=$4} /Threads_running/{printf "%5d %5d %5d\n", q, tc, $4}'  ## MySQL  1秒あたりの、クエリ数、Threds_connected、Threads_runnig（実行中のクエリの数）
+while [ 1 ];  do date; mysql -e "start slave io_thread;";  mysql -e "show slave status\G;";  sleep 3;  mysql -e "stop slave io_thread;";  mysql -e "show slave status\G;";  sleep 10; done | tee -a replication.log   ## 徐々に追い付かせる、事前に start slave sql_thread; させておく
+
+# puppet manifest
+debug(inline_template("Roles: <%= classes.join(', ') %>")) ## puppet manifest でdebug にメッセージを出したいとき
+FACTERLIB=/vagrant/modules/custom/lib/facter facter        ## facter 変数を確認したいとき puppet
+puppet apply -e 'notice($middlehostname)'                  ## 独自 facter 変数を確認したいとき
+
+# daemontools + dnscache
+svstat /service/dnscache  ## daemontools status 確認
+svc -t /service/dnscache  ## daemontools 再起動実施
+
+# sudoers
+hoge         ALL=(ALL)       NOPASSWD: ALL   ## sudo file でパスワード無しで権限を与える場合
+
+# vim
+c-w s ## 画面 - 分割 vim
+c-w v ## 画面 | 分割 vim
+c-w [hjkl] ## 画面移動 vim
+c-w o ## 画面閉じる vim
