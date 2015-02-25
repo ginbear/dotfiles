@@ -95,6 +95,8 @@ git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不�
 /sbin/service httpd configtest                                  ## config check
 wget -q -O - http://127.0.0.1/server-status/?auto               ## server-status を CUI で確認したい
 tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $1}'  | sort | uniq -c | sort -gr | head -n 4  ## $1 = IP-Address
+cat /var/log/httpd/access_log | awk '/23\/Feb\/2015:17:00:0/, /23\/Feb\/2015:17:15:0/'  | wc -l ## 影響範囲をしぼりましょう
+sudo ps ax -opid,cmd,wchan | grep httpd                         ## futex で止まっているもの
 
 # lighty
 tail -n 5000 /var/log/lighttpd/access.log | cut -f 4 -d " " | sed -e "s/[0-9]:[0-5][0-9]$//" | sort | uniq -c ## 10 分毎のアクセス数統計

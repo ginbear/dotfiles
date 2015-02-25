@@ -9,6 +9,7 @@ brew install tmux
 
 ## 運用tool
 brew install ansible
+brew install gist
 brew install tig
 brew install Caskroom/cask/java  ## jenkins 依存
 brew install jenkin

@@ -97,6 +97,14 @@ function peco-snippets() {
 zle -N peco-snippets
 bindkey '^x' peco-snippets
 
+# ghq look
+function ghq-look() {
+    local GHQLOOK=$(ghq list -p | peco)
+    cd $GHQLOOK
+}
+zle -N ghq-look
+bindkey '^G' ghq-look
+
 # history を peco で選択
 # http://blog.kenjiskywalker.org/blog/2014/06/12/peco/
 function peco-select-history() {

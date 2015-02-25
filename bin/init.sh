@@ -18,6 +18,10 @@ FILELIST="
 .snippets
 "
 
+VIMFILELIST="
+lightline.conf
+"
+
 # 必要ディレクトリの作成
 # cd ~
 # mkdir bin tmp work src
@@ -38,13 +42,10 @@ do
     ln -s ${PWD}/${FILE} ${HOME}/${FILE}
 done
 
-# install peco and ghq
-# export GOPATH=$HOME
-# go get github.com/peco/peco/cmd/peco
-# go get github.com/motemen/ghq
+# ディレクトリ配下の貼り直し
+for FILE in ${VIMFILELIST};
+do
+    rm -rf ~/.vim/${FILE}
+    ln -s ${PWD}/.vim/${FILE} ${HOME}/.vim/${FILE}
+done
 
-# NeoBundleinstall 
-# mkdir -p ~/.vim/bundle
-# git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-# git clone https://github.com/Shougo/vimproc ~/.vim/bundle/vimproc
-# vim +NeoBundleInstall! +qall

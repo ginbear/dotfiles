@@ -177,12 +177,14 @@ NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'davidoc/taskpaper.vim'
 NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'mattn/gist-vim'
-NeoBundle 'mattn/webapi-vim'
 NeoBundle 'Puppet-Syntax-Highlighting'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'fuenor/qfixgrep'
 NeoBundle 'fuenor/qfixhowm'
+NeoBundle 'mattn/gist-vim'
+NeoBundle 'mattn/webapi-vim'
+NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'airblade/vim-gitgutter'
 
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'jeffreyiacono/vim-colors-wombat'
@@ -251,6 +253,10 @@ let QFixMRU_Title['mkd_regxp'] = '^###[^#]'
 " lightline
 "----------------------------------------------------------------------------------------↲
 set laststatus=2
-let g:lightline = {
-      \ 'colorscheme': 'wombat'
-      \ }
+source ~/.vim/lightline.conf
+
+" vim-gitgutter
+"----------------------------------------------------------------------------------------↲
+nnoremap <silent> ,gg :<C-u>GitGutterToggle<CR>
+nnoremap <silent> ,gh :<C-u>GitGutterLineHighlightsToggle<CR>
+
