@@ -160,3 +160,6 @@ if [ -f ~/.zsh/auto-fu.zsh ]; then
     zstyle ':completion:*' completer _oldlist _complete
 fi
 
+
+PERL_MB_OPT="--install_base \"/Users/usr0600316/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/Users/usr0600316/perl5"; export PERL_MM_OPT;

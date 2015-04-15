@@ -6,6 +6,7 @@ brew install nkf
 brew install watch
 brew install tree
 brew install tmux
+brew install ag
 
 ## 運用tool
 brew install ansible

@@ -7,7 +7,7 @@ alias g='git'
 alias gist='gist -c -o -p'
 
 export EDITOR=/usr/bin/vim
-export GITHUB_URL=http://ghe.tokyo.pb/
+export GITHUB_URL=https://git.pepabo.com/
 
 # SSH-KEY
 [ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
