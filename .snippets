@@ -18,7 +18,15 @@ ghq list -p | p cd
 ping ${IPADDR} | perl -MPOSIX -ne 'print strftime("%Y-%m-%d %H:%M:%S ",localtime), $_'  ## ping に実行時間を付与する
 ssh -L 8443:127.0.0.1:8443 dareka@target-host.com                            ## localhost の 8443 を接続先の 8443 に接続させる、sslscan の時に使った
 cat hoge | egrep  -o '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n  ## IP アドレスだけ抽出してソートする
+cat hoge  |  awk --posix '$5 ~ /[0-9]{6,}/'                                  ## 5 カラム目が 6 桁以上
+cat /var/log/xferlog | awk '{sum[$1]+=$2} ; END { for (key in sum) {print key, sum[key] } }' ## 連想配列を使って $1 をキーに集計していく
+ps ax -orss,cmd | sort -rn<                                                  ## メモリを使っている順
+eval "`echo "$slave_status" | sed -ne 's/: \(.*\)/="\1"/p'`";                ## 一気に変数作成
+grep -cnr                                                                    ## わーっと探したいときに
+
+# LDAP
 /usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
+sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
 
 # rpm
 rpm -qV openssh-clients openssh libssh2 openssh-server | awk '$2!="c" {print $0}'  ## rpm でチェックサム確認

@@ -1,6 +1,8 @@
 # include common settings
 source ~/.shellrc
 
+eval "$(direnv hook zsh)" 
+
 # Ctrl-A, E とか効かせる
 bindkey -e
 
