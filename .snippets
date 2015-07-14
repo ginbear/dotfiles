@@ -23,6 +23,10 @@ cat /var/log/xferlog | awk '{sum[$1]+=$2} ; END { for (key in sum) {print key, s
 ps ax -orss,cmd | sort -rn<                                                  ## メモリを使っている順
 eval "`echo "$slave_status" | sed -ne 's/: \(.*\)/="\1"/p'`";                ## 一気に変数作成
 grep -cnr                                                                    ## わーっと探したいときに
+top -> cxz , sort key -> < >                                                 ## top の使い方
+find ... -exec sleep 0.1 \; -delete                                          ## ファイルをゆっくり削除する ref goo.gl/HnE0eq
+exec $SHELL -l                                                               ## shell の再立ち上げと同等
+install -o $uid -g $gid -d /path/to/directory                                ## replace mkdir && chown
 
 # LDAP
 /usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
@@ -122,14 +126,17 @@ tail -n 5000 /var/log/lighttpd/access.log | cut -f 4 -d " " | sed -e "s/[0-9]:[0
 # mysql
 mysql -e "show processlist"
 mysql -e "show full processlist"
-mysql -e "show slave status" 
+mysql -e "show slave status\G" 
 mysql -e "select Host, User from mysql.user;"                            ## user 一覧
 mysql -e "show grants for user-name@192.168.0.1"                         ## grant 文で結果が出るので、ユーザの作成に大変便利
 mysql -e "show processlist\G" | grep State: | sort | uniq -c | sort -rn  ## MySQL State 多い順
 mysql -e "show status like '%innodb_row_lock%' ;"                        ## Lock 待ちカウント（current_watis）
+mysql -e "SELECT PASSWORD('hoge');"                                      ## Password hash を出してみる. old_passwords の設定有無により生成される hash が異なるので注意
 
 # mysql shell
+status;                                                                  ## MySQL 作業前の記録に。version, user, uptime 情報など
 system hostname;                                                         ## MySQL OS のコマンドを実行
+select user();                                                           ## MySQL 接続ユーザの確認
 pager less;                                                              ## MySQL pager 設定 grep も設定可能
 show variables like '%tmp%';                                             ## mysql テンポラリテーブルを大きく使用する際に確認するコマンド。mysql で disk 使用率が上がったら確認するといいかも
 SET GLOBAL sql_slave_skip_counter = 100;                                 ## MySQL エラーを skip
@@ -171,6 +178,7 @@ c-w v ## 画面 | 分割 vim
 c-w [hjkl] ## 画面移動 vim
 c-w o ## 画面閉じる vim
 :echo expand("%:p")  ## vim ファイルパスを取得
+ :%s/\v^|$/|/g       ## 先頭末尾に | を挿入する
 
 # Vagrantfile
 c.vm.synced_folder "../www", "/var/www"               ## vagrant synced

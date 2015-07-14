@@ -7,6 +7,8 @@ set fileencoding=utf-8     " カレントバッファ内のファイルの文字
 set clipboard=unnamed      " OSのクリップボードを使用する
 set nobackup
 set noundofile             " *.un~ なファイルを作らない
+set expandtab
+set tabstop=4
 
 " ヘルプを出さない
 nmap <F1> <nop>
@@ -172,6 +174,8 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 
 NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/neosnippet'
+NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'thinca/vim-quickrun'
@@ -185,11 +189,11 @@ NeoBundle 'mattn/gist-vim'
 NeoBundle 'mattn/webapi-vim'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'airblade/vim-gitgutter'
-
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'jeffreyiacono/vim-colors-wombat'
 NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'tomasr/molokai'
+NeoBundle 'glidenote/serverspec-snippets'
 
 call neobundle#end()
 
@@ -200,9 +204,36 @@ filetype plugin indent on
 " this will conveniently prompt you to install them.
 NeoBundleCheck
 
+" neosnippet
+"----------------------------------------------------------------------------------------↲
+" Plugin key-mappings.
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
+
+" SuperTab like snippets behavior.
+imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+\ "\<Plug>(neosnippet_expand_or_jump)"
+\: pumvisible() ? "\<C-n>" : "\<TAB>"
+smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+\ "\<Plug>(neosnippet_expand_or_jump)"
+\: "\<TAB>"
+
+" For conceal markers.
+if has('conceal')
+  set conceallevel=2 concealcursor=niv
+endif
+
+let g:neocomplcache_enable_at_startup = 1 " 自動起動
+
+let g:neosnippet#snippets_directory = [
+      \'~/.vim/snippets',
+      \'~/.vim/bundle/serverspec-snippets',
+      \]
+
 " gist-vim
 "----------------------------------------------------------------------------------------↲
-let g:gist_api_url = 'http://git.pepabo.com/api/v3'
+let g:gist_api_url = 'https://git.pepabo.com/api/v3'
 
 " Unite
 "----------------------------------------------------------------------------------------↲
