@@ -15,6 +15,7 @@ brew install ag
 brew install jq
 brew install trash
 brew install coreutils
+brew install zsh-completions
 brew tap peco/peco
 brew install peco
 
