@@ -32,17 +32,6 @@ if is-at-least 4.3.10; then
     zstyle ':vcs_info:*' actionformats '%R' '%S' '%b|%a' '%s' '%c' '%u'
 fi
 
-# cdr
-autoload -Uz is-at-least
-if is-at-least 4.3.11
-then
-  autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-  add-zsh-hook chpwd chpwd_recent_dirs
-  zstyle ':chpwd:*' recent-dirs-max 5000
-  zstyle ':chpwd:*' recent-dirs-default yes
-  zstyle ':completion:*' recent-dirs-insert both
-fi
-
 # http://r7kamura.github.io/2014/06/21/ghq.html
 # peco の結果に $1 する. p cd とか
 p() { peco | while read LINE; do $@ $LINE; done }
@@ -125,30 +114,9 @@ function peco-select-history() {
 zle -N peco-select-history
 bindkey '^r' peco-select-history
 
-function peco-cdr () {
-    local selected_dir=$(cdr -l | awk '{ print $2 }' | peco)
-    if [ -n "$selected_dir" ]; then
-        BUFFER="cd ${selected_dir}"
-        zle accept-line
-    fi
-    zle clear-screen
-}
-zle -N peco-cdr
-bindkey '^@' peco-cdr
-
 ## 単語の定義を bash と同じにする
 autoload -U select-word-style
 select-word-style bash
-
-## http://shoma2da.hatenablog.com/entry/2014/03/26/222802
-## hub config --global hub.host <ghe.address>
-## https://github.com/github/hub/commit/7944d63edb1373fbbfa806bc108508b7906c8210
-# eval "$(hub alias -s)"
-
-## Other
-### tmux
-#### http://blog.glidenote.com/blog/2014/02/22/remote-pbcopy/
-# launchctl load ~/Library/LaunchAgents/pbcopy.plist
 
 #=============================
 # source auto-fu.zsh
@@ -161,7 +129,3 @@ if [ -f ~/.zsh/auto-fu.zsh ]; then
     zle -N zle-line-init
     zstyle ':completion:*' completer _oldlist _complete
 fi
-
-
-PERL_MB_OPT="--install_base \"/Users/usr0600316/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/Users/usr0600316/perl5"; export PERL_MM_OPT;
