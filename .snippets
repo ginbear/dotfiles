@@ -29,6 +29,8 @@ exec $SHELL -l                                                               ## 
 install -o $uid -g $gid -d /path/to/directory                                ## replace mkdir && chown
 echo hoge | ruby -n -e  'puts $_ if $_ =~ /hoge/'                       ## ruby の正規表現ワライナー
 find ./ -type f -name '*.pp' -print0 | LC_ALL=C xargs -0 sed -i '' -e "s/hoge/fuga/g"  ## manifest で一括置換
+ssh-keygen -y -f ~/.ssh/id_dsa                                               ## 秘密鍵から公開鍵を出力する
+ssh-keygen -l -f $HOME/.ssh/id_rsa.pub                                       ## 公開鍵から bit 長と種別を確認する
 
 # LDAP
 /usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
