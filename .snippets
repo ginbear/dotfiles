@@ -27,6 +27,8 @@ top -> cxz , sort key -> < >                                                 ## 
 find ... -exec sleep 0.1 \; -delete                                          ## ファイルをゆっくり削除する ref goo.gl/HnE0eq
 exec $SHELL -l                                                               ## shell の再立ち上げと同等
 install -o $uid -g $gid -d /path/to/directory                                ## replace mkdir && chown
+echo hoge | ruby -n -e  'puts $_ if $_ =~ /hoge/'                       ## ruby の正規表現ワライナー
+find ./ -type f -name '*.pp' -print0 | LC_ALL=C xargs -0 sed -i '' -e "s/hoge/fuga/g"  ## manifest で一括置換
 
 # LDAP
 /usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
@@ -132,6 +134,7 @@ mysql -e "show grants for user-name@192.168.0.1"                         ## gran
 mysql -e "show processlist\G" | grep State: | sort | uniq -c | sort -rn  ## MySQL State 多い順
 mysql -e "show status like '%innodb_row_lock%' ;"                        ## Lock 待ちカウント（current_watis）
 mysql -e "SELECT PASSWORD('hoge');"                                      ## Password hash を出してみる. old_passwords の設定有無により生成される hash が異なるので注意
+mysql -e 'show databases;' -N --batch                                    ## -N で先頭行を外す。--batch で table 枠を無くす
 
 # mysql shell
 status;                                                                  ## MySQL 作業前の記録に。version, user, uptime 情報など

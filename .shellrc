@@ -5,6 +5,7 @@ alias ll='ls -l'
 alias la='ls -la'
 alias g='git'
 alias gist='gist -c -o -p'
+alias v=vagrant
 
 export EDITOR=/usr/bin/vim
 export GITHUB_URL=https://git.pepabo.com/
