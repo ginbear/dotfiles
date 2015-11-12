@@ -12,13 +12,7 @@ export GITHUB_URL=https://git.pepabo.com/
 
 # SSH-KEY
 [ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
-
-# anyenv
-# https://github.com/riywo/anyenv
-if [ -d $HOME/.anyenv ] ; then
-  export PATH="$HOME/.anyenv/bin:$PATH"
-  eval "$(anyenv init -)"
-fi
+[ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
 
 # GO 
 if [ -d $HOME/.go ] ; then
