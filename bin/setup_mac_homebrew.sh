@@ -1,6 +1,11 @@
 #!/bin/sh
 
+brew update
+brew upgrade
+
 ## basic tools
+brew install zsh
+brew install vim
 brew install wget
 brew install htop
 brew install nkf
@@ -37,3 +42,5 @@ fc-cache -vf
 #     launchctl load ~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist
 # Or, if you don't want/need launchctl, you can just run:
 #     jenkinss
+
+brew cleanup
