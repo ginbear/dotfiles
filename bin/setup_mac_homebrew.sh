@@ -7,6 +7,7 @@ brew install nkf
 brew install watch
 brew install tree
 brew install ag
+brew install jq
 brew install trash
 brew install coreutils
 brew tap peco/peco
