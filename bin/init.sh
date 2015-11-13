@@ -46,6 +46,7 @@ done
 for FILE in ${VIMFILELIST};
 do
     rm -rf ~/.vim/${FILE}
+    mkdir ~/.vim
     ln -s ${PWD}/.vim/${FILE} ${HOME}/.vim/${FILE}
 done
 
