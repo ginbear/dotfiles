@@ -17,6 +17,7 @@ brew install trash
 brew install coreutils
 brew install zsh-completions
 brew install go
+brew install ghq
 brew tap peco/peco
 brew install peco
 
