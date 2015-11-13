@@ -49,3 +49,5 @@ do
     ln -s ${PWD}/.vim/${FILE} ${HOME}/.vim/${FILE}
 done
 
+# go
+mkdir ~/.go
