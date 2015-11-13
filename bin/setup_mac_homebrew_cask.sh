@@ -18,6 +18,7 @@ brew cask install slack
 brew cask install cyberduck
 brew cask install skitch
 brew cask install keepassx
+brew cask install tunnelblick
 # brew cask install cheatsheet
 # brew cask install vlc
 # brew cask install evernote
