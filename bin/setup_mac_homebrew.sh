@@ -27,12 +27,13 @@ brew install tig
 brew install fabric
 
 ## ricty
-brew tap sanemat/font
-brew install Caskroom/cask/xquartz
-brew install ricty
-
-cp -f /usr/local/opt/ricty/share/fonts/Ricty*.ttf ~/Library/Fonts/
-fc-cache -vf
+brew list | grep ricty > /dev/null 2>&1 || (                                                                           [~]
+  brew tap sanemat/font
+  brew install Caskroom/cask/xquartz
+  brew install ricty
+  cp -f /usr/local/opt/ricty/share/fonts/Ricty*.ttf ~/Library/Fonts/
+  fc-cache -vf
+)
 
 # jenkins
 # brew install Caskroom/cask/java
