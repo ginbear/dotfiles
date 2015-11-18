@@ -52,3 +52,6 @@ done
 
 # go
 mkdir ~/.go
+
+# vim neobundle install
+[ ! -e ~/.vim/bundle ] && git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
