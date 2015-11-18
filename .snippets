@@ -189,3 +189,13 @@ c-w o ## 画面閉じる vim
 c.vm.synced_folder "../www", "/var/www"               ## vagrant synced
 c.vm.network :forwarded_port, guest: 80, host: 8080   ## vagrant port foward
 c.vm.network :forwarded_port, guest: 443, host: 8443  ## vagrant port foward
+
+# ruby
+rbenv verion                        ## 現在の ruby version
+rbenv versions                      ## 有効な ruby version
+rbenv global <system|version>       ## version の set, 但し .ruby-version があると変更されるから注意
+rbenv exec gem install bundler      ## ruby 環境ごとにgem を install する
+rbenv exec gem list                 ## 現在有効なrubyにインストールされたgemの確認
+rbenv exec gem which bundler        ## 実行パスの確認
+gem env                             ## gem envしたときの GEM PATHSの先頭から、権限のあるところに gem が入る
+rbenv exec gem list | awk '{print "rbenv exec gem uninstall " $1}' | sh -xv  ## gem の入れなおしで全削除

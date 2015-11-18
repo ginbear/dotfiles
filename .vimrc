@@ -64,11 +64,14 @@ set number
 set ruler 
 syntax on
 
-colorscheme jellybeans
-" colorscheme molokai
-" let g:molokai_original = 1
+" mkdir ~/.vim/colors ; cd ~/.vim/colors
+" git clone https://github.com/tomasr/molokai
+" mv molokai/colors/molokai.vim ~/.vim/colors/
+colorscheme molokai
+let g:molokai_original = 1
+set t_Co=256
 " let g:rehash256 = 1
-" set background=dark
+set background=dark
 
 " タブ、空白、改行を可視化
 set list
@@ -91,7 +94,6 @@ if has('gui_macvim')
   " .gvimrc http://rhysd.hatenablog.com/entry/20111113/1321193061
   set transparency=0 " initialize
   nnoremap <expr><F12> &transparency+20 >= 100 ? ":set transparency=0\<CR>" : ":let &transparency=&transparency+20\<CR>"
-  " colorscheme desert
 endif
 
 " ----------------------------------------------------------------------------------------
