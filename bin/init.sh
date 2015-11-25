@@ -15,6 +15,7 @@ FILELIST="
 .peco
 .shellrc
 .gitconfig
+.gitignore
 .snippets
 "
 
