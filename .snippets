@@ -199,3 +199,9 @@ rbenv exec gem list                 ## 現在有効なrubyにインストール�
 rbenv exec gem which bundler        ## 実行パスの確認
 gem env                             ## gem envしたときの GEM PATHSの先頭から、権限のあるところに gem が入る
 rbenv exec gem list | awk '{print "rbenv exec gem uninstall " $1}' | sh -xv  ## gem の入れなおしで全削除
+
+# python
+pyenv install --list                ## install 可能な version を確認
+pyenv global <system|version>       ## Version の指定
+pip install python-openstackclient python-neutronclient python-novaclient ## Openstack client の install
+

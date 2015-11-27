@@ -27,6 +27,7 @@ brew install tmux
 brew install gist
 brew install tig
 brew install fabric
+brew install pyenv
 
 ## ricty
 brew list | grep ricty > /dev/null 2>&1 || (                                                                           [~]
