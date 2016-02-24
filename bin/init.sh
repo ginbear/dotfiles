@@ -18,6 +18,7 @@ FILELIST="
 .gitignore
 .snippets
 .fabricrc
+fabfile.py
 "
 
 VIMFILELIST="
