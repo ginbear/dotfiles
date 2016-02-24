@@ -20,6 +20,7 @@ brew install go
 brew install ghq
 brew tap peco/peco
 brew install peco
+brew install ipcalc
 
 ## ops tools
 # brew install ansible

@@ -17,6 +17,7 @@ FILELIST="
 .gitconfig
 .gitignore
 .snippets
+.fabricrc
 "
 
 VIMFILELIST="

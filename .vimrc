@@ -270,18 +270,18 @@ let g:syntastic_puppet_puppetlint_args="--no-80chars-check --no-documentation-ch
 " g,m 一覧表示 m -> mru, l -> 更新順, L -> 作成順
 " g,g メモを検索
 "----------------------------------------------------------------------------------------↲
-" ファイル拡張子をmdにする
-let howm_filename = '%Y/%m/%Y-%m-%d-%H%M%S.md'
-" ファイルタイプをmarkdownにする
-let QFixHowm_FileType = 'markdown'
-" タイトル記号
-let QFixHowm_Title = '#'
-" タイトル行検索正規表現の辞書を初期化
-let QFixMRU_Title = {}
-" MRUでタイトル行とみなす正規表現(Vimの正規表現で指定)
-let QFixMRU_Title['mkd'] = '^###[^#]'
-" grepでタイトル行とみなす正規表現(使用するgrepによっては変更する必要があります)
-let QFixMRU_Title['mkd_regxp'] = '^###[^#]'
+" " ファイル拡張子をmdにする
+" let howm_filename = '%Y/%m/%Y-%m-%d-%H%M%S.md'
+" " ファイルタイプをmarkdownにする
+" let QFixHowm_FileType = 'markdown'
+" " タイトル記号
+" let QFixHowm_Title = '#'
+" " タイトル行検索正規表現の辞書を初期化
+" let QFixMRU_Title = {}
+" " MRUでタイトル行とみなす正規表現(Vimの正規表現で指定)
+" let QFixMRU_Title['mkd'] = '^###[^#]'
+" " grepでタイトル行とみなす正規表現(使用するgrepによっては変更する必要があります)
+" let QFixMRU_Title['mkd_regxp'] = '^###[^#]'
 
 " lightline
 "----------------------------------------------------------------------------------------↲
