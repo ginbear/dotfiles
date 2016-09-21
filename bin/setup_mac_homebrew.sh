@@ -21,11 +21,13 @@ brew install ghq
 brew tap peco/peco
 brew install peco
 brew install ipcalc
+brew install tcptraceroute
 
 ## ops tools
 # brew install ansible
 brew install tmux
 brew install gist
+brew install hub
 brew install tig
 brew install fabric
 brew install pyenv

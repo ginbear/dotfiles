@@ -28,24 +28,9 @@ nnoremap # #zz
 nnoremap g* g*zz
 nnoremap g# g#zz
 
-" benri
-" ----------------------
-nmap <F5> <ESC>i<C-R>=strftime("%Y/%m/%d (%a) %H:%M")<CR><CR>
-imap <F5> <ESC>i<C-R>=strftime("%Y/%m/%d (%a) %H:%M")<CR><CR>
-
 " filetype
 " ----------------------
 au BufNewFile,BufRead *.pp setf puppet
-
-" ----------------------------------------------------------------------------------------
-" Move 
-" ----------------------------------------------------------------------------------------
-imap <c-e> <END>
-imap <c-a> <HOME>
-imap <c-h> <LEFT>
-imap <c-j> <DOWN>
-imap <c-k> <UP>
-imap <c-l> <Right>
 
 " brackets
 " --------------------
@@ -56,35 +41,6 @@ inoremap "" ""<LEFT>
 inoremap '' ''<LEFT>
 inoremap <> <><LEFT>
 inoremap []5 [% %]<LEFT><LEFT><LEFT>
-
-" ----------------------------------------------------------------------------------------
-" appearance
-" ----------------------------------------------------------------------------------------
-set number
-set ruler 
-syntax on
-
-" mkdir ~/.vim/colors ; cd ~/.vim/colors
-" git clone https://github.com/tomasr/molokai
-" mv molokai/colors/molokai.vim ~/.vim/colors/
-colorscheme molokai
-let g:molokai_original = 1
-set t_Co=256
-" let g:rehash256 = 1
-set background=dark
-
-" タブ、空白、改行を可視化
-set list
-set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
-
-" カーソル行を強調表示しない
-set nocursorline
-" 挿入モードの時のみ、カーソル行をハイライトする
-autocmd InsertEnter,InsertLeave * set cursorline!
-
-" iTerm2 でコンソールの形状を変える
-let &t_SI = "\e]50;CursorShape=1\x7"
-let &t_EI = "\e]50;CursorShape=0\x7"
 
 " ----------------------------------------------------------------------------------------
 " appearance (Only GUI)
@@ -176,26 +132,21 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 
 NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'thinca/vim-quickrun'
-NeoBundle 'davidoc/taskpaper.vim'
 NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'Puppet-Syntax-Highlighting'
-NeoBundle 'scrooloose/syntastic'
-NeoBundle 'fuenor/qfixgrep'
-NeoBundle 'fuenor/qfixhowm'
+NeoBundle 'glidenote/serverspec-snippets'
+NeoBundle 'scrooloose/syntastic'  " syntax check
 NeoBundle 'mattn/gist-vim'
 NeoBundle 'mattn/webapi-vim'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'jeffreyiacono/vim-colors-wombat'
-NeoBundle 'nanotech/jellybeans.vim'
-NeoBundle 'tomasr/molokai'
-NeoBundle 'glidenote/serverspec-snippets'
+NeoBundle 'airblade/vim-gitgutter' " git の差分が見える
+NeoBundle 'jeffreyiacono/vim-colors-wombat' " color
+NeoBundle 'nanotech/jellybeans.vim' " color
+NeoBundle 'tomasr/molokai' " color
+NeoBundle 'sjl/badwolf'
 
 call neobundle#end()
 
@@ -264,32 +215,41 @@ au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vspli
 "----------------------------------------------------------------------------------------↲
 let g:syntastic_puppet_puppetlint_args="--no-80chars-check --no-documentation-check --no-unquoted_file_mode-check --no-file_mode-check"
 
-" qfixhowm
-" g,c メモを作成
-" g,<Space> 作成日を元にしたファイル名が開く、追記イメージ
-" g,m 一覧表示 m -> mru, l -> 更新順, L -> 作成順
-" g,g メモを検索
-"----------------------------------------------------------------------------------------↲
-" " ファイル拡張子をmdにする
-" let howm_filename = '%Y/%m/%Y-%m-%d-%H%M%S.md'
-" " ファイルタイプをmarkdownにする
-" let QFixHowm_FileType = 'markdown'
-" " タイトル記号
-" let QFixHowm_Title = '#'
-" " タイトル行検索正規表現の辞書を初期化
-" let QFixMRU_Title = {}
-" " MRUでタイトル行とみなす正規表現(Vimの正規表現で指定)
-" let QFixMRU_Title['mkd'] = '^###[^#]'
-" " grepでタイトル行とみなす正規表現(使用するgrepによっては変更する必要があります)
-" let QFixMRU_Title['mkd_regxp'] = '^###[^#]'
-
 " lightline
 "----------------------------------------------------------------------------------------↲
 set laststatus=2
-source ~/.vim/lightline.conf
+" source ~/.vim/lightline.conf
 
 " vim-gitgutter
 "----------------------------------------------------------------------------------------↲
 nnoremap <silent> ,gg :<C-u>GitGutterToggle<CR>
 nnoremap <silent> ,gh :<C-u>GitGutterLineHighlightsToggle<CR>
+
+" ----------------------------------------------------------------------------------------
+" appearance
+" ----------------------------------------------------------------------------------------
+set number
+set ruler 
+syntax on
+
+" mkdir ~/.vim/colors ; cd ~/.vim/colors
+" git clone https://github.com/tomasr/molokai
+" mv molokai/colors/molokai.vim ~/.vim/colors/
+" let g:molokai_original = 1
+colorscheme badwolf
+set t_Co=256
+set background=dark
+
+" タブ、空白、改行を可視化
+set list
+set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
+
+" カーソル行を強調表示しない
+set nocursorline
+" 挿入モードの時のみ、カーソル行をハイライトする
+autocmd InsertEnter,InsertLeave * set cursorline!
+
+" iTerm2 でコンソールの形状を変える
+let &t_SI = "\e]50;CursorShape=1\x7"
+let &t_EI = "\e]50;CursorShape=0\x7"
 

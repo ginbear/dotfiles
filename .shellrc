@@ -1,11 +1,20 @@
 # commmon shell settings
 
+## local
+source ~/.shellrc.local
+
 ## alias
 alias ll='ls -l'
 alias la='ls -la'
 alias g='git'
 alias gist='gist -c -o -p'
 alias v=vagrant
+alias b=bundle
+alias be='bundle exec'
+alias bi='bundle install --path vendor/bundler'
+alias r=rbenv
+alias re='rbenv exec'
+alias rv='rbenv versions'
 
 export EDITOR=/usr/bin/vim
 export GITHUB_URL=https://git.pepabo.com/

@@ -16,3 +16,6 @@ export HISTIGNORE=ls:history
 
 # include common settings
 source ~/.shellrc
+
+# for hub 
+eval "$(hub alias -s)"

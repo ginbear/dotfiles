@@ -30,6 +30,15 @@ if is-at-least 4.3.10; then
     zstyle ':vcs_info:*' actionformats '%R' '%S' '%b|%a' '%s' '%c' '%u'
 fi
 
+# for hub
+function git(){hub "$@"}
+
+# for git worktree
+function gwt() {
+    GIT_CDUP_DIR=`git rev-parse --show-cdup`
+    git worktree add ${GIT_CDUP_DIR}tmp/$1 -b $1
+}
+
 # http://r7kamura.github.io/2014/06/21/ghq.html
 # peco の結果に $1 する. p cd とか
 p() { peco | while read LINE; do $@ $LINE; done }
