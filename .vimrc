@@ -1,3 +1,14 @@
+" Vim tips
+"
+" ggVG   全選択
+" =      インデント整理
+" ci"    "" で囲まれた中身を消してインサート, ci' だったら '' でもいける
+" ciw    カーソル上の単語を消してインサート
+" cit    HTMLタグもいける
+" ea     単語の後にインサート
+" s/S    カーソル上/カーソル行を消してインサート
+" g;     直前の変更箇所にジャンプ, g, で戻る
+"
 " ----------------------------------------------------------------------------------------
 " Base settings
 " ----------------------------------------------------------------------------------------
@@ -8,11 +19,15 @@ set clipboard=unnamed      " OSのクリップボードを使用する
 set nobackup
 set noundofile             " *.un~ なファイルを作らない
 set expandtab
-set tabstop=4
+set tabstop=2
+set scrolloff=5            " スクロール時の前後行数
+set cursorline             " カーソルがある行がハイライト
+nmap <F1> <nop>            " help を出さない
+imap <F1> <nop>            " help を出さない
 
-" ヘルプを出さない
-nmap <F1> <nop>
-imap <F1> <nop>
+" より便利に使う
+" ----------------------
+inoremap <silent> jj <ESC> " インサートモードから jj でコマンドモードへ戻る
 
 " search
 " ----------------------
@@ -43,17 +58,8 @@ inoremap <> <><LEFT>
 inoremap []5 [% %]<LEFT><LEFT><LEFT>
 
 " ----------------------------------------------------------------------------------------
-" appearance (Only GUI)
-" ----------------------------------------------------------------------------------------
-
-if has('gui_macvim')
-  " .gvimrc http://rhysd.hatenablog.com/entry/20111113/1321193061
-  set transparency=0 " initialize
-  nnoremap <expr><F12> &transparency+20 >= 100 ? ":set transparency=0\<CR>" : ":let &transparency=&transparency+20\<CR>"
-endif
-
-" ----------------------------------------------------------------------------------------
 " Anywhere SID http://qiita.com/wadako111/items/755e753677dd72d8036d
+" tab を便利に使うやつ
 " ----------------------------------------------------------------------------------------
 function! s:SID_PREFIX()
   return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
@@ -130,23 +136,23 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Refer to |:NeoBundle-examples|.
 " Note: You don't set neobundle setting in .gvimrc!
 
-NeoBundle 'Shougo/neocomplcache'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'ujihisa/unite-colorscheme'
-NeoBundle 'Shougo/neosnippet'
-NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'Shougo/neocomplcache'            " snippet
+NeoBundle 'Shougo/neosnippet'               " snippet
+NeoBundle 'Shougo/neosnippet-snippets'      " snippet
 NeoBundle 'Shougo/neomru.vim'
+NeoBundle 'Shougo/unite.vim'                " unite filer
+NeoBundle 'ujihisa/unite-colorscheme'       " unite filer colorscheme
 NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'Puppet-Syntax-Highlighting'
 NeoBundle 'glidenote/serverspec-snippets'
-NeoBundle 'scrooloose/syntastic'  " syntax check
-NeoBundle 'mattn/gist-vim'
-NeoBundle 'mattn/webapi-vim'
-NeoBundle 'airblade/vim-gitgutter' " git の差分が見える
+NeoBundle 'scrooloose/syntastic'            " syntax check
+NeoBundle 'mattn/gist-vim'                  " gist
+NeoBundle 'mattn/webapi-vim'                " gist
+NeoBundle 'airblade/vim-gitgutter'          " git の差分が見える
 NeoBundle 'jeffreyiacono/vim-colors-wombat' " color
-NeoBundle 'nanotech/jellybeans.vim' " color
-NeoBundle 'tomasr/molokai' " color
-NeoBundle 'sjl/badwolf'
+NeoBundle 'nanotech/jellybeans.vim'         " color
+NeoBundle 'tomasr/molokai'                  " color
+NeoBundle 'sjl/badwolf'                     " color
 
 call neobundle#end()
 
@@ -157,12 +163,13 @@ filetype plugin indent on
 " this will conveniently prompt you to install them.
 NeoBundleCheck
 
+"----------------------------------------------------------------------------------------↲
 " neosnippet
 "----------------------------------------------------------------------------------------↲
 " Plugin key-mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
+imap <C-k> <Plug>(neosnippet_expand_or_jump)
+smap <C-k> <Plug>(neosnippet_expand_or_jump)
+xmap <C-k> <Plug>(neosnippet_expand_target)
 
 " SuperTab like snippets behavior.
 imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
@@ -178,16 +185,12 @@ if has('conceal')
 endif
 
 let g:neocomplcache_enable_at_startup = 1 " 自動起動
-
 let g:neosnippet#snippets_directory = [
-      \'~/.vim/snippets',
       \'~/.vim/bundle/serverspec-snippets',
+      \'~/.vim/bundle/neosnippet-snippets/neosnippets',
       \]
 
-" gist-vim
 "----------------------------------------------------------------------------------------↲
-let g:gist_api_url = 'https://git.pepabo.com/api/v3'
-
 " Unite
 "----------------------------------------------------------------------------------------↲
 " 入力モードで開始する
@@ -211,22 +214,30 @@ au FileType unite inoremap <silent> <buffer> <expr> <C-j> unite#do_action('split
 au FileType unite nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
 au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
 
+"----------------------------------------------------------------------------------------↲
 " syntastic
 "----------------------------------------------------------------------------------------↲
 let g:syntastic_puppet_puppetlint_args="--no-80chars-check --no-documentation-check --no-unquoted_file_mode-check --no-file_mode-check"
 
+"----------------------------------------------------------------------------------------↲
 " lightline
 "----------------------------------------------------------------------------------------↲
 set laststatus=2
 " source ~/.vim/lightline.conf
 
+"----------------------------------------------------------------------------------------↲
 " vim-gitgutter
 "----------------------------------------------------------------------------------------↲
 nnoremap <silent> ,gg :<C-u>GitGutterToggle<CR>
 nnoremap <silent> ,gh :<C-u>GitGutterLineHighlightsToggle<CR>
 
+"----------------------------------------------------------------------------------------↲
+" gist-vim
+"----------------------------------------------------------------------------------------↲
+let g:gist_api_url = 'https://git.pepabo.com/api/v3'
+
 " ----------------------------------------------------------------------------------------
-" appearance
+" appearance (colorscheme で bundle 利用のものがあるので、下部に設置している)
 " ----------------------------------------------------------------------------------------
 set number
 set ruler 
@@ -252,4 +263,14 @@ autocmd InsertEnter,InsertLeave * set cursorline!
 " iTerm2 でコンソールの形状を変える
 let &t_SI = "\e]50;CursorShape=1\x7"
 let &t_EI = "\e]50;CursorShape=0\x7"
+
+" ----------------------------------------------------------------------------------------
+" appearance (Only GUI)
+" ----------------------------------------------------------------------------------------
+
+if has('gui_macvim')
+  " .gvimrc http://rhysd.hatenablog.com/entry/20111113/1321193061
+  set transparency=0 " initialize
+  nnoremap <expr><F12> &transparency+20 >= 100 ? ":set transparency=0\<CR>" : ":let &transparency=&transparency+20\<CR>"
+endif
 
