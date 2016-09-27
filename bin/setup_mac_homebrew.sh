@@ -33,10 +33,10 @@ brew install fabric
 brew install pyenv
 
 ## ricty
-brew list | grep ricty > /dev/null 2>&1 || (                                                                           [~]
+brew list | grep ricty > /dev/null 2>&1 || (
   brew tap sanemat/font
   brew install Caskroom/cask/xquartz
-  brew install ricty
+  brew install --vim-powerline ricty
   cp -f /usr/local/opt/ricty/share/fonts/Ricty*.ttf ~/Library/Fonts/
   fc-cache -vf
 )
