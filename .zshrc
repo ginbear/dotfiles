@@ -1,93 +1,49 @@
+#=============================
 # include common settings
+#=============================
 source ~/.shellrc
 
+#=============================
+# zsh settings
+#=============================
 # Ctrl-A, E とか効かせる
 bindkey -e
 
+## 単語の定義を bash と同じにする
+autoload -U select-word-style
+select-word-style bash
+
+#=============================
 # zsh-completions
 # http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03
+#=============================
 fpath=(/usr/local/share/zsh-completions $fpath)
 autoload -Uz compinit
 compinit -u
 
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git 
-
-# 下のformatsの値をそれぞれの変数に入れてくれる機能の、変数の数の最大。
-# デフォルトだと2くらいなので、指定しておかないと、下のformatsがほぼ動かない。
-zstyle ':vcs_info:*' max-exports 7
-
-# 左から順番に、vcs_info_msg_{n}_ という名前の変数に格納されるので、下で利用する
-zstyle ':vcs_info:*' formats '%R' '%S' '%b' '%s'
-# 状態が特殊な場合のformats
-zstyle ':vcs_info:*' actionformats '%R' '%S' '%b|%a' '%s'
-
-# 4.3.10以上の場合は、check-for-changesという機能を使う。
-autoload -Uz is-at-least
-if is-at-least 4.3.10; then
-    zstyle ':vcs_info:*' check-for-changes true
-    zstyle ':vcs_info:*' formats '%R' '%S' '%b' '%s' '%c' '%u'
-    zstyle ':vcs_info:*' actionformats '%R' '%S' '%b|%a' '%s' '%c' '%u'
-fi
-
+#=============================
 # for hub
+#=============================
 function git(){hub "$@"}
 
+#=============================
 # for git worktree
+#=============================
 function gwt() {
     GIT_CDUP_DIR=`git rev-parse --show-cdup`
     git worktree add ${GIT_CDUP_DIR}tmp/$1 -b $1
 }
 
-# http://r7kamura.github.io/2014/06/21/ghq.html
+#=============================
 # peco の結果に $1 する. p cd とか
+# http://r7kamura.github.io/2014/06/21/ghq.html
+#=============================
 p() { peco | while read LINE; do $@ $LINE; done }
 
-# zshのPTOMPTに渡す文字列は、可読性がそんなに良くなくて、読み書きしたり、つまりデバッグが
-# 大変なため、文字列を組み立てるのは関数でやることにする。
-# そのほうが分岐などを追加するのが楽。
-# この先、追加で表示させたい情報はいろいろでてくるとおもうし。
-function echo_rprompt () {
-    local repos branch st color
-
-    STY= LANG=en_US.UTF-8 vcs_info
-    if [[ -n "$vcs_info_msg_1_" ]]; then
-        # -Dつけて、~とかに変換
-        repos=`print -nD "$vcs_info_msg_0_"`
-
-        # if [[ -n "$vcs_info_msg_2_" ]]; then
-            branch="$vcs_info_msg_2_"
-        # else
-        #     branch=$(basename "`git symbolic-ref HEAD 2> /dev/null`")
-        # fi
-
-        if [[ -n "$vcs_info_msg_4_" ]]; then # staged
-            branch="%F{green}$branch%f"
-        elif [[ -n "$vcs_info_msg_5_" ]]; then # unstaged
-            branch="%F{red}$branch%f"
-        else
-            branch="%F{blue}$branch%f"
-        fi
-
-        print -n "[%25<..<"
-        print -n "%F{yellow}$vcs_info_msg_1_%F"
-        print -n "%<<]"
-
-        print -n "[%15<..<"
-        print -nD "%F{yellow}$repos%f"
-        print -n "@$branch"
-        print -n "%<<]"
-
-    else
-        print -nD "[%F{yellow}%60<..<%~%<<%f]"
-    fi
-}
-
-setopt prompt_subst
-RPROMPT='`echo_rprompt`'
-
+#=============================
 # snippets
 # http://blog.glidenote.com/blog/2014/06/26/snippets-peco-percol/
+#=============================
 function peco-snippets() {
     local SNIPPETS=$(cat ~/.snippets ~/.snippets.local | peco --query "$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
 #     zle clear-screen
@@ -95,7 +51,9 @@ function peco-snippets() {
 zle -N peco-snippets
 bindkey '^x' peco-snippets
 
+#=============================
 # ghq look
+#=============================
 function ghq-look() {
     local GHQLOOK=$(ghq list -p | peco)
     cd $GHQLOOK
@@ -103,8 +61,10 @@ function ghq-look() {
 zle -N ghq-look
 bindkey '^G' ghq-look
 
+#=============================
 # history を peco で選択
 # http://blog.kenjiskywalker.org/blog/2014/06/12/peco/
+#=============================
 function peco-select-history() {
     local tac
     if which tac > /dev/null; then
@@ -121,12 +81,8 @@ function peco-select-history() {
 zle -N peco-select-history
 bindkey '^r' peco-select-history
 
-## 単語の定義を bash と同じにする
-autoload -U select-word-style
-select-word-style bash
-
 #=============================
-# source auto-fu.zsh
+# auto-fu.zsh
 #=============================
 if [ -f ~/.zsh/auto-fu.zsh ]; then
     source ~/.zsh/auto-fu.zsh
@@ -136,3 +92,24 @@ if [ -f ~/.zsh/auto-fu.zsh ]; then
     zle -N zle-line-init
     zstyle ':completion:*' completer _oldlist _complete
 fi
+
+#=============================
+# Appearance & prompt
+#=============================
+# DEFAULT=$'\U1F411 ' # ひつじ
+DEFAULT=$'\U1F30E ' # 地球
+# ERROR=$'\U1F363 '   # スシ
+ERROR=$'\U1F47A '   # 天狗
+BRANCH=$'\U2B60'   # ブランチ
+
+autoload -Uz vcs_info
+setopt prompt_subst
+zstyle ':vcs_info:git:*' check-for-changes true
+zstyle ':vcs_info:git:*' stagedstr "%F{yellow}!"
+zstyle ':vcs_info:git:*' unstagedstr "%F{red}+"
+zstyle ':vcs_info:*' formats "%F{green}%c%u%r${BRANCH}%b $ %f"
+zstyle ':vcs_info:*' actionformats '[%b|%a]'
+precmd () { vcs_info }
+# PROMPT='${vcs_info_msg_0_}%% '
+
+PROMPT=$'%(?.${DEFAULT}.${ERROR}) ${vcs_info_msg_0_}'

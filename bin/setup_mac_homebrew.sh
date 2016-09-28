@@ -33,10 +33,11 @@ brew install fabric
 brew install pyenv
 
 ## ricty
+# check -> ruby -e 'puts "\u{2B60 2B61 2B80 2B81}"' 
 brew list | grep ricty > /dev/null 2>&1 || (
   brew tap sanemat/font
   brew install Caskroom/cask/xquartz
-  brew install --vim-powerline ricty
+  brew install --patch-in-place --powerline --vim-powerline ricty
   cp -f /usr/local/opt/ricty/share/fonts/Ricty*.ttf ~/Library/Fonts/
   fc-cache -vf
 )
