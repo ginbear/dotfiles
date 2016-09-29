@@ -97,7 +97,8 @@ fi
 # Appearance & prompt
 #=============================
 # DEFAULT=$'\U1F411 ' # ひつじ
-DEFAULT=$'\U1F30E ' # 地球
+# DEFAULT=$'\U1F30E ' # 地球
+DEFAULT='$ ' # シンプルに
 # ERROR=$'\U1F363 '   # スシ
 ERROR=$'\U1F47A '   # 天狗
 BRANCH=$'\U2B60'   # ブランチ
@@ -107,7 +108,7 @@ setopt prompt_subst
 zstyle ':vcs_info:git:*' check-for-changes true
 zstyle ':vcs_info:git:*' stagedstr "%F{yellow}!"
 zstyle ':vcs_info:git:*' unstagedstr "%F{red}+"
-zstyle ':vcs_info:*' formats "%F{green}%c%u%r ${BRANCH}%b $ %f"
+zstyle ':vcs_info:*' formats "%F{green}%c%u%r ${BRANCH}%b$ %f"
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
 precmd () { vcs_info }
 # PROMPT='${vcs_info_msg_0_}%% '
