@@ -22,7 +22,6 @@ set noundofile             " *.un~ なファイルを作らない
 set expandtab
 set tabstop=2
 set scrolloff=5            " スクロール時の前後行数
-set cursorline             " カーソルがある行がハイライト
 nmap <F1> <nop>            " help を出さない
 imap <F1> <nop>            " help を出さない
 
@@ -222,10 +221,13 @@ au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vspli
 let g:syntastic_puppet_puppetlint_args="--no-80chars-check --no-documentation-check --no-unquoted_file_mode-check --no-file_mode-check"
 
 "----------------------------------------------------------------------------------------
-" lightline
+" lightline (ステータスバー)
 "----------------------------------------------------------------------------------------
 set laststatus=2
-" source ~/.vim/lightline.conf
+" let g:lightline = {
+"       \ 'colorscheme': 'wombat'
+"       \ }
+source ~/.vim/lightline.conf
 
 "----------------------------------------------------------------------------------------
 " vim-gitgutter

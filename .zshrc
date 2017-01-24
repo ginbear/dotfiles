@@ -35,6 +35,28 @@ function gwt() {
 }
 
 #=============================
+# peco + ssh
+#=============================
+function peco-ssh () {
+  local selected_host=$(awk '
+  tolower($1)=="host" {
+    for (i=2; i<=NF; i++) {
+      if ($i !~ "[*?]") {
+        print $i
+      }
+    }
+  }
+  ' ~/.ssh/config | sort | peco --query "$LBUFFER")
+  if [ -n "$selected_host" ]; then
+    BUFFER="ssh ${selected_host}"
+    zle accept-line
+  fi
+  zle clear-screen
+}
+zle -N peco-ssh
+bindkey '^t' peco-ssh
+
+#=============================
 # peco の結果に $1 する. p cd とか
 # http://r7kamura.github.io/2014/06/21/ghq.html
 #=============================
@@ -98,9 +120,9 @@ fi
 #=============================
 # DEFAULT=$'\U1F411 ' # ひつじ
 # DEFAULT=$'\U1F30E ' # 地球
-DEFAULT='$ ' # シンプルに
-# ERROR=$'\U1F363 '   # スシ
-ERROR=$'\U1F47A '   # 天狗
+DEFAULT='$' # シンプルに
+# ERROR=$'\U1F363'   # スシ
+ERROR=$'\U1F47A'   # 天狗
 BRANCH=$'\U2B60'   # ブランチ
 
 autoload -Uz vcs_info

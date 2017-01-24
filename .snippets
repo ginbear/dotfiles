@@ -1,4 +1,4 @@
-# 未振り分け
+# misc
 stat                                                                         ## file の詳細な情報を表示
 grep -v -E "^\s*#|^\s*$"                                                     ## config だけを見たいんや！
 grep --color=auto                                                            ## grep をカラフルに見たいんや！ 永続的に設定したいとき export GREP_OPTIONS='--color=auto'
@@ -34,6 +34,11 @@ ssh-keygen -l -f $HOME/.ssh/id_rsa.pub                                       ## 
 strace -v -s 4096 -f -F -o ~/strace_$(date +%y%m%d-%H%M%S).log -p XXX        ## strace よく使うオプション達
 ltrace -p $( pgrep xinetd ) -f                                               ## ltrace よく使うパターン
 gstack $(pgrep in.proftpd )                                                  ## gdb で backtrace 取るのと同じ内容を出す
+date +%Y%m%d -d '1 days ago'
+set-window-option synchronize-panes on                                       ## tmux キーブロードキャスト
+hoge         ALL=(ALL)       NOPASSWD: ALL                                   ## sudo file でパスワード無しで権限を与える場合
+/usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
+sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
 
 # yum
 sudo yum install yum-plugin-changelog                                        ## changelog を yum で見たい
@@ -41,10 +46,6 @@ sudo yum changelog 10 glibc | grep -C3 -i CVE-2015-7547                      ## 
 sudo yum update --security                                                   ## security 周りの update 
 sudo yum update kernel-headers kernel-tools kernel-tools-libs kernel         ## kenel 周りを上げるなら付随もろもろ
 sudo yum history                                                             ## 履歴から undo とか redo とか出来る. ref https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/sec-Yum-Transaction_History.html
-
-# LDAP
-/usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
-sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
 
 # rpm
 rpm -qV openssh-clients openssh libssh2 openssh-server | awk '$2!="c" {print $0}'  ## rpm でチェックサム確認
@@ -56,10 +57,6 @@ find ./ -daystart -ctime +2
 find ./ -daystart -ctime -2
 find . -maxdepth 1 -type f -name "*.txt" -print0 | xargs -0 rm　             ## カレントディレクトリ内で.txtファイルを探し、ファイル名に空白が含む物も併せて削除する
 find . -maxdepth 1 -type f \! \( -name "*.txt" -o -name "*.rb" \)            ## カレントディレクトリ内で.txt、.rbファイル 「以外」を探す
-
-# date
-date +%Y%m%d
-date +%Y%m%d -d '1 days ago'
 
 # sar
 sar -W -f /var/log/sa/sa13  ## 13日の Swap I/O 量を見る pswpin/s pswpout/s
@@ -105,9 +102,6 @@ dstat --top-io --top-bio
 dstat --top-io-adv --top-bio-adv
 dstat -ta --top-io-adv --top-bio-adv  ## なんか便利！
 
-# tmux
-set-window-option synchronize-panes on ## tmux キーブロードキャスト
-
 # git
 git push origin $(git branch | grep ^\* | cut -f2 -d " ")       ## 現行の Branch を git push
 git diff FETCH_HEAD                                             ## マージ前の差分チェック
@@ -122,6 +116,7 @@ git reset --soft HEAD^                                          ## 直前の com
 git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;    ## remote buranch の更新を local branch にマージしたい場合
 git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
 git branch --set-upstream-to=origin/branch-name branch-name     ## 自分で remote に push した branch に別の人が編集しそれを取り込みたい場合、git pull の前に行う
+git push --delete origin add-inamuu-to-dareka                   ## PR を出す直前に取り消す
 
 # apache
 /usr/local/apache2/bin/httpd -SM                                ## いろいろ確認
@@ -131,13 +126,12 @@ tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $1}'  | sort | uni
 cat /var/log/httpd/access_log | awk '/23\/Feb\/2015:17:00:0/, /23\/Feb\/2015:17:15:0/'  | wc -l ## 影響範囲をしぼりましょう
 sudo ps ax -opid,cmd,wchan | grep httpd                         ## futex で止まっているもの
 php -r 'phpinfo();                                              ## php info の結果をコマンドラインで確認する
-
-# lighty
 tail -n 5000 /var/log/lighttpd/access.log | cut -f 4 -d " " | sed -e "s/[0-9]:[0-5][0-9]$//" | sort | uniq -c ## 10 分毎のアクセス数統計
 
 # lb keepalive
 /sbin/ipvsadm -Ln --sort                                        ## 振り分け状況とコネクション状況を参照
 /sbin/ipvsadm -L -n --sort | cut -c-49                          ## 比較用
+/sbin/ipvsadm -e -t 210.172.182.xxx:443 -r 192.168.182.xxx -w 0 ## weight をオンサービスで設定
 
 # mysql
 mysql -e "show processlist"
@@ -184,19 +178,13 @@ puppet apply -e 'notice($middlehostname)'                  ## 独自 facter 変�
 svstat /service/dnscache  ## daemontools status 確認
 svc -t /service/dnscache  ## daemontools 再起動実施
 
-# sudoers
-hoge         ALL=(ALL)       NOPASSWD: ALL   ## sudo file でパスワード無しで権限を与える場合
-
-# munin
-munin-node-configure -suggest ## プラグイン使えるか否か分かる！
-
 # vim
 c-w s ## 画面 - 分割 vim
 c-w v ## 画面 | 分割 vim
 c-w [hjkl] ## 画面移動 vim
 c-w o ## 画面閉じる vim
 :echo expand("%:p")  ## vim ファイルパスを取得
- :%s/\v^|$/|/g       ## 先頭末尾に | を挿入する
+:%s/\v^|$/|/g       ## 先頭末尾に | を挿入する
 
 # Vagrantfile
 c.vm.synced_folder "../www", "/var/www"               ## vagrant synced
@@ -217,4 +205,3 @@ rbenv exec gem list | awk '{print "rbenv exec gem uninstall " $1}' | sh -xv  ## 
 pyenv install --list                ## install 可能な version を確認
 pyenv global <system|version>       ## Version の指定
 pip install python-openstackclient python-neutronclient python-novaclient ## Openstack client の install
-
