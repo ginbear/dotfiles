@@ -22,6 +22,7 @@ brew tap peco/peco
 brew install peco
 brew install ipcalc
 brew install tcptraceroute
+brew install https://raw.githubusercontent.com/sorah/envchain/master/brew/envchain.rb  ## make ref http://techlife.cookpad.com/entry/envchain
 
 ## ops tools
 # brew install ansible
@@ -31,6 +32,7 @@ brew install hub
 brew install tig
 brew install fabric
 brew install pyenv
+brew install terraform
 
 ## ricty
 # check -> ruby -e 'puts "\u{2B60 2B61 2B80 2B81}"' 

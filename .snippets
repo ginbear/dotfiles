@@ -39,6 +39,7 @@ set-window-option synchronize-panes on                                       ## 
 hoge         ALL=(ALL)       NOPASSWD: ALL                                   ## sudo file でパスワード無しで権限を与える場合
 /usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
 sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
+find . | xargs grep ""                                                       ## cat するとき、一緒にファイル名を表示する
 
 # yum
 sudo yum install yum-plugin-changelog                                        ## changelog を yum で見たい
