@@ -1,5 +1,7 @@
 #!/bin/sh
 
+brew tap caskroom/cask
+
 brew cask install google-japanese-ime
 brew cask install firefox
 brew cask install google-chrome
