@@ -87,21 +87,33 @@ bindkey '^G' ghq-look
 # history を peco で選択
 # http://blog.kenjiskywalker.org/blog/2014/06/12/peco/
 #=============================
-function peco-select-history() {
-    local tac
-    if which tac > /dev/null; then
-        tac="tac"
-    else
-        tac="tail -r"
-    fi
-    BUFFER=$(history -n 1 | \
-        eval $tac | \
-        peco --query "$LBUFFER")
-    CURSOR=$#BUFFER
-    zle clear-screen
-}
-zle -N peco-select-history
-bindkey '^r' peco-select-history
+# function peco-select-history() {
+#     local tac
+#     if which tac > /dev/null; then
+#         tac="tac"
+#     else
+#         tac="tail -r"
+#     fi
+#     BUFFER=$(history -n 1 | \
+#         eval $tac | \
+#         peco --query "$LBUFFER")
+#     CURSOR=$#BUFFER
+#     zle clear-screen
+# }
+# zle -N peco-select-history
+# bindkey '^r' peco-select-history
+
+#=============================
+# history
+# http://www.tellme.tokyo/entry/2017/06/13/233305
+#=============================
+
+GITHUB_TOKEN=""
+ZSH_HISTORY_AUTO_SYNC="true"
+ZSH_HISTORY_KEYBIND_GET="^r"
+ZSH_HISTORY_FILTER_OPTIONS="--filter-branch --filter-dir"
+ZSH_HISTORY_KEYBIND_ARROW_UP="^p"
+ZSH_HISTORY_KEYBIND_ARROW_DOWN="^n"
 
 #=============================
 # auto-fu.zsh

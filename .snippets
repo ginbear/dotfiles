@@ -40,6 +40,7 @@ hoge         ALL=(ALL)       NOPASSWD: ALL                                   ## 
 /usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
 sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
 find . | xargs grep ""                                                       ## cat するとき、一緒にファイル名を表示する
+sudo less /var/log/maillog | grep status=deferred | awk '{for(i=12;i<NF;i++){printf("%s%s",$i,OFS=" ")}print $NF}' | sort | uniq -c | sort -nr ## 任意の列以降を表示
 
 # yum
 sudo yum install yum-plugin-changelog                                        ## changelog を yum で見たい
@@ -114,6 +115,7 @@ git config --list --global                                      ## git の globa
 git commit --amend -m "(新しいコミットメッセージ)"              ## 直前のコミットログを編集する
 git fetch ; git merge origin/hoge                               ## リモートブランチが更新されてそれを取り込みたい場合
 git reset --soft HEAD^                                          ## 直前の commit を取り消したい
+git reset --hard origin/<branch name>                           ## branch 上で git pull した後、stage を最新にするための作業
 git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;    ## remote buranch の更新を local branch にマージしたい場合
 git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
 git branch --set-upstream-to=origin/branch-name branch-name     ## 自分で remote に push した branch に別の人が編集しそれを取り込みたい場合、git pull の前に行う
