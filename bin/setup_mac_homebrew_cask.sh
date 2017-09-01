@@ -14,7 +14,7 @@ brew cask install boostnote
 brew cask install iterm2
 
 # productivity
-brew cask install karabiner
+brew cask install karabiner-elements
 brew cask install spectacle
 brew cask install sourcetree
 brew cask install gitify
