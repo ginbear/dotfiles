@@ -36,6 +36,15 @@ brew install fabric
 brew install pyenv
 brew install terraform
 
+## rbenv
+brew install rbenv ruby-build
+rbenv install 2.2.1
+rbenv install 2.3.1
+rbenv install 2.4.1
+rbenv global 2.3.1
+rbenv exec gem install bundler
+rbenv rehash
+
 ## ricty
 # check -> ruby -e 'puts "\u{2B60 2B61 2B80 2B81}"' 
 brew list | grep ricty > /dev/null 2>&1 || (
