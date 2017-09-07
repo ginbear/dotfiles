@@ -2,6 +2,7 @@
 # include common settings
 #=============================
 source ~/.shellrc
+source ~/.zsh/*.zsh
 
 #=============================
 # zsh settings

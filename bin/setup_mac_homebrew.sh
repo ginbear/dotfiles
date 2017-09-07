@@ -7,6 +7,7 @@ brew upgrade
 
 ## basic tools
 brew install zsh
+mkdir ~/.zsh/
 brew install vim
 brew install wget
 brew install htop
