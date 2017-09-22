@@ -17,7 +17,8 @@ brew cask install iterm2
 brew cask install karabiner-elements
 brew cask install spectacle
 brew cask install sourcetree
-brew cask install gitify
+# brew cask install gitify
+# brew cask install jasper
 
 # dev
 brew cask install virtualbox

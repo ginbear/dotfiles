@@ -36,6 +36,7 @@ brew install tig
 brew install fabric
 brew install pyenv
 brew install terraform
+brew install pssh
 
 ## rbenv
 brew install rbenv ruby-build
