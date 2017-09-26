@@ -59,6 +59,7 @@ mkdir ~/.go
 
 # vim neobundle install
 [ ! -e ~/.vim/bundle ] && git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
+sudo chown shimizu ~/.vim/bundle/.neobundle
 
 # tssh deploy
 ln -s ${PWD}/tssh/tssh /usr/local/bin

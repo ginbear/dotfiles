@@ -4,7 +4,7 @@
 2. `sh bin/setup_mac.sh`
 3. `sh bin/setup_homebrew.sh`
 4. `sh bin/setup_homebrew_cask.sh`
-5. `ghq get git@github.com:ginbear/dotfiles.git`
+5. `ghq get https://github.com/ginbear/dotfiles.git`
 6. `ghq look dotfiles`
 7. `sh bin/init.sh`
 
