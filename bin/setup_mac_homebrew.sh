@@ -38,6 +38,10 @@ brew install pyenv
 brew install terraform
 brew install pssh
 
+## mackerel
+brew tap mackerelio/mackerel-agent
+brew install mkr
+
 ## rbenv
 brew install rbenv ruby-build
 rbenv install 2.2.1
