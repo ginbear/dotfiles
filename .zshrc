@@ -55,7 +55,7 @@ function peco-ssh () {
   zle clear-screen
 }
 zle -N peco-ssh
-bindkey '^t' peco-ssh
+# bindkey '^t' peco-ssh
 
 #=============================
 # peco の結果に $1 する. p cd とか

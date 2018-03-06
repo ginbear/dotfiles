@@ -41,6 +41,7 @@ hoge         ALL=(ALL)       NOPASSWD: ALL                                   ## 
 sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
 find . | xargs grep ""                                                       ## cat するとき、一緒にファイル名を表示する
 sudo less /var/log/maillog | grep status=deferred | awk '{for(i=12;i<NF;i++){printf("%s%s",$i,OFS=" ")}print $NF}' | sort | uniq -c | sort -nr ## 任意の列以降を表示
+cat hogehoge | xargs -t -L1 -I{} echo {} | pv -ls $(wc -l hogehoge | cut -d" " -f1) > /dev/null ## pv を使って行カウントをする
 
 # yum
 sudo yum install yum-plugin-changelog                                        ## changelog を yum で見たい

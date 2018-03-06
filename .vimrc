@@ -9,6 +9,26 @@
 " s/S    カーソル上/カーソル行を消してインサート
 " g;     直前の変更箇所にジャンプ, g, で戻る
 " C-o    元いた場所に戻る、C-i で進む
+" mm & `m  m<mark> で場所を記録、 `<mark>でもどる
+" :`<, `>normal <something> ヴィジュアルモードで選択した行に対して実行できる
+" b, w, e, ge
+" fx/tx ;/,
+" visual > a" i> at a] などで選択範囲を特定できる。a=arround  i=inside
+" daw ciw 空白の場所に注目
+" HML     画面カーソルジャンプ
+" g/re/p,d
+" :3d     ３行目を削除, :{start},{end} で範囲 . は現在行 $ は行末 % は全行
+" :g/{/.+1,/}/-1sort  { から } の中身を sort できる. :g/{start}/ .,{finish}
+" [cmd]
+" :v/./d   空行削除
+"   abc を含む行を削除する  :g/abc/d
+"   abc を含まない行を削除する  :v/abc/d
+"
+" set hoge    hoge を設定する
+" set nohoge  hoge を無効
+" set hoge!   hoge の設定をトグル
+" set hoge?   hoge の設定を確認
+" set hoge&   hoge の設定をデフォルトにリセット
 "
 " ----------------------------------------------------------------------------------------
 " Base settings
@@ -154,6 +174,7 @@ NeoBundle 'jeffreyiacono/vim-colors-wombat' " color
 NeoBundle 'nanotech/jellybeans.vim'         " color
 NeoBundle 'tomasr/molokai'                  " color
 NeoBundle 'sjl/badwolf'                     " color
+NeoBundle 'justinmk/vim-dirvish'            " filer
 
 call neobundle#end()
 
