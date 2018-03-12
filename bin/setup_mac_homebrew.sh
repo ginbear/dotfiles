@@ -26,6 +26,7 @@ brew install peco
 brew install ipcalc
 brew install tcptraceroute
 brew install envchain
+brew install nodejs
 
 ## ops tools
 # brew install ansible

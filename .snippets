@@ -88,6 +88,7 @@ openssl rsa  -noout -modulus -in *.key | openssl md5  ## 上記のコマンド�
 openssl req  -noout -modulus -in *.csr | openssl md5  ## 上記のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
 openssl s_client -connect <DOMAIN>:443 -tls1          ## tls で接続（接続を期待）
 openssl s_client -connect <DOMAIN>:443 -ssl3          ## ssl3 で接続 (接続不可を期待)
+echo "" | openssl s_client -connect <DOMAIN>:443 -servername <SERVERNAME> -cipher "EDH"  -showcerts 2>&1 | grep 'Temp' ## SNI だと servername もつける、このコマンドは 暗号化キー（DH keypair）のビット数を確認するもの
 
 # netstat
 netstat -ltapn | grep ESTABLISHED | more
