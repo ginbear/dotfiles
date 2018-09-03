@@ -175,6 +175,9 @@ NeoBundle 'nanotech/jellybeans.vim'         " color
 NeoBundle 'tomasr/molokai'                  " color
 NeoBundle 'sjl/badwolf'                     " color
 NeoBundle 'justinmk/vim-dirvish'            " filer
+NeoBundle 'vim-scripts/vim-auto-save'       " 200msecなんもしなかったり(デフォルト設定)、インサートモードを抜けたりした時に、ファイルが保存される。
+let g:auto_save = 1        " 自動保存有効
+let g:auto_save_in_insert_mode = 0  " insert mode は自動保存しない
 
 call neobundle#end()
 

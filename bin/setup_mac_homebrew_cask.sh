@@ -9,6 +9,7 @@ brew cask install google-chrome
 # editor
 brew cask install macvim
 brew cask install boostnote
+brew cask install visual-studio-code
 
 # terminal
 brew cask install iterm2
