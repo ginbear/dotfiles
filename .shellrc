@@ -15,6 +15,7 @@ alias bi='bundle install --path vendor/bundler'
 alias r=rbenv
 alias re='rbenv exec'
 alias rv='rbenv versions'
+alias date='gdate'
 
 export EDITOR=/usr/bin/vim
 export GITHUB_URL=https://git.pepabo.com/

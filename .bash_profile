@@ -19,3 +19,5 @@ source ~/.shellrc
 
 # for hub 
 eval "$(hub alias -s)"
+
+complete -C /usr/local/bin/vault vault

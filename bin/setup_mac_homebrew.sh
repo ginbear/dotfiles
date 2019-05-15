@@ -8,28 +8,31 @@ brew upgrade
 ## basic tools
 brew install zsh
 mkdir ~/.zsh/
-brew install vim
-brew install wget
-brew install htop
-brew install nkf
-brew install watch
-brew install tree
+brew install fish
 brew install ag
-brew install jq
-brew install trash
+brew install bat
 brew install coreutils
-brew install zsh-completions
-brew install go
 brew install ghq
+brew install go
+brew install htop
+brew install ipcalc
+brew install jq
+brew install nkf
+brew install nodejs
+brew install tcptraceroute
+brew install trash
+brew install tree
+brew install vim
+brew install watch
+brew install wget
+brew install zsh-completions
+brew isntall rmtrash
 brew tap peco/peco
 brew install peco
-brew install ipcalc
-brew install tcptraceroute
-brew install envchain
-brew install nodejs
 
 ## ops tools
 # brew install ansible
+brew install envchain
 brew install tmux
 brew install gist
 brew install hub
@@ -38,6 +41,8 @@ brew install fabric
 brew install pyenv
 brew install terraform
 brew install pssh
+brew install awscli
+brew install akamai
 
 ## mackerel
 brew tap mackerelio/mackerel-agent
@@ -48,7 +53,8 @@ brew install rbenv ruby-build
 rbenv install 2.2.1
 rbenv install 2.3.1
 rbenv install 2.4.1
-rbenv global 2.3.1
+rbenv install 2.5.1
+rbenv global 2.5.1
 rbenv exec gem install bundler
 rbenv rehash
 

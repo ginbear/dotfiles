@@ -183,3 +183,6 @@ autoload -Uz colors
 colors
 
 PROMPT='%(?.${DEFAULT}.%{${fg[red]}%}${DEFAULT}%{${reset_color}%}) ${vcs_info_msg_0_}'
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/local/bin/vault vault
