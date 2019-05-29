@@ -57,5 +57,8 @@ brew cask install kindle
 # brew cask install vlc
 # brew cask install evernote
 
-## 以下のアプリは手動で入れる必要がありそう
+## 以下のアプリは手動で入れている
 # line
+# Day-O 2
+# The Unarchiver
+# Display Menu
