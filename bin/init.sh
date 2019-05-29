@@ -19,6 +19,7 @@ FILELIST="
 .snippets
 .rspec
 .fabricrc
+.config
 fabfile.py
 "
 
