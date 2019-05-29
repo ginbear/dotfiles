@@ -26,7 +26,7 @@ brew install vim
 brew install watch
 brew install wget
 brew install zsh-completions
-brew isntall rmtrash
+brew install rmtrash
 brew tap peco/peco
 brew install peco
 
@@ -63,8 +63,7 @@ rbenv rehash
 brew list | grep ricty > /dev/null 2>&1 || (
   brew tap sanemat/font
   brew install Caskroom/cask/xquartz
-#  brew install --patch-in-place --powerline --vim-powerline ricty
-  brew install --vim-powerline ricty
+  brew install ricty --with-powerline
   cp -f /usr/local/opt/ricty/share/fonts/Ricty*.ttf ~/Library/Fonts/
   fc-cache -vf
 )
