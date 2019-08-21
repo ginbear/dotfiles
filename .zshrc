@@ -1,8 +1,18 @@
+export LC_ALL=en_US.UTF-8
+#
 #=============================
 # include common settings
 #=============================
 source ~/.shellrc
 source ~/.zsh/*.zsh
+
+#=============================
+# exec fish`
+#=============================
+# case $- in
+#     *i*) exec fish;;
+#       *) return;;
+# esac
 
 #=============================
 # zsh settings
@@ -26,14 +36,6 @@ compinit -u
 # for hub
 #=============================
 function git(){hub "$@"}
-
-#=============================
-# for git worktree
-#=============================
-function gwt() {
-    GIT_CDUP_DIR=`git rev-parse --show-cdup`
-    git worktree add ${GIT_CDUP_DIR}tmp/$1 -b $1
-}
 
 #=============================
 # peco + ssh
@@ -150,18 +152,20 @@ setopt inc_append_history
 #=============================
 # auto-fu.zsh
 #=============================
-if [ -d ~/.zsh/auto-fu.zsh ]; then
-    source ~/.zsh/auto-fu.zsh/auto-fu.zsh
-    function zle-line-init () {
-        auto-fu-init
-    }
-    zle -N zle-line-init
-    zstyle ':completion:*' completer _oldlist _complete
-fi
+# if [ -d ~/.zsh/auto-fu.zsh ]; then
+#     source ~/.zsh/auto-fu.zsh/auto-fu.zsh
+#     function zle-line-init () {
+#         auto-fu-init
+#     }
+#     zle -N zle-line-init
+#     zstyle ':completion:*' completer _oldlist _complete
+# fi
 
 #=============================
 # Appearance & prompt
 #=============================
+# font は https://gist.github.com/qrush/1595572#file-menlo-powerline-otf を利用
+# 一度 ↑ を入れてから ricty に変えたら記号が見えたっぽい. 謎
 # DEFAULT=$'\U1F411 ' # ひつじ
 # DEFAULT=$'\U1F30E ' # 地球
 DEFAULT='$' # シンプルに
@@ -184,5 +188,4 @@ colors
 
 PROMPT='%(?.${DEFAULT}.%{${fg[red]}%}${DEFAULT}%{${reset_color}%}) ${vcs_info_msg_0_}'
 
-autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/local/bin/vault vault
+# autoload -U +X bashcompinit && bashcompinit

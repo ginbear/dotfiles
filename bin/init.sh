@@ -64,3 +64,6 @@ sudo chown shimizu ~/.vim/bundle/.neobundle
 
 # tssh deploy
 ln -s ${PWD}/tssh/tssh /usr/local/bin
+
+# lltsv
+go get github.com/sonots/lltsv

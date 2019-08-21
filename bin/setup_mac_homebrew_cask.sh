@@ -7,22 +7,20 @@ brew cask install firefox
 brew cask install google-chrome
 
 # editor
-# brew cask install boostnote
 brew cask install macvim
 brew cask install visual-studio-code
 
 # terminal
+# brew cask install alacritty
 brew cask install iterm2
-brew cask install hyper
+# brew cask install hyper
 
 # productivity
 brew cask install karabiner-elements
 brew cask install spectacle
 brew cask install bartender
 # brew cask install sourcetree
-# brew cask install day-o
 # brew cask install gitify
-# brew cask install jasper
 # brew cask install bitbar
 
 # dev
@@ -32,7 +30,6 @@ brew cask install docker
 
 # communication
 # brew cask install skype
-# brew cask install franz
 brew cask install slack
 brew cask install tunnelblick
 brew cask install station
@@ -49,16 +46,5 @@ brew cask install 1password
 # other
 brew cask install kindle
 
-# brew cask install google-japanese-ime
-# brew cask install totalterminal
-# brew cask install dash
-# brew cask install keepassx
-# brew cask install cheatsheet
-# brew cask install vlc
-# brew cask install evernote
-
 ## 以下のアプリは手動で入れている
 # line
-# Day-O 2
-# The Unarchiver
-# Display Menu

@@ -9,7 +9,7 @@ brew upgrade
 brew install zsh
 mkdir ~/.zsh/
 brew install fish
-brew install ag
+# brew install ag # to ripgrep
 brew install bat
 brew install coreutils
 brew install ghq
@@ -29,6 +29,16 @@ brew install zsh-completions
 brew install rmtrash
 brew tap peco/peco
 brew install peco
+brew install ripgrep
+
+### lsd
+brew install lsd
+brew tap homebrew/cask-fonts
+brew cask install font-hack-nerd-font
+# 一度 iterm2 を再起動する
+# iTerm2 > Preferences > Profiles > Text > Non-ASCII-Font > Change Font
+# ref https://github.com/Peltoche/lsd/issues/199
+
 
 ## ops tools
 # brew install ansible
@@ -43,6 +53,7 @@ brew install terraform
 brew install pssh
 brew install awscli
 brew install akamai
+brew install fftw httping
 
 ## mackerel
 brew tap mackerelio/mackerel-agent

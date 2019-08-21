@@ -1,9 +1,10 @@
 # commmon shell settings
-
 ## local
 source ~/.shellrc.local
 
 ## alias
+alias l='lsd'
+alias ls='lsd'
 alias ll='ls -l'
 alias la='ls -la'
 alias g='git'
@@ -16,6 +17,8 @@ alias r=rbenv
 alias re='rbenv exec'
 alias rv='rbenv versions'
 alias date='gdate'
+alias grep='rg'
+alias cat='bat -p'
 
 export EDITOR=/usr/bin/vim
 export GITHUB_URL=https://git.pepabo.com/
