@@ -43,6 +43,8 @@ find . | xargs grep ""                                                       ## 
 sudo less /var/log/maillog | grep status=deferred | awk '{for(i=12;i<NF;i++){printf("%s%s",$i,OFS=" ")}print $NF}' | sort | uniq -c | sort -nr ## 任意の列以降を表示
 cat hogehoge | xargs -t -L1 -I{} echo {} | pv -ls $(wc -l hogehoge | cut -d" " -f1) > /dev/null ## pv を使って行カウントをする
 puts a b c | each -t bash -c "echo {}; dig {}.pepabo.com CNAM +short"        ## zipper の便利コマンドより
+journalctl -ex -u redis-sentinel --since "2019-09-08 20:00:00" --no-pager    ## jounarlctl をざっと見たい時
+consul members | grep role-name                                              ## シュッとリストをだす
 
 # yum
 sudo yum install yum-plugin-changelog                                        ## changelog を yum で見たい

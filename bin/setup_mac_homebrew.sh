@@ -30,6 +30,7 @@ brew install rmtrash
 brew tap peco/peco
 brew install peco
 brew install ripgrep
+brew install sd
 
 ### lsd
 brew install lsd
@@ -49,7 +50,8 @@ brew install hub
 brew install tig
 brew install fabric
 brew install pyenv
-brew install terraform
+# brew install terraform
+brew install tfenv
 brew install pssh
 brew install awscli
 brew install akamai

@@ -19,6 +19,8 @@ brew cask install iterm2
 brew cask install karabiner-elements
 brew cask install spectacle
 brew cask install bartender
+brew cask install cacher
+npm install --g alfred-cacher
 # brew cask install sourcetree
 # brew cask install gitify
 # brew cask install bitbar

@@ -190,3 +190,4 @@ colors
 PROMPT='%(?.${DEFAULT}.%{${fg[red]}%}${DEFAULT}%{${reset_color}%}) ${vcs_info_msg_0_}'
 
 # autoload -U +X bashcompinit && bashcompinit
+export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
