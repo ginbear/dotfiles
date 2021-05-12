@@ -18,15 +18,15 @@ brew install htop
 brew install ipcalc
 brew install jq
 brew install nkf
-brew install nodejs
+# brew install nodejs
 brew install tcptraceroute
 brew install trash
 brew install tree
 brew install vim
 brew install watch
 brew install wget
-brew install zsh-completions
-brew install rmtrash
+# brew install zsh-completions
+# brew install rmtrash
 brew tap peco/peco
 brew install peco
 brew install ripgrep
@@ -54,7 +54,7 @@ brew install pyenv
 brew install tfenv
 brew install pssh
 brew install awscli
-brew install akamai
+# brew install akamai
 brew install fftw httping
 
 ## mackerel

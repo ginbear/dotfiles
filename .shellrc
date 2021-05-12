@@ -24,7 +24,7 @@ export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
 
 # SSH-KEY
-[ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
+# [ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
 [ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
 
 # GO 

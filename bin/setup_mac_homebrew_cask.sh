@@ -4,7 +4,8 @@ brew tap caskroom/cask
 
 # browser
 brew cask install firefox
-brew cask install google-chrome
+brew cask install sidekick
+# brew cask install google-chrome
 
 # editor
 brew cask install macvim
@@ -19,10 +20,10 @@ brew cask install iterm2
 brew cask install karabiner-elements
 brew cask install spectacle
 brew cask install bartender
-brew cask install cacher
-npm install --g alfred-cacher
+# brew cask install cacher
+# npm install --g alfred-cacher
 # brew cask install sourcetree
-# brew cask install gitify
+brew cask install gitify
 # brew cask install bitbar
 
 # dev
@@ -32,18 +33,18 @@ brew cask install docker
 
 # communication
 # brew cask install skype
-brew cask install slack
-brew cask install tunnelblick
-brew cask install station
+# brew cask install slack
+# brew cask install tunnelblick
+# brew cask install station
 
 # tools
 brew cask install the-unarchiver
 brew cask install skitch
 brew cask install cyberduck
-brew cask install sequel-pro 
+# brew cask install sequel-pro 
 brew cask install notion
 brew cask install alfred3
-brew cask install 1password
+# brew cask install 1password
 
 # other
 brew cask install kindle
