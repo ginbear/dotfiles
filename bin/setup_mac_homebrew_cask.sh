@@ -45,6 +45,7 @@ brew install cyberduck --cask
 brew install notion --cask
 brew install alfred --cask
 # brew install 1password --cask
+brew install krisp --cask
 
 # other
 brew install kindle --cask
