@@ -3,51 +3,51 @@
 brew tap homebrew/cask
 
 # browser
-brew cask install firefox
-brew cask install sidekick
-# brew cask install google-chrome
+brew install firefox --cask
+brew install sidekick --cask
+# brew install google-chrome --cask
 
 # editor
-brew cask install macvim
-brew cask install visual-studio-code
+brew install macvim --cask
+brew install visual-studio-code --cask
 
 # terminal
-# brew cask install alacritty
-brew cask install iterm2
-# brew cask install hyper
+# brew install alacritty --cask
+brew install iterm2 --cask
+# brew install hyper --cask
 
 # productivity
-brew cask install karabiner-elements
-brew cask install spectacle
-brew cask install bartender
-# brew cask install cacher
+brew install karabiner-elements --cask
+brew install spectacle --cask
+brew install bartender --cask
+# brew install cacher --cask
 # npm install --g alfred-cacher
-# brew cask install sourcetree
-brew cask install gitify
-# brew cask install bitbar
+# brew install sourcetree --cask
+brew install gitify --cask
+# brew install bitbar --cask
 
 # dev
-# brew cask install virtualbox
-# brew cask install vagrant
-brew cask install docker
+# brew install virtualbox --cask
+# brew install vagrant --cask
+brew install docker --cask
 
 # communication
-# brew cask install skype
-# brew cask install slack
-# brew cask install tunnelblick
-# brew cask install station
+# brew install skype --cask
+# brew install slack --cask
+# brew install tunnelblick --cask
+# brew install station --cask
 
 # tools
-brew cask install the-unarchiver
-brew cask install skitch
-brew cask install cyberduck
-# brew cask install sequel-pro 
-brew cask install notion
-brew cask install alfred3
-# brew cask install 1password
+brew install the-unarchiver --cask
+brew install skitch --cask
+brew install cyberduck --cask
+# brew install sequel-pro  --cask
+brew install notion --cask
+brew install alfred3 --cask
+# brew install 1password --cask
 
 # other
-brew cask install kindle
+brew install kindle --cask
 
 ## 以下のアプリは手動で入れている
 # line
