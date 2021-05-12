@@ -43,7 +43,7 @@ brew install skitch --cask
 brew install cyberduck --cask
 # brew install sequel-pro  --cask
 brew install notion --cask
-brew install alfred3 --cask
+brew install alfred --cask
 # brew install 1password --cask
 
 # other
