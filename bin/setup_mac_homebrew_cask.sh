@@ -4,7 +4,7 @@ brew tap homebrew/cask
 
 # browser
 brew install firefox --cask
-brew install pushplaylabs-sidekick　--cask 
+brew install pushplaylabs-sidekick --cask 
 # brew install google-chrome --cask
 
 # editor
