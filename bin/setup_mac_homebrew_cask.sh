@@ -1,6 +1,6 @@
 #!/bin/sh
 
-brew tap caskroom/cask
+brew tap homebrew/cask
 
 # browser
 brew cask install firefox
