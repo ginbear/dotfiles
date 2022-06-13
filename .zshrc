@@ -5,7 +5,6 @@ export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # include common settings
 #=============================
 source ~/.shellrc
-# source ~/.zsh/*.zsh
 
 #=============================
 # exec fish`
@@ -113,9 +112,9 @@ setopt hist_ignore_space
 setopt hist_verify
 
 # 余分な空白は詰めて記録
-setopt hist_reduce_blanks  
+setopt hist_reduce_blanks
 
-# 古いコマンドと同じものは無視 
+# 古いコマンドと同じものは無視
 setopt hist_save_no_dups
 
 # historyコマンドは履歴に登録しない

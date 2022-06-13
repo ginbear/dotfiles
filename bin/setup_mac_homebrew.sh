@@ -9,7 +9,6 @@ brew upgrade
 brew install zsh
 mkdir ~/.zsh/
 brew install fish
-# brew install ag # to ripgrep
 brew install bat
 brew install coreutils
 brew install ghq
@@ -18,15 +17,12 @@ brew install htop
 brew install ipcalc
 brew install jq
 brew install nkf
-# brew install nodejs
 brew install tcptraceroute
 brew install trash
 brew install tree
 brew install vim
 brew install watch
 brew install wget
-# brew install zsh-completions
-# brew install rmtrash
 brew tap peco/peco
 brew install peco
 brew install ripgrep
@@ -42,30 +38,18 @@ brew install font-hack-nerd-font --cask
 
 
 ## ops tools
-# brew install ansible
 brew install envchain
 brew install tmux
 brew install gist
 brew install hub
 brew install tig
-brew install fabric
 brew install pyenv
-# brew install terraform
 brew install tfenv
 brew install pssh
 brew install awscli
-# brew install akamai
-brew install fftw httping
-
-## mackerel
-brew tap mackerelio/mackerel-agent
-brew install mkr
 
 ## rbenv
 brew install rbenv ruby-build
-rbenv install 2.2.1
-rbenv install 2.3.1
-rbenv install 2.4.1
 rbenv install 2.5.1
 rbenv global 2.5.1
 rbenv exec gem install bundler
@@ -80,15 +64,5 @@ brew list | grep ricty > /dev/null 2>&1 || (
   cp -f /usr/local/opt/ricty/share/fonts/Ricty*.ttf ~/Library/Fonts/
   fc-cache -vf
 )
-
-# jenkins
-# brew install Caskroom/cask/java
-# brew install jenkin
-# To have launchd start jenkins at login:
-#     ln -sfv /usr/local/opt/jenkins/*.plist ~/Library/LaunchAgents
-# Then to load jenkins now:
-#     launchctl load ~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist
-# Or, if you don't want/need launchctl, you can just run:
-#     jenkinss
 
 brew cleanup

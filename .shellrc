@@ -3,17 +3,13 @@
 source ~/.shellrc.local
 
 ## alias
-alias l='lsd'
 alias ls='lsd'
 alias ll='ls -l'
 alias la='ls -la'
 alias g='git'
 alias gist='gist -c -o -p'
-alias v=vagrant
-alias b=bundle
 alias be='bundle exec'
 alias bi='bundle install --path vendor/bundler'
-alias r=rbenv
 alias re='rbenv exec'
 alias rv='rbenv versions'
 alias date='gdate'
@@ -28,7 +24,6 @@ export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
 
 # SSH-KEY
-# [ -e ~/.ssh/id_dsa ] && ssh-add ~/.ssh/id_dsa
 [ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
 
 # GO 
