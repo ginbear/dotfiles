@@ -1,4 +1,5 @@
 # misc
+sed -e 's/,$//g' | gsed -e 's/"time": /date -r /e'                           ## mkr の epoctime unixtime を変換する
 stat                                                                         ## file の詳細な情報を表示
 grep -v -E "^\s*#|^\s*$"                                                     ## config だけを見たいんや！
 grep --color=auto                                                            ## grep をカラフルに見たいんや！ 永続的に設定したいとき export GREP_OPTIONS='--color=auto'

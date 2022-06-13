@@ -1,10 +1,11 @@
 export LC_ALL=en_US.UTF-8
+export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 #
 #=============================
 # include common settings
 #=============================
 source ~/.shellrc
-source ~/.zsh/*.zsh
+# source ~/.zsh/*.zsh
 
 #=============================
 # exec fish`
@@ -26,7 +27,6 @@ select-word-style bash
 
 #=============================
 # zsh-completions
-# http://qiita.com/harapeko_wktk/items/47aee77e6e7f7800fa03
 #=============================
 fpath=(/usr/local/share/zsh-completions $fpath)
 autoload -Uz compinit
@@ -36,28 +36,6 @@ compinit -u
 # for hub
 #=============================
 function git(){hub "$@"}
-
-#=============================
-# peco + ssh
-#=============================
-function peco-ssh () {
-  local selected_host=$(awk '
-  tolower($1)=="host" {
-    for (i=2; i<=NF; i++) {
-      if ($i !~ "[*?]") {
-        print $i
-      }
-    }
-  }
-  ' <(cat ~/.ssh/config ~/.ssh/config.*) | sort | peco --query "$LBUFFER")
-  if [ -n "$selected_host" ]; then
-    BUFFER="ssh ${selected_host}"
-    zle accept-line
-  fi
-  zle clear-screen
-}
-zle -N peco-ssh
-# bindkey '^t' peco-ssh
 
 #=============================
 # peco の結果に $1 する. p cd とか
@@ -150,18 +128,6 @@ setopt hist_expand
 setopt inc_append_history
 
 #=============================
-# auto-fu.zsh
-#=============================
-# if [ -d ~/.zsh/auto-fu.zsh ]; then
-#     source ~/.zsh/auto-fu.zsh/auto-fu.zsh
-#     function zle-line-init () {
-#         auto-fu-init
-#     }
-#     zle -N zle-line-init
-#     zstyle ':completion:*' completer _oldlist _complete
-# fi
-
-#=============================
 # Appearance & prompt
 #=============================
 # font は https://gist.github.com/qrush/1595572#file-menlo-powerline-otf を利用
@@ -169,8 +135,8 @@ setopt inc_append_history
 # DEFAULT=$'\U1F411 ' # ひつじ
 # DEFAULT=$'\U1F30E ' # 地球
 DEFAULT='$' # シンプルに
-# ERROR=$'\U1F363'   # スシ
-ERROR=$'\U1F47A'   # 天狗
+# # ERROR=$'\U1F363'   # スシ
+# ERROR=$'\U1F47A'   # 天狗
 BRANCH=$'\U2B60'   # ブランチ
 
 autoload -Uz vcs_info
@@ -189,5 +155,18 @@ colors
 
 PROMPT='%(?.${DEFAULT}.%{${fg[red]}%}${DEFAULT}%{${reset_color}%}) ${vcs_info_msg_0_}'
 
-# autoload -U +X bashcompinit && bashcompinit
-export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/shimizu/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/shimizu/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/shimizu/opt/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/shimizu/opt/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

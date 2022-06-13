@@ -1,6 +1,6 @@
 # pyenv が必要なので先に `bin/setup_mac_homebrew.sh` を実行する
 
-PYVERSION="2.7.14"
+PYVERSION="3.6.13"
 
 # https://github.com/pyenv/pyenv/wiki/Common-build-problems
 # High Sierra にしてから標準の openssl が LibreSSL になったので

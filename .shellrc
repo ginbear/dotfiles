@@ -19,6 +19,10 @@ alias rv='rbenv versions'
 alias date='gdate'
 alias grep='rg'
 alias cat='bat -p'
+alias tf='terraform'
+alias tfp='terraform plan'
+alias tfim='terraform import'
+alias tfsrm='terraform state rm'
 
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8

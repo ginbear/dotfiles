@@ -28,3 +28,9 @@ function fish_user_key_bindings
 #   bind \cx\cr peco_recentd
 #   bind \cx\ck peco_kill
 end
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+eval /Users/shimizu/opt/anaconda3/bin/conda "shell.fish" "hook" $argv | source
+# <<< conda initialize <<<
+

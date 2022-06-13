@@ -35,7 +35,7 @@ brew install sd
 ### lsd
 brew install lsd
 brew tap homebrew/cask-fonts
-brew cask install font-hack-nerd-font
+brew install font-hack-nerd-font --cask
 # 一度 iterm2 を再起動する
 # iTerm2 > Preferences > Profiles > Text > Non-ASCII-Font > Change Font
 # ref https://github.com/Peltoche/lsd/issues/199

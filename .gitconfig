@@ -6,8 +6,7 @@
         editor = /usr/bin/vim
         excludesfile = ~/.gitignore
 [ghq]
-        root = ~/.ghq
-        root = ~/.go/src
+        root = ~/ghq
 [alias]
         st = status
         sh = show

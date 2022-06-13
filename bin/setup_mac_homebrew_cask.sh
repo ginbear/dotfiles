@@ -14,6 +14,7 @@ brew install visual-studio-code --cask
 # terminal
 # brew install alacritty --cask
 brew install iterm2 --cask
+brew install warp --cask
 # brew install hyper --cask
 
 # productivity
