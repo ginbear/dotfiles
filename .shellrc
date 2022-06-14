@@ -23,8 +23,8 @@ alias tfsrm='terraform state rm'
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
 
-# SSH-KEY
-[ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
+# SSH-KEY 1password 利用中のため
+# [ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
 
 # GO 
 if [ -d $HOME/.go ] ; then

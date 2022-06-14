@@ -14,4 +14,3 @@
 
 ![image](https://user-images.githubusercontent.com/3601231/29417586-a3096820-83a4-11e7-9570-ffdeb6a3e41b.png)
 
-### zsh のvcs_info で使っている font 
