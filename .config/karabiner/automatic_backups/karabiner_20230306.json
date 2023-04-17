@@ -1,10 +1,8 @@
 {
     "global": {
-        "ask_for_confirmation_before_quitting": true,
         "check_for_updates_on_startup": true,
         "show_in_menu_bar": true,
-        "show_profile_name_in_menu_bar": false,
-        "unsafe_ui": false
+        "show_profile_name_in_menu_bar": false
     },
     "profiles": [
         {
@@ -33,6 +31,56 @@
                                     }
                                 ],
                                 "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "available_since": "12.3.0",
+                        "description": "Change button4 + mouse motion to scroll wheel (rev 1)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    },
+                                    "pointing_button": "button4"
+                                },
+                                "to": [
+                                    {
+                                        "set_variable": {
+                                            "name": "enable_mouse_motion_to_scroll",
+                                            "value": 1
+                                        }
+                                    }
+                                ],
+                                "to_after_key_up": [
+                                    {
+                                        "set_variable": {
+                                            "name": "enable_mouse_motion_to_scroll",
+                                            "value": 0
+                                        }
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "name": "enable_mouse_motion_to_scroll",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "from": {
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "type": "mouse_motion_to_scroll"
                             }
                         ]
                     },
@@ -750,8 +798,7 @@
                                 }
                             ]
                         }
-                    ],
-                    "treat_as_built_in_keyboard": false
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -764,8 +811,7 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": true,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
+                    "simple_modifications": []
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -809,8 +855,7 @@
                                 }
                             ]
                         }
-                    ],
-                    "treat_as_built_in_keyboard": false
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -894,8 +939,7 @@
                                 }
                             ]
                         }
-                    ],
-                    "treat_as_built_in_keyboard": false
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -908,8 +952,7 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": false,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
+                    "simple_modifications": []
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -943,8 +986,7 @@
                                 }
                             ]
                         }
-                    ],
-                    "treat_as_built_in_keyboard": false
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -978,8 +1020,7 @@
                                 }
                             ]
                         }
-                    ],
-                    "treat_as_built_in_keyboard": false
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -992,120 +1033,7 @@
                     },
                     "ignore": true,
                     "manipulate_caps_lock_led": false,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "is_pointing_device": false,
-                        "product_id": 638,
-                        "vendor_id": 1452
-                    },
-                    "ignore": false,
-                    "manipulate_caps_lock_led": true,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": false,
-                        "is_pointing_device": true,
-                        "product_id": 638,
-                        "vendor_id": 1452
-                    },
-                    "ignore": true,
-                    "manipulate_caps_lock_led": false,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "is_pointing_device": false,
-                        "product_id": 258,
-                        "vendor_id": 10730
-                    },
-                    "ignore": false,
-                    "manipulate_caps_lock_led": true,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": false,
-                        "is_pointing_device": true,
-                        "product_id": 258,
-                        "vendor_id": 10730
-                    },
-                    "ignore": true,
-                    "manipulate_caps_lock_led": false,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "is_pointing_device": false,
-                        "product_id": 32982,
-                        "vendor_id": 1149
-                    },
-                    "ignore": false,
-                    "manipulate_caps_lock_led": true,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": false,
-                        "is_pointing_device": true,
-                        "product_id": 32982,
-                        "vendor_id": 1149
-                    },
-                    "ignore": true,
-                    "manipulate_caps_lock_led": false,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "is_pointing_device": false,
-                        "product_id": 34304,
-                        "vendor_id": 1452
-                    },
-                    "ignore": false,
-                    "manipulate_caps_lock_led": true,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
-                },
-                {
-                    "disable_built_in_keyboard_if_exists": false,
-                    "fn_function_keys": [],
-                    "identifiers": {
-                        "is_keyboard": false,
-                        "is_pointing_device": true,
-                        "product_id": 65520,
-                        "vendor_id": 1149
-                    },
-                    "ignore": true,
-                    "manipulate_caps_lock_led": false,
-                    "simple_modifications": [],
-                    "treat_as_built_in_keyboard": false
+                    "simple_modifications": []
                 }
             ],
             "fn_function_keys": [

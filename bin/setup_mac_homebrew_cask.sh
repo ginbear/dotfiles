@@ -21,6 +21,7 @@ brew install bartender --cask
 
 # dev
 brew install docker --cask
+brew install google-cloud-sdk --cask
 
 # communication
 brew install slack --cask
@@ -31,6 +32,7 @@ brew install skitch --cask
 brew install notion --cask
 brew install alfred --cask
 brew install 1password --cask
+brew install 1password-cli --cask
 
 # other
 brew install kindle --cask
