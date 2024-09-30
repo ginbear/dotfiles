@@ -19,6 +19,7 @@ alias tf='terraform'
 alias tfp='terraform plan'
 alias tfim='terraform import'
 alias tfsrm='terraform state rm'
+alias vi='nvim'
 
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8

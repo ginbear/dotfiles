@@ -20,13 +20,14 @@ brew install nkf
 brew install tcptraceroute
 brew install trash
 brew install tree
-brew install vim
+# brew install vim
 brew install watch
 brew install wget
 brew tap peco/peco
 brew install peco
 brew install ripgrep
 brew install sd
+brew install neovim
 
 ### lsd
 brew install lsd
