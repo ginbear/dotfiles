@@ -7,15 +7,15 @@
 
 # gitで管理するファイルリスト
 FILELIST="
+.gitignore
+.gitconfig
+.shellrc
 .bash_profile
 .zshrc
-.tmux.conf
+.p10k.zsh
 .peco
-.shellrc
-.gitconfig
-.gitignore
 .snippets
-.rspec
+.tmux.conf
 .config
 "
 

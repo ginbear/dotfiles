@@ -1,18 +1,17 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-#
+
 #=============================
 # include common settings
 #=============================
 source ~/.shellrc
-
-#=============================
-# exec fish`
-#=============================
-# case $- in
-#     *i*) exec fish;;
-#       *) return;;
-# esac
 
 #=============================
 # zsh settings
@@ -126,34 +125,6 @@ setopt hist_expand
 # 履歴をインクリメンタルに追加
 setopt inc_append_history
 
-#=============================
-# Appearance & prompt
-#=============================
-# font は https://gist.github.com/qrush/1595572#file-menlo-powerline-otf を利用
-# 一度 ↑ を入れてから ricty に変えたら記号が見えたっぽい. 謎
-# DEFAULT=$'\U1F411 ' # ひつじ
-# DEFAULT=$'\U1F30E ' # 地球
-DEFAULT='$' # シンプルに
-# # ERROR=$'\U1F363'   # スシ
-# ERROR=$'\U1F47A'   # 天狗
-BRANCH=$'\U2B60'   # ブランチ
-
-autoload -Uz vcs_info
-setopt prompt_subst
-zstyle ':vcs_info:git:*:-all-' command /usr/bin/git
-zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' stagedstr "%F{yellow}!"
-zstyle ':vcs_info:git:*' unstagedstr "%F{red}+"
-zstyle ':vcs_info:*' formats "%F{green}%c%u%r ${BRANCH}%b$ %f"
-zstyle ':vcs_info:*' actionformats '[%b|%a]'
-precmd () { vcs_info }
-# PROMPT='${vcs_info_msg_0_}%% '
-
-autoload -Uz colors
-colors
-
-PROMPT='%(?.${DEFAULT}.%{${fg[red]}%}${DEFAULT}%{${reset_color}%}) ${vcs_info_msg_0_}'
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/Users/shimizu/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -169,3 +140,7 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+## https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#installation
+source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
