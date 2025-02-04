@@ -36,6 +36,7 @@ brew install 1password-cli --cask
 
 # other
 brew install kindle --cask
+brew install --cask keyboardcleantool
 
 ## 以下のアプリは手動で入れている
 # line

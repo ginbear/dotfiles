@@ -8,8 +8,6 @@
 # gitで管理するファイルリスト
 FILELIST="
 .bash_profile
-.vimrc
-.gvimrc
 .zshrc
 .tmux.conf
 .peco
@@ -18,9 +16,7 @@ FILELIST="
 .gitignore
 .snippets
 .rspec
-.fabricrc
 .config
-fabfile.py
 "
 
 VIMFILELIST="
@@ -55,15 +51,15 @@ do
     ln -s ${PWD}/.vim/${FILE} ${HOME}/.vim/${FILE}
 done
 
-# go
-mkdir ~/.go
-
-# vim neobundle install
-[ ! -e ~/.vim/bundle ] && git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-sudo chown shimizu ~/.vim/bundle/.neobundle
-
-# tssh deploy
-ln -s ${PWD}/tssh/tssh /usr/local/bin
+# # go
+# mkdir ~/.go
+# 
+# # vim neobundle install
+# [ ! -e ~/.vim/bundle ] && git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
+# sudo chown shimizu ~/.vim/bundle/.neobundle
+# 
+# # tssh deploy
+# ln -s ${PWD}/tssh/tssh /usr/local/bin
 
 # lltsv
 go get github.com/sonots/lltsv
