@@ -28,6 +28,7 @@ brew install peco
 brew install ripgrep
 brew install sd
 brew install neovim
+brew install ghostty
 brew install powerlevel10k # https://github.com/romkatv/powerlevel10k
 
 ## ops tools

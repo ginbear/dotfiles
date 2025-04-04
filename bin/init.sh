@@ -16,7 +16,6 @@ FILELIST="
 .peco
 .snippets
 .tmux.conf
-.config
 "
 
 VIMFILELIST="
