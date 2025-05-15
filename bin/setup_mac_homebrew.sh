@@ -8,7 +8,7 @@ brew upgrade
 ## basic tools
 brew install zsh
 mkdir ~/.zsh/
-brew install fish
+# brew install fish
 brew install bat
 brew install coreutils
 brew install ghq
@@ -27,7 +27,7 @@ brew tap peco/peco
 brew install peco
 brew install ripgrep
 brew install sd
-brew install neovim
+# brew install neovim
 brew install ghostty
 brew install powerlevel10k # https://github.com/romkatv/powerlevel10k
 
