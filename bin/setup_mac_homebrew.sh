@@ -30,6 +30,7 @@ brew install sd
 # brew install neovim
 brew install ghostty
 brew install powerlevel10k # https://github.com/romkatv/powerlevel10k
+brew install lsd
 
 ## ops tools
 brew install envchain
