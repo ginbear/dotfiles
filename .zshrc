@@ -125,6 +125,71 @@ setopt hist_expand
 # 履歴をインクリメンタルに追加
 setopt inc_append_history
 
+#=============================
+# k8s で context をいい感じに選ぶ
+#=============================
+function kctx() {
+  local ctx=$(kubectl config get-contexts -o name | fzf)
+  if [[ -n "$ctx" ]]; then
+    kubectl config use-context "$ctx"
+    echo "Switched to context: $ctx"
+  fi
+}
+
+#=============================
+# k8s で namespace をいい感じに選ぶ
+#=============================
+function kns() {
+  local ns=$(kubectl get ns --no-headers | awk '{print $1}' | fzf)
+  if [[ -n "$ns" ]]; then
+    kubectl config set-context --current --namespace="$ns"
+    echo "Switched to namespace: $ns"
+  fi
+}
+
+#=============================
+# k8s で pod 選んで describe
+#=============================
+function kpod() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  if [[ -n "$pod" ]]; then
+    kubectl describe pod "$pod"
+  fi
+}
+
+#=============================
+# k8s で pod 選んで log
+#=============================
+function klog() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  if [[ -n "$pod" ]]; then
+    kubectl logs "$pod"
+  fi
+}
+
+## マルチコンテナ対応バージョン
+function klogc() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  if [[ -z "$pod" ]]; then return; fi
+
+  local containers=$(kubectl get pod "$pod" -o jsonpath='{.spec.containers[*].name}')
+  local container=$(echo "$containers" | tr ' ' '\n' | fzf)
+  if [[ -n "$container" ]]; then
+    kubectl logs "$pod" -c "$container"
+  fi
+}
+
+#=============================
+# k8s で pod 選んで exec -it
+#=============================
+function kexec() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  if [[ -n "$pod" ]]; then
+    kubectl exec -it "$pod" -- /bin/sh
+  fi
+}
+
+
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/Users/shimizu/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"

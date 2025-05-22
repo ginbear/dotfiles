@@ -23,6 +23,7 @@ alias tfim='terraform import'
 alias tfsrm='terraform state rm'
 alias vi='nvim'
 alias k='kubectl'
+alias c='cursor'
 
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
