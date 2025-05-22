@@ -86,44 +86,19 @@ bindkey '^r' fzf-select-history
 # history
 # http://qiita.com/syui/items/c1a1567b2b76051f50c4
 #=============================
-# 履歴ファイルの保存先
-export HISTFILE=${HOME}/.zsh_history
-
-# メモリに保存される履歴の件数
-export HISTSIZE=1000
-
-# 履歴ファイルに保存される履歴の件数
-export SAVEHIST=100000
-
-# 重複を記録しない
-setopt hist_ignore_dups
-
-# 開始と終了を記録
-setopt EXTENDED_HISTORY
-
-# ヒストリに追加されるコマンド行が古いものと同じなら古いものを削除
-setopt hist_ignore_all_dups
-
-# スペースで始まるコマンド行はヒストリリストから削除
-setopt hist_ignore_space
-
-# ヒストリを呼び出してから実行する間に一旦編集可能
-setopt hist_verify
-
-# 余分な空白は詰めて記録
-setopt hist_reduce_blanks
-
-# 古いコマンドと同じものは無視
-setopt hist_save_no_dups
-
-# historyコマンドは履歴に登録しない
-setopt hist_no_store
-
-# 補完時にヒストリを自動的に展開
-setopt hist_expand
-
-# 履歴をインクリメンタルに追加
-setopt inc_append_history
+export HISTFILE=${HOME}/.zsh_history        # 履歴ファイルの保存先
+export HISTSIZE=1000                        # メモリに保存される履歴の件数
+export SAVEHIST=100000                      # 履歴ファイルに保存される履歴の件数
+setopt hist_ignore_dups                     # 直前と重複するコマンドは記録しない
+setopt EXTENDED_HISTORY                     # 開始と終了のタイムスタンプも記録
+setopt hist_ignore_all_dups                 # 古い重複コマンドを削除して新しいのだけ残す
+setopt hist_ignore_space                    # スペースで始まるコマンドは記録しない
+setopt hist_verify                          # 履歴からの実行前に編集可能
+setopt hist_reduce_blanks                   # 余分な空白を詰めて記録
+setopt hist_save_no_dups                    # 同一コマンドを履歴に保存しない
+setopt hist_no_store                        # `history` コマンド自体を履歴に残さない
+setopt hist_expand                          # 補完時にヒストリ展開を有効にする
+setopt inc_append_history                   # コマンド実行ごとに履歴を即座に保存
 
 #=============================
 # k8s で context をいい感じに選ぶ
