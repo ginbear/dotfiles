@@ -7,6 +7,7 @@ fi
 
 export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
 
 #=============================
 # include common settings
@@ -31,6 +32,14 @@ autoload -Uz compinit
 compinit -u
 
 #=============================
+# for aws
+#=============================
+function aws-profile() {
+  export AWS_PROFILE=$(grep -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
+  echo "Switched to profile: $AWS_PROFILE"
+}
+
+#=============================
 # for hub
 #=============================
 function git(){hub "$@"}
@@ -42,45 +51,36 @@ function git(){hub "$@"}
 p() { peco | while read LINE; do $@ $LINE; done }
 
 #=============================
-# snippets
-# http://blog.glidenote.com/blog/2014/06/26/snippets-peco-percol/
+# snippets with fzf
 #=============================
-function peco-snippets() {
-    local SNIPPETS=$(cat ~/.snippets ~/.snippets.local | peco --query "$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
-#     zle clear-screen
+function fzf-snippets() {
+  local SNIPPETS=$(cat ~/.snippets | fzf --query="$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
 }
-zle -N peco-snippets
-bindkey '^x' peco-snippets
+zle -N fzf-snippets
+bindkey '^x' fzf-snippets
 
 #=============================
-# ghq look
+# ghq look with fzf
 #=============================
-function ghq-look() {
-    local GHQLOOK=$(ghq list -p | peco)
-    cd $GHQLOOK
+function fzf-ghq-look() {
+  local dir=$(ghq list -p | fzf)
+  if [[ -n "$dir" ]]; then
+    cd "$dir"
+  fi
 }
-zle -N ghq-look
-bindkey '^G' ghq-look
+zle -N fzf-ghq-look
+bindkey '^G' fzf-ghq-look
 
 #=============================
-# history を peco で選択
-# http://blog.kenjiskywalker.org/blog/2014/06/12/peco/
+# history with fzf
 #=============================
-function peco-select-history() {
-    local tac
-    if which tac > /dev/null; then
-        tac="tac"
-    else
-        tac="tail -r"
-    fi
-    BUFFER=$(history -n 1 | \
-        eval $tac | \
-        peco --query "$LBUFFER")
-    CURSOR=$#BUFFER
-    zle clear-screen
+function fzf-select-history() {
+  BUFFER=$(history -n 1 | tac | fzf --query="$LBUFFER")
+  CURSOR=$#BUFFER
+  zle redisplay
 }
-zle -N peco-select-history
-bindkey '^r' peco-select-history
+zle -N fzf-select-history
+bindkey '^r' fzf-select-history
 
 #=============================
 # history

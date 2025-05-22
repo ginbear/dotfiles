@@ -16,6 +16,7 @@ brew install go
 brew install htop
 brew install ipcalc
 brew install jq
+brew install yq
 brew install nkf
 brew install tcptraceroute
 brew install trash
@@ -42,6 +43,7 @@ brew install pyenv
 brew install tfenv
 brew install pssh
 brew install awscli
+brew install eksctl
 
 ## rbenv
 brew install rbenv ruby-build
