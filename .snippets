@@ -215,3 +215,29 @@ rbenv exec gem list | awk '{print "rbenv exec gem uninstall " $1}' | sh -xv  ## 
 pyenv install --list                ## install 可能な version を確認
 pyenv global <system|version>       ## Version の指定
 pip install python-openstackclient python-neutronclient python-novaclient ## Openstack client の install
+
+# kubectl config & namespace
+kubectl config get-contexts                             ## 現在の context 一覧を表示（どれが使われているかチェック）→ 関数: kctx
+kubectl config use-context <context-name>               ## context を切り替え（例：dev / staging / prod）→ 関数: kctx
+kubectl get ns                                           ## namespace 一覧を表示 → 関数: kns
+kubectl config set-context --current --namespace=<namespace>  ## 現在の context に namespace を設定 → 関数: kns
+
+# pod 操作
+kubectl get pods -o wide                                 ## pod 一覧を表示（IP や Node 情報も含まれる）→ 関数: kpod
+kubectl describe pod <pod-name>                          ## pod の詳細情報（イベント、Volume、状態など）→ 関数: kpod
+kubectl logs <pod-name>                                  ## pod のログを表示（シングルコンテナ向け）→ 関数: klog
+klogc                                                    ## pod → container を選んでログ表示（マルチコンテナ対応）
+kubectl exec -it <pod-name> -- /bin/bash                 ## pod に bash で入る（login shell）→ 関数: kexec（sh fallback 付き）
+
+# kustomize 関連
+kst                                                      ## kustomize 関連コマンド確認用の alias（例：help, version など）
+ksb                                                      ## `kustomize build` のショートカット
+ksbf                                                     ## fzf などでファイルを選んで build 実行（用途に応じて overlay 切り替えなど）
+
+# 備考
+# - kctx: context を fzf で選んで use-context
+# - kns: namespace を fzf で選んで set-context
+# - kpod: pod を fzf で選んで describe / logs などに使える
+# - kexec: pod を選んで bash or sh に入る（bash が無ければ自動で sh に fallback）
+# - klogc: pod → container を fzf で選択して logs 表示（マルチコンテナ対応）
+
