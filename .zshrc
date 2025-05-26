@@ -107,7 +107,6 @@ function kctx() {
   local ctx=$(kubectl config get-contexts -o name | fzf)
   if [[ -n "$ctx" ]]; then
     kubectl config use-context "$ctx"
-    echo "Switched to context: $ctx"
   fi
 }
 
@@ -160,7 +159,23 @@ function klogc() {
 function kexec() {
   local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
   if [[ -n "$pod" ]]; then
-    kubectl exec -it "$pod" -- /bin/sh
+    local bash_path
+    bash_path=$(kubectl exec "$pod" -- which bash 2>/dev/null)
+    if [[ -n "$bash_path" ]]; then
+      kubectl exec -it "$pod" -- "$bash_path"
+    else
+      kubectl exec -it "$pod" -- /bin/sh
+    fi
+  fi
+}
+
+#=============================
+# k8s/kustomization する対象を選んで実行
+#=============================
+function ksbf() {
+  local dir=$(find . -name kustomization.yaml | sed 's|/kustomization.yaml||' | fzf)
+  if [[ -n "$dir" ]]; then
+    kustomize build "$dir"
   fi
 }
 
