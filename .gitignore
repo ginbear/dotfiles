@@ -7,3 +7,4 @@
 !.config/ghostty
 !.config/gh
 !.config/gh/config.yml
+.config/gh/hosts.yml
