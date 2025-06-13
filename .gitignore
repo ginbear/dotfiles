@@ -5,3 +5,5 @@
 *.log
 .config/hub
 .config/op
+.config/raycast
+.config/karabiner
