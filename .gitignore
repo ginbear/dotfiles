@@ -3,7 +3,6 @@
 .vagrant
 *.swp
 *.log
-.config/hub
-.config/op
-.config/raycast
-.config/karabiner
+.config/*
+!.config/ghostty
+!.config/gh/config.yml
