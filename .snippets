@@ -229,6 +229,9 @@ kubectl logs <pod-name>                                  ## pod のログを表�
 klogc                                                    ## pod → container を選んでログ表示（マルチコンテナ対応）
 kubectl exec -it <pod-name> -- /bin/bash                 ## pod に bash で入る（login shell）→ 関数: kexec（sh fallback 付き）
 
+# argoCD 関連
+kubectl get applications.argoproj.io -A                  ## クラスタ上の Application 一覧
+
 # kustomize 関連
 kst                                                      ## kustomize 関連コマンド確認用の alias（例：help, version など）
 ksb                                                      ## `kustomize build` のショートカット

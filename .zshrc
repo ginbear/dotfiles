@@ -1,6 +1,6 @@
 export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
+export FZF_DEFAULT_OPTS='--height 40% --reverse --border --no-sort'
 
 #=============================
 # include common settings
@@ -28,9 +28,23 @@ compinit -u
 # for aws
 #=============================
 function aws-profile() {
-  export AWS_PROFILE=$(grep -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
+  export AWS_PROFILE=$(rg -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
   echo "Switched to profile: $AWS_PROFILE"
 }
+
+#=============================
+# AWS SSO LOGIN を 1 日一回やる
+#=============================
+AWS_SSO_LOGIN_STAMP_FILE="$HOME/.aws_sso_login_last"
+
+if [ ! -f "$AWS_SSO_LOGIN_STAMP_FILE" ] || [ "$(date +%Y-%m-%d)" != "$(cat $AWS_SSO_LOGIN_STAMP_FILE)" ]; then
+  for AWS_SSO_PROFILE in $(grep -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq ) 
+  do
+    echo "Running aws sso login for profile $AWS_SSO_PROFILE..."
+    aws sso login --profile "$AWS_SSO_PROFILE"
+  done
+  date +%Y-%m-%d > "$AWS_SSO_LOGIN_STAMP_FILE"
+fi
 
 #=============================
 # for hub
@@ -187,3 +201,7 @@ source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -44,6 +44,8 @@ brew install tfenv
 brew install pssh
 brew install awscli
 brew install eksctl
+brew install kubent
+brew install kubeseal
 
 ## rbenv
 brew install rbenv ruby-build
