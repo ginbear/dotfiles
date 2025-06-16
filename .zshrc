@@ -205,3 +205,34 @@ source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#=============================
+# for production settings
+#=============================
+
+if [[ "$ENV_TYPE" == "production" ]]; then
+
+#   export LOGFILE=~/.logs/zsh-session-$(date +%F-%H%M%S)-$$.log
+#   mkdir -p ~/.logs
+#   echo "[LOG START $(date)]" >> "$LOGFILE"
+# 
+#   # stdout, stderr を tee に流す
+#   exec >> "$LOGFILE" 2>&1
+# 
+#   # preexec フック：コマンド直前のログ
+#   function log_command_with_timestamp() {
+#     echo "" >&2
+#     echo "## [$(date '+%F %T')] Running: $1" >&2
+#   }
+#   autoload -Uz add-zsh-hook
+#   add-zsh-hook preexec log_command_with_timestamp
+
+  # Powerlevel10k のプロンプト制御
+  typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=off
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    dir
+    vcs
+    time
+  )
+
+fi

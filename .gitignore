@@ -5,6 +5,8 @@
 *.log
 .config/*
 !.config/ghostty
+!.config/nvim
+!.config/zsh-profiles
 !.config/gh
 !.config/gh/config.yml
 .config/gh/hosts.yml

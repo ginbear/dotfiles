@@ -12,6 +12,7 @@ FILELIST="
 .shellrc
 .bash_profile
 .zshrc
+.zlogout
 .p10k.zsh
 .peco
 .snippets

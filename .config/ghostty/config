@@ -43,7 +43,19 @@
 # resize-overlay-duration = 4s 200ms
 
 theme = catppuccin-mocha
+# theme = xcodedarkhc
+
 window-padding-x = 10
 background-opacity = 0.85
 background-blur-radius = 5
-keybind = shift+enter=text:\n
+
+# macos-titlebar-style = hidden
+macos-window-shadow = false
+
+cursor-style = block
+cursor-style-blink = false
+cursor-invert-fg-bg = true
+cursor-opacity = 0.8
+
+copy-on-select = clipboard
+
