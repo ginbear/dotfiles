@@ -1,3 +1,4 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
 export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export FZF_DEFAULT_OPTS='--height 40% --reverse --border --no-sort'
@@ -28,28 +29,68 @@ compinit -u
 # for aws
 #=============================
 function aws-profile() {
-  export AWS_PROFILE=$(rg -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
+  local AWS_PROFILE_SELECTED
+  local AWS_SSO_LOGIN_STAMP_DIR="$HOME/.aws/sso_login_timestamps"
+#  local CURRENT_TIME=$(date +%s) # 現在時刻をUnixエポック秒で取得
+
+  # プロファイルを選択
+  AWS_PROFILE_SELECTED=$(rg -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
+
+  if [ -z "$AWS_PROFILE_SELECTED" ]; then
+    echo "プロファイルが選択されませんでした。"
+    return 1
+  fi
+
+  export AWS_PROFILE="$AWS_PROFILE_SELECTED"
   echo "Switched to profile: $AWS_PROFILE"
+  echo "exec: aws sso login --profile $AWS_PROFILE_SELECTED"
+  aws sso login --profile "$AWS_PROFILE_SELECTED"
+
+#   # ログインタイムスタンプディレクトリが存在しない場合は作成
+#   mkdir -p "$AWS_SSO_LOGIN_STAMP_DIR"
+# 
+#   local STAMP_FILE="$AWS_SSO_LOGIN_STAMP_DIR/${AWS_PROFILE_SELECTED}.timestamp"
+#   local LAST_LOGIN_TIME=0
+# 
+#   # 過去のログイン時刻を読み込む
+#   if [ -f "$STAMP_FILE" ]; then
+#     LAST_LOGIN_TIME=$(cat "$STAMP_FILE")
+#   fi
+# 
+#   local SEVENTY_TWO_HOURS_IN_SECONDS=$((24 * 60 * 60))
+# 
+#   # 前回のログインから72時間以上経過しているかチェック
+#   if [ $((CURRENT_TIME - LAST_LOGIN_TIME)) -ge "$SEVENTY_TWO_HOURS_IN_SECONDS" ]; then
+#     echo "前回のログインから72時間以上経過しました。aws sso login を実行します..."
+#     if aws sso login --profile "$AWS_PROFILE_SELECTED"; then
+#       echo "$CURRENT_TIME" > "$STAMP_FILE" # ログイン成功時にタイムスタンプを更新
+#       echo "aws sso login が正常に完了しました。"
+#     else
+#       echo "aws sso login に失敗しました。"
+#     fi
+#   else
+#     echo "前回のログインから72時間以内です。aws sso login はスキップします。"
+#   fi
 }
-
-#=============================
-# AWS SSO LOGIN を 1 日一回やる
-#=============================
-AWS_SSO_LOGIN_STAMP_FILE="$HOME/.aws_sso_login_last"
-
-if [ ! -f "$AWS_SSO_LOGIN_STAMP_FILE" ] || [ "$(date +%Y-%m-%d)" != "$(cat $AWS_SSO_LOGIN_STAMP_FILE)" ]; then
-  for AWS_SSO_PROFILE in $(grep -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq ) 
-  do
-    echo "Running aws sso login for profile $AWS_SSO_PROFILE..."
-    aws sso login --profile "$AWS_SSO_PROFILE"
-  done
-  date +%Y-%m-%d > "$AWS_SSO_LOGIN_STAMP_FILE"
-fi
 
 #=============================
 # for hub
 #=============================
-function git(){hub "$@"}
+# function git(){hub "$@"}
+
+#=============================
+# git 補完
+#=============================
+fpath=(~/.zsh/completion $fpath)
+
+# 補完機能を有効化
+autoload -Uz compinit
+compinit
+
+function gsw() {
+  local branch=$(git branch | sed 's/^[* ] //' | fzf)
+  [[ -n "$branch" ]] && git switch "$branch"
+}
 
 #=============================
 # peco の結果に $1 する. p cd とか
@@ -236,3 +277,5 @@ if [[ "$ENV_TYPE" == "production" ]]; then
   )
 
 fi
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"

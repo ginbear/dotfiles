@@ -111,8 +111,7 @@ dstat --top-io-adv --top-bio-adv
 dstat -ta --top-io-adv --top-bio-adv  ## なんか便利！
 
 # git
-git push origin $(git branch | grep ^\* | cut -f2 -d " ")       ## 現行の Branch を git push
-git push origin (git branch | grep '^\*' | cut -f2 -d " ")      ## 現行の Branch を git push fish 版
+git push origin HEAD                                            ## 現行の Branch を git push, git pushh を alias にしている
 git diff FETCH_HEAD                                             ## マージ前の差分チェック
 git merge FETCH_HEAD                                            ## マージ
 git branch -d hoge                                              ## ブランチ削除
@@ -127,6 +126,8 @@ git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;    ## remote buranc
 git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
 git branch --set-upstream-to=origin/branch-name branch-name     ## 自分で remote に push した branch に別の人が編集しそれを取り込みたい場合、git pull の前に行う
 git push --delete origin add-inamuu-to-dareka                   ## PR を出す直前に取り消す
+git diff --name-only abcdef12^ abcdef12                         ## 差分からファイル名だけを表示する
+git restore --source=HEAD^ fileA fileB                          ## 直前のコミットから一部のファイルだけ戻したいとき
 
 # apache
 /usr/local/apache2/bin/httpd -SM                                ## いろいろ確認
@@ -228,11 +229,18 @@ kubectl describe pod <pod-name>                          ## pod の詳細情報�
 kubectl logs <pod-name>                                  ## pod のログを表示（シングルコンテナ向け）→ 関数: klog
 klogc                                                    ## pod → container を選んでログ表示（マルチコンテナ対応）
 kubectl exec -it <pod-name> -- /bin/bash                 ## pod に bash で入る（login shell）→ 関数: kexec（sh fallback 付き）
+kubectl get pods --all-namespaces --field-selector spec.nodeName=<nodename> -o wide  ## 特定のnodeにいる pod の一覧
+
+# misc
+kubectl get daemonset --all-namespaces                         ## daemon sest のリスト
+kubectl get replicaset --sort-by=.metadata.creationTimestamp | tail -r  ## replicaset 一覧を最近生まれた順に表示
 
 # argoCD 関連
 kubectl get applications.argoproj.io -A                  ## クラスタ上の Application 一覧
 
 # kustomize 関連
+kustomize build overlays/dev | yq 'select(.kind == "Ingress" and .metadata.name == "hoge")' ## kustomize で手元のmanifestを生成(標準出力に出る)
+kustomize build admin/dev | k diff -f -
 kst                                                      ## kustomize 関連コマンド確認用の alias（例：help, version など）
 ksb                                                      ## `kustomize build` のショートカット
 ksbf                                                     ## fzf などでファイルを選んで build 実行（用途に応じて overlay 切り替えなど）
