@@ -1,7 +1,7 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-export FZF_DEFAULT_OPTS='--height 40% --reverse --border --no-sort'
+export FZF_DEFAULT_OPTS='--height 70% --reverse --border --tiebreak=length,index'
 
 #=============================
 # include common settings
@@ -19,6 +19,24 @@ autoload -U select-word-style
 select-word-style bash
 
 #=============================
+# history
+# http://qiita.com/syui/items/c1a1567b2b76051f50c4
+#=============================
+export HISTFILE=${HOME}/.zsh_history        # 履歴ファイルの保存先
+export HISTSIZE=1000                        # メモリに保存される履歴の件数
+export SAVEHIST=100000                      # 履歴ファイルに保存される履歴の件数
+setopt hist_ignore_dups                     # 直前と重複するコマンドは記録しない
+setopt EXTENDED_HISTORY                     # 開始と終了のタイムスタンプも記録
+setopt hist_ignore_all_dups                 # 古い重複コマンドを削除して新しいのだけ残す
+setopt hist_ignore_space                    # スペースで始まるコマンドは記録しない
+setopt hist_verify                          # 履歴からの実行前に編集可能
+setopt hist_reduce_blanks                   # 余分な空白を詰めて記録
+setopt hist_save_no_dups                    # 同一コマンドを履歴に保存しない
+setopt hist_no_store                        # `history` コマンド自体を履歴に残さない
+setopt hist_expand                          # 補完時にヒストリ展開を有効にする
+setopt inc_append_history                   # コマンド実行ごとに履歴を即座に保存
+
+#=============================
 # zsh-completions
 #=============================
 fpath=(/usr/local/share/zsh-completions $fpath)
@@ -26,12 +44,34 @@ autoload -Uz compinit
 compinit -u
 
 #=============================
+# peco の結果に $1 する. p cd とか
+# http://r7kamura.github.io/2014/06/21/ghq.html
+#=============================
+p() { peco | while read LINE; do $@ $LINE; done }
+
+#=============================
+# 関数を呼び出す関数
+#=============================
+fn-fzf() {
+  local sel
+  sel=$(
+    print -l ${(k)functions} | while read -r fn; do
+      [[ ${functions_source[$fn]} == "$HOME/.zshrc" ]] && echo "$fn"
+    done |
+    sort |
+    fzf --prompt="Zshrc Function> " \
+        --preview='functions {} | sed -n "1,200p"' \
+        --preview-window=down,60%
+  ) || return
+  print -z "$sel "
+}
+
+#=============================
 # for aws
 #=============================
 function aws-profile() {
   local AWS_PROFILE_SELECTED
   local AWS_SSO_LOGIN_STAMP_DIR="$HOME/.aws/sso_login_timestamps"
-#  local CURRENT_TIME=$(date +%s) # 現在時刻をUnixエポック秒で取得
 
   # プロファイルを選択
   AWS_PROFILE_SELECTED=$(rg -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
@@ -45,58 +85,7 @@ function aws-profile() {
   echo "Switched to profile: $AWS_PROFILE"
   echo "exec: aws sso login --profile $AWS_PROFILE_SELECTED"
   aws sso login --profile "$AWS_PROFILE_SELECTED"
-
-#   # ログインタイムスタンプディレクトリが存在しない場合は作成
-#   mkdir -p "$AWS_SSO_LOGIN_STAMP_DIR"
-# 
-#   local STAMP_FILE="$AWS_SSO_LOGIN_STAMP_DIR/${AWS_PROFILE_SELECTED}.timestamp"
-#   local LAST_LOGIN_TIME=0
-# 
-#   # 過去のログイン時刻を読み込む
-#   if [ -f "$STAMP_FILE" ]; then
-#     LAST_LOGIN_TIME=$(cat "$STAMP_FILE")
-#   fi
-# 
-#   local SEVENTY_TWO_HOURS_IN_SECONDS=$((24 * 60 * 60))
-# 
-#   # 前回のログインから72時間以上経過しているかチェック
-#   if [ $((CURRENT_TIME - LAST_LOGIN_TIME)) -ge "$SEVENTY_TWO_HOURS_IN_SECONDS" ]; then
-#     echo "前回のログインから72時間以上経過しました。aws sso login を実行します..."
-#     if aws sso login --profile "$AWS_PROFILE_SELECTED"; then
-#       echo "$CURRENT_TIME" > "$STAMP_FILE" # ログイン成功時にタイムスタンプを更新
-#       echo "aws sso login が正常に完了しました。"
-#     else
-#       echo "aws sso login に失敗しました。"
-#     fi
-#   else
-#     echo "前回のログインから72時間以内です。aws sso login はスキップします。"
-#   fi
 }
-
-#=============================
-# for hub
-#=============================
-# function git(){hub "$@"}
-
-#=============================
-# git 補完
-#=============================
-fpath=(~/.zsh/completion $fpath)
-
-# 補完機能を有効化
-autoload -Uz compinit
-compinit
-
-function gsw() {
-  local branch=$(git branch | sed 's/^[* ] //' | fzf)
-  [[ -n "$branch" ]] && git switch "$branch"
-}
-
-#=============================
-# peco の結果に $1 する. p cd とか
-# http://r7kamura.github.io/2014/06/21/ghq.html
-#=============================
-p() { peco | while read LINE; do $@ $LINE; done }
 
 #=============================
 # snippets with fzf
@@ -131,22 +120,108 @@ zle -N fzf-select-history
 bindkey '^r' fzf-select-history
 
 #=============================
-# history
-# http://qiita.com/syui/items/c1a1567b2b76051f50c4
+# git 補完
 #=============================
-export HISTFILE=${HOME}/.zsh_history        # 履歴ファイルの保存先
-export HISTSIZE=1000                        # メモリに保存される履歴の件数
-export SAVEHIST=100000                      # 履歴ファイルに保存される履歴の件数
-setopt hist_ignore_dups                     # 直前と重複するコマンドは記録しない
-setopt EXTENDED_HISTORY                     # 開始と終了のタイムスタンプも記録
-setopt hist_ignore_all_dups                 # 古い重複コマンドを削除して新しいのだけ残す
-setopt hist_ignore_space                    # スペースで始まるコマンドは記録しない
-setopt hist_verify                          # 履歴からの実行前に編集可能
-setopt hist_reduce_blanks                   # 余分な空白を詰めて記録
-setopt hist_save_no_dups                    # 同一コマンドを履歴に保存しない
-setopt hist_no_store                        # `history` コマンド自体を履歴に残さない
-setopt hist_expand                          # 補完時にヒストリ展開を有効にする
-setopt inc_append_history                   # コマンド実行ごとに履歴を即座に保存
+fpath=(~/.zsh/completion $fpath)
+
+# 補完機能を有効化
+autoload -Uz compinit
+compinit
+
+function gsw() {
+  local branch=$(git branch | sed 's/^[* ] //' | fzf)
+  [[ -n "$branch" ]] && git switch "$branch"
+}
+
+#=============================
+# pr list for me
+#=============================
+git-pr() {
+  local state="${1:-open}"  # open / closed / merged / all
+  local q="is:pr author:@me sort:updated-desc"
+  [ "$state" != "all" ] && q="$q state:$state"
+
+  gh api graphql -F q="$q" -f query='
+    query($q: String!) {
+      search(query: $q, type: ISSUE, first: 100) {
+        nodes {
+          ... on PullRequest {
+            url
+            title
+            number
+            updatedAt
+            repository { nameWithOwner }
+          }
+        }
+      }
+    }' \
+  | jq -r '.data.search.nodes[] | "\(.url)\t[\(.repository.nameWithOwner)] #\(.number)  \(.title)  (updated: \(.updatedAt))"' \
+  | fzf --with-nth=2.. --prompt="my PRs ($state)> " \
+  | cut -f1 \
+  | xargs -r -n1 gh pr view --web
+}
+
+#=============================
+# relase 切って master PR 作る
+#=============================
+git-release-cut-pr() {
+  local base="${1:-origin/develop}"
+  local target_base="${2:-master}"
+  local label="${3:-リリース報告なし}"   # 存在時のみ付与
+
+  # 本文テンプレ（展開を防ぐためクォート付き heredoc）
+  local body
+  body=$(cat <<'EOF'
+以下をリリースします
+- aaa
+- bbb
+- [ ] label の付与について見直し
+EOF
+)
+
+  # 1) 基準更新
+  git fetch origin || return 1
+
+  # 2) SHA 決定（12桁）
+  local sha
+  sha="$(git rev-parse --short=12 "$base")" || return 1
+
+  # 3) "release" ブランチ衝突チェック（あると release/<sha> が作れない）
+  if git show-ref --quiet --verify refs/heads/release || git ls-remote --exit-code --heads origin release >/dev/null 2>&1; then
+    echo "❌ 'release' ブランチが存在するので 'release/$sha' は作れないよ。削除するか命名を変えてね（例: release-$sha）"
+    return 1
+  fi
+
+  local branch="release/$sha"
+
+  # 4) 既存なら checkout、無ければ作成して push
+  if git rev-parse --verify "$branch" >/dev/null 2>&1; then
+    git switch "$branch" || return 1
+  else
+    git switch -c "$branch" "$base" || return 1
+    git push -u origin "$branch" || return 1
+  fi
+
+  # 5) ラベル存在チェック → あれば付与
+  local label_opts=()
+  if gh label list --limit 1000 | grep -Fq "$label"; then
+    label_opts+=(--label "$label")
+  fi
+
+  # 6) Draft で作成（本文テンプレを渡す）→ 直後にブラウザで編集
+  gh pr create \
+    --base "$target_base" \
+    --head "$branch" \
+    --title "release: $sha" \
+    --assignee @me \
+    "${label_opts[@]}" \
+    --body "$body" \
+    --draft || return 1
+
+  gh pr edit --web --head "$branch" || return 1
+
+  echo "✅ Draft PR created & opened: $branch -> $target_base （assignee: @me, label: ${label_opts[*]:-(none)}）"
+}
 
 #=============================
 # k8s で context をいい感じに選ぶ
@@ -172,7 +247,7 @@ function kns() {
 #=============================
 # k8s で pod 選んで describe
 #=============================
-function kpod() {
+function k-desc-pod() {
   local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
   if [[ -n "$pod" ]]; then
     kubectl describe pod "$pod"
@@ -182,7 +257,7 @@ function kpod() {
 #=============================
 # k8s で pod 選んで log
 #=============================
-function klog() {
+function k-log-pod() {
   local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
   if [[ -n "$pod" ]]; then
     kubectl logs "$pod"
@@ -190,7 +265,7 @@ function klog() {
 }
 
 ## マルチコンテナ対応バージョン
-function klogc() {
+function k-log-multic() {
   local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
   if [[ -z "$pod" ]]; then return; fi
 
@@ -204,7 +279,7 @@ function klogc() {
 #=============================
 # k8s で pod 選んで exec -it
 #=============================
-function kexec() {
+function k-exec() {
   local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
   if [[ -n "$pod" ]]; then
     local bash_path
@@ -220,7 +295,7 @@ function kexec() {
 #=============================
 # k8s/kustomization する対象を選んで実行
 #=============================
-function ksbf() {
+function ks-build() {
   local dir=$(find . -name kustomization.yaml | sed 's|/kustomization.yaml||' | fzf)
   if [[ -n "$dir" ]]; then
     kustomize build "$dir"
@@ -252,21 +327,6 @@ export NVM_DIR="$HOME/.nvm"
 #=============================
 
 if [[ "$ENV_TYPE" == "production" ]]; then
-
-#   export LOGFILE=~/.logs/zsh-session-$(date +%F-%H%M%S)-$$.log
-#   mkdir -p ~/.logs
-#   echo "[LOG START $(date)]" >> "$LOGFILE"
-# 
-#   # stdout, stderr を tee に流す
-#   exec >> "$LOGFILE" 2>&1
-# 
-#   # preexec フック：コマンド直前のログ
-#   function log_command_with_timestamp() {
-#     echo "" >&2
-#     echo "## [$(date '+%F %T')] Running: $1" >&2
-#   }
-#   autoload -Uz add-zsh-hook
-#   add-zsh-hook preexec log_command_with_timestamp
 
   # Powerlevel10k のプロンプト制御
   typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=off

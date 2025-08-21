@@ -125,9 +125,16 @@ git reset --hard origin/<branch name>                           ## branch 上で
 git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;    ## remote buranch の更新を local branch にマージしたい場合
 git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
 git branch --set-upstream-to=origin/branch-name branch-name     ## 自分で remote に push した branch に別の人が編集しそれを取り込みたい場合、git pull の前に行う
-git push --delete origin add-inamuu-to-dareka                   ## PR を出す直前に取り消す
 git diff --name-only abcdef12^ abcdef12                         ## 差分からファイル名だけを表示する
 git restore --source=HEAD^ fileA fileB                          ## 直前のコミットから一部のファイルだけ戻したいとき
+git log --oneline -10                                           ## git log をみやすく
+git log --graph --oneline --decorate --all -10                  ## もりもり git log
+
+# gh
+gh pr view -w                                                   ## PRをブラウザで開く
+gh pr checks --watch                                            ## カレンとブランチのPRのCIをみる
+gh pr checkout <target>                                         ## リモートブランチをローカルチェックイン, push 不要
+gh pr create --assignee @me --fill-verbose --draft && gh pr view --web ## RP作る、fill-verbose で自動入力
 
 # apache
 /usr/local/apache2/bin/httpd -SM                                ## いろいろ確認
@@ -224,16 +231,20 @@ kubectl get ns                                           ## namespace 一覧を�
 kubectl config set-context --current --namespace=<namespace>  ## 現在の context に namespace を設定 → 関数: kns
 
 # pod 操作
+kubectl get all                                          ## とりあえず全体俯瞰したいときに
 kubectl get pods -o wide                                 ## pod 一覧を表示（IP や Node 情報も含まれる）→ 関数: kpod
 kubectl describe pod <pod-name>                          ## pod の詳細情報（イベント、Volume、状態など）→ 関数: kpod
 kubectl logs <pod-name>                                  ## pod のログを表示（シングルコンテナ向け）→ 関数: klog
 klogc                                                    ## pod → container を選んでログ表示（マルチコンテナ対応）
 kubectl exec -it <pod-name> -- /bin/bash                 ## pod に bash で入る（login shell）→ 関数: kexec（sh fallback 付き）
 kubectl get pods --all-namespaces --field-selector spec.nodeName=<nodename> -o wide  ## 特定のnodeにいる pod の一覧
+stern <your-pod-regex> --container <your-container-name> ## 複数 log 調査
+k tree deploy kube-state-metrics                         ## krew で入れた tree コマンドのサンプル
 
 # misc
 kubectl get daemonset --all-namespaces                         ## daemon sest のリスト
 kubectl get replicaset --sort-by=.metadata.creationTimestamp | tail -r  ## replicaset 一覧を最近生まれた順に表示
+kubectl port-forward -n kube-system svc/kube-state-metrics 8080:8080  ## portfoward , この後別 temirnal で curl -s localhost:8080/metrics とかする
 
 # argoCD 関連
 kubectl get applications.argoproj.io -A                  ## クラスタ上の Application 一覧
@@ -244,6 +255,7 @@ kustomize build admin/dev | k diff -f -
 kst                                                      ## kustomize 関連コマンド確認用の alias（例：help, version など）
 ksb                                                      ## `kustomize build` のショートカット
 ksbf                                                     ## fzf などでファイルを選んで build 実行（用途に応じて overlay 切り替えなど）
+helm list -A                                             ## helm で何入ってるか調査
 
 # 備考
 # - kctx: context を fzf で選んで use-context

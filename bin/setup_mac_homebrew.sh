@@ -46,6 +46,16 @@ brew install awscli
 brew install eksctl
 brew install kubent
 brew install kubeseal
+brew install krew
+brew install kubecolor
+
+## krew
+kubectl krew install resource-capacity
+kubectl krew install score
+kubectl krew install sniff
+kubectl krew install stern
+kubectl krew install tree
+kubectl krew install neat
 
 ## rbenv
 brew install rbenv ruby-build

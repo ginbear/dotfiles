@@ -15,7 +15,7 @@ alias bi='bundle install --path vendor/bundler'
 alias re='rbenv exec'
 alias rv='rbenv versions'
 alias date='gdate'
-alias grep='rg --color=auto'
+# alias grep='rg --color=auto'
 alias cat='bat -p'
 alias tf='terraform'
 alias tfp='terraform plan'
@@ -26,10 +26,11 @@ alias k='kubectl'
 alias kst='kustomize'
 alias ksb='kustomize build'
 alias c='cursor'
-
+alias kubectl="kubecolor"
 
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # SSH-KEY 1password 利用中のため
 # [ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
