@@ -42,8 +42,7 @@
 # # Just for example:
 # resize-overlay-duration = 4s 200ms
 
-theme = catppuccin-mocha
-# theme = xcodedarkhc
+theme = "Monokai Pro"
 
 window-padding-x = 10
 background-opacity = 0.85

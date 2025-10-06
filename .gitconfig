@@ -72,6 +72,5 @@
 [interactive]
 	diffFilter = delta --color-only
 [delta]
-	features = woolly-mammoth
-	line-numbers = true
-	side-by-side = true
+	color-only = true
+	syntax-theme = Dracula

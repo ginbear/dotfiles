@@ -48,6 +48,7 @@ brew install kubent
 brew install kubeseal
 brew install krew
 brew install kubecolor
+brew install argocd
 
 ## krew
 kubectl krew install resource-capacity
@@ -56,6 +57,7 @@ kubectl krew install sniff
 kubectl krew install stern
 kubectl krew install tree
 kubectl krew install neat
+kubectl krew install rolesum
 
 ## rbenv
 brew install rbenv ruby-build

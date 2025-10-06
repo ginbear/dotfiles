@@ -14,6 +14,29 @@ source ~/.shellrc
 # Ctrl-A, E とか効かせる
 bindkey -e
 
+#=============================
+# Ctrl w で空白まで削除、Esc delete で記号まで削除
+#=============================
+# 1) 共有の -match 関数を読み込む（済ならOK）
+autoload -U backward-kill-word-match
+
+# 2) 2つのウィジェットを作る
+zle -N backward-kill-space  backward-kill-word-match   # 空白区切り
+zle -N backward-kill-punct  backward-kill-word-match   # 記号区切り
+
+# 3) 各ウィジェットごとに word-style を変える
+zstyle ':zle:backward-kill-space' word-style whitespace
+zstyle ':zle:backward-kill-punct' word-style normal     # ← $WORDCHARS に従う
+
+# 4) . と - を「語に含めない」＝そこで止めたいなら WORDCHARS を調整
+# typeset -g WORDCHARS='*?_[]~=/&;!#$%^(){}<>'  # （. と - を入れない）
+
+# 5) キー割り当て
+bindkey '^W'      backward-kill-space        # Ctrl-W = 空白まで削除
+bindkey '^[^?'    backward-kill-punct        # Esc+Backspace = .や-で区切って削除
+#   ↑ Esc+Delete の送出シーケンス（環境で違う場合は後述の zkbd を使って検出）
+
+
 ## 単語の定義を bash と同じにする
 autoload -U select-word-style
 select-word-style bash
@@ -162,22 +185,81 @@ git-pr() {
 }
 
 #=============================
-# relase 切って master PR 作る
+# release 切って master PR 作る（URLを渡すと本文に差し込む）
 #=============================
 git-release-cut-pr() {
-  local base="${1:-origin/develop}"
-  local target_base="${2:-master}"
-  local label="${3:-リリース報告なし}"   # 存在時のみ付与
+  # デフォルト
+  local base="origin/develop"
+  local target_base="master"
+  local label="リリース報告無し"   # 実在ラベルに合わせてね
+  local release_url=""
 
-  # 本文テンプレ（展開を防ぐためクォート付き heredoc）
+  # 引数パース（--base/--target/--label/--release と、先頭のURL位置引数）
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --base|-b)
+        base="${2:?--base には値が必要}"; shift 2 ;;
+      --base=*)
+        base="${1#*=}"; shift ;;
+      --target|-t|--to)
+        target_base="${2:?--target には値が必要}"; shift 2 ;;
+      --target=*|--to=*)
+        target_base="${1#*=}"; shift ;;
+      --label|-l)
+        label="${2:?--label には値が必要}"; shift 2 ;;
+      --label=*)
+        label="${1#*=}"; shift ;;
+      --release|-u)
+        release_url="${2:?--release にはURLが必要}"; shift 2 ;;
+      --release=*)
+        release_url="${1#*=}"; shift ;;
+      https://*|http://*)
+        # 先頭位置引数がURLなら release_url とみなす
+        if [ -z "$release_url" ]; then
+          release_url="$1"
+          shift
+        else
+          echo "⚠️ 複数のURLが渡されたため最初の1つを使用: $release_url"
+          shift
+        fi
+        ;;
+      --) shift; break ;;
+      -*)
+        echo "❌ 不明なオプション: $1"; return 1 ;;
+      *)
+        # 互換性: 古い呼び方 (base target label) をまだ許容
+        if [ "$base" = "origin/develop" ] && [ "$1" != "" ]; then
+          base="$1"; shift; continue
+        fi
+        if [ "$target_base" = "master" ] && [ "$1" != "" ]; then
+          target_base="$1"; shift; continue
+        fi
+        if [ "$label" = "リリース報告無し" ] && [ "$1" != "" ]; then
+          label="$1"; shift; continue
+        fi
+        shift ;;
+    esac
+  done
+
+  # 本文テンプレ
   local body
-  body=$(cat <<'EOF'
+  if [ -n "$release_url" ]; then
+    # URL を1行だけ挿入
+    body=$(cat <<EOF
+以下をリリースします
+- $release_url
+EOF
+)
+  else
+    # 従来テンプレ
+    body=$(cat <<'EOF'
 以下をリリースします
 - aaa
 - bbb
 - [ ] label の付与について見直し
 EOF
 )
+  fi
 
   # 1) 基準更新
   git fetch origin || return 1
@@ -186,7 +268,7 @@ EOF
   local sha
   sha="$(git rev-parse --short=12 "$base")" || return 1
 
-  # 3) "release" ブランチ衝突チェック（あると release/<sha> が作れない）
+  # 3) "release" ブランチ衝突チェック
   if git show-ref --quiet --verify refs/heads/release || git ls-remote --exit-code --heads origin release >/dev/null 2>&1; then
     echo "❌ 'release' ブランチが存在するので 'release/$sha' は作れないよ。削除するか命名を変えてね（例: release-$sha）"
     return 1
@@ -202,11 +284,43 @@ EOF
     git push -u origin "$branch" || return 1
   fi
 
-  # 5) ラベル存在チェック → あれば付与
-  local label_opts=()
-  if gh label list --limit 1000 | grep -Fq "$label"; then
-    label_opts+=(--label "$label")
+  # 5) ラベル存在チェック（PRのベース側リポで）
+  local repo_for_labels
+  repo_for_labels="$(gh repo view --json isFork,parent,nameWithOwner \
+    -q 'if .isFork then .parent.nameWithOwner else .nameWithOwner end')"
+
+  local resolved_label=""
+  if [ -n "$label" ]; then
+    # 「無し/なし」ゆらぎ吸収しつつ厳密一致優先
+    local label_variants=("$label" "${label//無し/なし}" "${label//なし/無し}")
+    mapfile -t _labels < <(gh label list --repo "$repo_for_labels" --json name --jq '.[].name')
+    for v in "${label_variants[@]}"; do
+      for existing in "${_labels[@]}"; do
+        if [[ "$v" == "$existing" ]]; then
+          resolved_label="$existing"; break 2
+        fi
+      done
+    done
   fi
+
+  local label_opts=()
+  if [ -n "$resolved_label" ]; then
+    label_opts+=(--label "$resolved_label")
+  fi
+
+  # ⚠️ ここで確認プロンプト（必要なら復活させてね）
+  echo "これから PR を作成するよ:"
+  echo "  base:  $target_base"
+  echo "  head:  $branch"
+  echo "  title: release: $sha"
+  echo "  label: ${label_opts[*]:-(none)}"
+  if [ -n "$release_url" ]; then
+    echo "  url:   $release_url"
+  fi
+  echo "  body:"
+  echo "-----------------------------"
+  echo "$body"
+  echo "-----------------------------"
 
   # 6) Draft で作成（本文テンプレを渡す）→ 直後にブラウザで編集
   gh pr create \
@@ -218,47 +332,119 @@ EOF
     --body "$body" \
     --draft || return 1
 
-  gh pr edit --web --head "$branch" || return 1
+  gh pr view --web || return 1
 
   echo "✅ Draft PR created & opened: $branch -> $target_base （assignee: @me, label: ${label_opts[*]:-(none)}）"
 }
 
 #=============================
+# difffff
+#=============================
+git-pr-diff () {
+  local pr="${1:?usage: prdiff-bases <PR#> [pattern]}"
+  local pat="${2:-/bases/}"
+  gh pr diff "$pr" \
+  | awk -v p="$pat" '/^diff --git/ {show = ($0 ~ p)} {if (show) print}' \
+  | grep -v 'last-update-date' \
+  | grep -E '^(diff --git|index |--- |\+\+\+ |@@ |\+|-) ' \
+  | delta --keep-plus-minus-markers
+}
+
+#=============================
 # k8s で context をいい感じに選ぶ
 #=============================
-function kctx() {
-  local ctx=$(kubectl config get-contexts -o name | fzf)
-  if [[ -n "$ctx" ]]; then
-    kubectl config use-context "$ctx"
-  fi
+kctx() {
+  local current choice ctx
+  current="$(kubectl config current-context 2>/dev/null)"
+
+  choice="$(
+    kubectl config get-contexts -o name | while read -r real; do
+      display="$(sed -E 's#^arn:aws:eks:[^:]+:[0-9]+:cluster/##' <<<"$real")"
+      display="${display##*/}"
+      mark=" "
+      [[ "$real" == "$current" ]] && mark="*"
+      printf "%s\t%s\t%s\n" "$mark" "$display" "$real"
+    done | fzf \
+      --prompt='select context > ' \
+      --header=$'CURRENT\tNAME' \
+      --delimiter='\t' \
+      --with-nth=1,2 \
+      --nth=2 \
+      --select-1 --exit-0
+  )" || return
+
+  ctx="$(awk -F'\t' '{print $3}' <<<"$choice")"
+  [[ -n "$ctx" ]] || return
+  kubectl config use-context "$ctx"
 }
 
 #=============================
 # k8s で namespace をいい感じに選ぶ
 #=============================
-function kns() {
-  local ns=$(kubectl get ns --no-headers | awk '{print $1}' | fzf)
-  if [[ -n "$ns" ]]; then
-    kubectl config set-context --current --namespace="$ns"
-    echo "Switched to namespace: $ns"
-  fi
+kns() {
+  local current choice ns
+  current="$(kubectl config view --minify -o 'jsonpath={..namespace}' 2>/dev/null)"
+  [[ -z "$current" ]] && current="default"
+
+  choice="$(
+    kubectl get ns --no-headers \
+      | awk -v cur="$current" '{
+          # $1=NAME, $2=STATUS, $3=AGE
+          mark = ($1==cur) ? "*" : "-";   # ← 空白ではなく "-" を使う
+          printf "%s\t%s\t%s\t%s\n", mark, $1, $2, $3
+        }' \
+      | column -t -s $'\t' \
+      | fzf \
+          --prompt='select namespace > ' \
+          --with-nth=1,2,3,4 \
+          --nth=2 \
+          --delimiter='[[:space:]]+' \
+          --select-1 --exit-0
+  )" || return
+
+  # 整形後も 2 列目が NAME
+  ns="$(awk '{print $2}' <<<"$choice")"
+  [[ -n "$ns" ]] || return
+
+  kubectl config set-context --current --namespace="$ns"
+  echo "Switched to namespace: $ns"
 }
 
 #=============================
 # k8s で pod 選んで describe
 #=============================
-function k-desc-pod() {
-  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
-  if [[ -n "$pod" ]]; then
-    kubectl describe pod "$pod"
-  fi
+k-desc-pod() {
+  local line
+  line="$(
+    kubectl get pods -A \
+    | fzf \
+        --header='↑↓で選択 / NAME列だけで検索 / Enterで describe（右でプレビュー）' \
+        --header-lines=1 \
+        --delimiter='\s+' \
+        --nth=2 \
+        --preview '
+          ns=$(awk "{print \$1}" <<< {}); \
+          name=$(awk "{print \$2}" <<< {}); \
+          [[ "$ns" == "NAMESPACE" ]] && echo "header" && exit 0; \
+          # 重くなりすぎないように describe を120行だけ
+          kubectl describe pod -n "$ns" "$name" 2>/dev/null | sed -n "1,120p"
+        ' \
+        --preview-window=right:40%:wrap
+  )" || return
+
+  local ns name
+  ns="$(awk '{print $1}' <<<"$line")"
+  name="$(awk '{print $2}' <<<"$line")"
+
+  [[ -n "$ns" && -n "$name" ]] || return
+  kubectl describe pod -n "$ns" "$name"
 }
 
 #=============================
 # k8s で pod 選んで log
 #=============================
 function k-log-pod() {
-  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf  --prompt="選んだpodのlogを取得するよ: ")
   if [[ -n "$pod" ]]; then
     kubectl logs "$pod"
   fi
@@ -266,7 +452,7 @@ function k-log-pod() {
 
 ## マルチコンテナ対応バージョン
 function k-log-multic() {
-  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf --prompt="選んだpodのlogを取得するよ（マルチコンテナ対応）: ")
   if [[ -z "$pod" ]]; then return; fi
 
   local containers=$(kubectl get pod "$pod" -o jsonpath='{.spec.containers[*].name}')
@@ -280,7 +466,7 @@ function k-log-multic() {
 # k8s で pod 選んで exec -it
 #=============================
 function k-exec() {
-  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf)
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf --prompt="選んだpodにshell loginするよ: ")
   if [[ -n "$pod" ]]; then
     local bash_path
     bash_path=$(kubectl exec "$pod" -- which bash 2>/dev/null)
@@ -290,6 +476,27 @@ function k-exec() {
       kubectl exec -it "$pod" -- /bin/sh
     fi
   fi
+}
+
+#=============================
+# k8s/サービスアカウント選んで rolesum を実行する
+#=============================
+function k-role() {
+  local serviceaccount namespace name
+
+  serviceaccount=$(
+    kubectl get serviceaccount \
+      --all-namespaces \
+      -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name \
+    | fzf --prompt="Select a Role: " --header-lines=1
+  )
+
+  [[ -z "$serviceaccount" ]] && return 1
+
+  namespace=$(echo "$serviceaccount" | awk '{print $1}')
+  name=$(echo "$serviceaccount" | awk '{print $2}')
+
+  kubectl rolesum "$name" -n "$namespace"
 }
 
 #=============================
