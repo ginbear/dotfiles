@@ -135,7 +135,7 @@ bindkey '^G' fzf-ghq-look
 # history with fzf
 #=============================
 function fzf-select-history() {
-  BUFFER=$(history -n 1 | tac | fzf --query="$LBUFFER")
+  BUFFER=$(history -n 1 | tac | fzf --no-sort --query="$LBUFFER")
   CURSOR=$#BUFFER
   zle redisplay
 }

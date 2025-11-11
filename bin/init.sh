@@ -18,6 +18,7 @@ FILELIST="
 .snippets
 .tmux.conf
 .config
+.claude
 "
 
 VIMFILELIST="

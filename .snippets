@@ -241,6 +241,10 @@ kubectl get pods --all-namespaces --field-selector spec.nodeName=<nodename> -o w
 stern <your-pod-regex> --container <your-container-name> ## 複数 log 調査
 k tree deploy kube-state-metrics                         ## krew で入れた tree コマンドのサンプル
 
+# 調査で使ったやつ
+k -n kube-system get configmap cluster-autoscaler-status -o yaml | sed -n '1,200p'
+k -n kube-system logs deploy/cluster-autoscaler -f | egrep -i 'unschedulable|NoScaleUp|unfeasible|BestOption|not viable|Skipping|nodegroup|scale up|predicates'
+
 # misc
 kubectl get daemonset --all-namespaces                         ## daemon sest のリスト
 kubectl get replicaset --sort-by=.metadata.creationTimestamp | tail -r  ## replicaset 一覧を最近生まれた順に表示

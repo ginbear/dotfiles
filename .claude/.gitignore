@@ -1,0 +1,9 @@
+# Exclude personal history and session data
+history.jsonl
+debug/
+file-history/
+projects/
+session-env/
+shell-snapshots/
+statsig/
+todos/

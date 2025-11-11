@@ -49,6 +49,8 @@ brew install kubeseal
 brew install krew
 brew install kubecolor
 brew install argocd
+brew install colima docker docker-buildx docker-compose
+brew install docker-credential-helper
 
 ## krew
 kubectl krew install resource-capacity

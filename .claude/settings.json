@@ -1,0 +1,24 @@
+{
+  "alwaysThinkingEnabled": true,
+  "permissions": {
+    "bash": {
+      "allow": [
+        "kubectl kustomize.*",
+        "kubectl get.*",
+        "kubectl describe.*",
+        "kubectl logs.*",
+        "git status",
+        "git diff.*",
+        "git log.*",
+        "ls.*",
+        "echo.*"
+      ]
+    },
+    "read": {
+      "allow": [".*"]
+    },
+    "web_fetch": {
+      "allow": [".*"]
+    }
+  }
+}
