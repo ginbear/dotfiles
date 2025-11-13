@@ -1,24 +1,28 @@
 {
   "alwaysThinkingEnabled": true,
   "permissions": {
-    "bash": {
-      "allow": [
-        "kubectl kustomize.*",
-        "kubectl get.*",
-        "kubectl describe.*",
-        "kubectl logs.*",
-        "git status",
-        "git diff.*",
-        "git log.*",
-        "ls.*",
-        "echo.*"
-      ]
-    },
-    "read": {
-      "allow": [".*"]
-    },
-    "web_fetch": {
-      "allow": [".*"]
-    }
+    "allow": [
+      "Bash(kubectl kustomize:*)",
+      "Bash(kubectl get:*)",
+      "Bash(kubectl describe:*)",
+      "Bash(kubectl logs:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(ls:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(pwd)",
+      "Bash(which:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Read(*)",
+      "WebFetch(domain:*)"
+    ]
   }
 }

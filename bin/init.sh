@@ -18,11 +18,15 @@ FILELIST="
 .snippets
 .tmux.conf
 .config
-.claude
 "
 
 VIMFILELIST="
 lightline.conf
+"
+
+CLAUDEFILELIST="
+settings.json
+CLAUDE.md
 "
 
 # 必要ディレクトリの作成
@@ -51,6 +55,14 @@ do
     rm -rf ~/.vim/${FILE}
     mkdir ~/.vim
     ln -s ${PWD}/.vim/${FILE} ${HOME}/.vim/${FILE}
+done
+
+# .claude 配下の特定ファイルのみ貼り直し
+for FILE in ${CLAUDEFILELIST};
+do
+    rm -rf ~/.claude/${FILE}
+    mkdir -p ~/.claude
+    ln -s ${PWD}/.claude/${FILE} ${HOME}/.claude/${FILE}
 done
 
 # # go
