@@ -43,8 +43,8 @@
 # resize-overlay-duration = 4s 200ms
 
 theme = "Monokai Pro"
-# font-family = "PlemolJP Console NF"
-font-family = "HackGen Console NF"
+font-family = "PlemolJP Console NF"
+# font-family = "HackGen Console NF"
 
 window-padding-x = 10
 background-opacity = 0.85

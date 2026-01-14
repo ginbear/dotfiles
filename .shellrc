@@ -29,6 +29,7 @@ alias kst='kustomize'
 alias ksb='kustomize build'
 alias c='cursor'
 alias kubectl="kubecolor"
+alias grep='grep --color=auto'
 
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8

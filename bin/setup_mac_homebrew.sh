@@ -32,6 +32,7 @@ brew install sd
 brew install ghostty
 brew install powerlevel10k # https://github.com/romkatv/powerlevel10k
 brew install lsd
+brew install atuin
 
 ## ops tools
 brew install envchain
@@ -51,6 +52,7 @@ brew install kubecolor
 brew install argocd
 brew install colima docker docker-buildx docker-compose
 brew install docker-credential-helper
+brew install mise
 
 ## krew
 kubectl krew install resource-capacity

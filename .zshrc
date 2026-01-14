@@ -134,13 +134,25 @@ bindkey '^G' fzf-ghq-look
 #=============================
 # history with fzf
 #=============================
-function fzf-select-history() {
-  BUFFER=$(history -n 1 | tac | fzf --no-sort --query="$LBUFFER")
-  CURSOR=$#BUFFER
-  zle redisplay
-}
-zle -N fzf-select-history
-bindkey '^r' fzf-select-history
+# function fzf-select-history() {
+#   BUFFER=$(history -n -r 1 | awk '!seen[$0]++' | \
+#     fzf --no-sort \
+#         --query="$LBUFFER" \
+#         --height 50% \
+#         --border \
+#         --prompt="History> " \
+#         --bind 'ctrl-/:toggle-preview' \
+#         --preview 'echo {}' \
+#         --preview-window=down:3:wrap)
+#   CURSOR=$#BUFFER
+#   zle redisplay
+# }
+# zle -N fzf-select-history
+# bindkey '^r' fzf-select-history
+export ATUIN_NOBIND="true"
+eval "$(atuin init zsh)"
+
+bindkey '^r' atuin-search
 
 #=============================
 # git 補完
@@ -185,157 +197,9 @@ git-pr() {
 }
 
 #=============================
-# release 切って master PR 作る（URLを渡すと本文に差し込む）
+# release 切って master PR 作る（private: .local.sh に分離）
 #=============================
-git-release-cut-pr() {
-  # デフォルト
-  local base="origin/develop"
-  local target_base="master"
-  local label="リリース報告無し"   # 実在ラベルに合わせてね
-  local release_url=""
-
-  # 引数パース（--base/--target/--label/--release と、先頭のURL位置引数）
-  while [ $# -gt 0 ]; do
-    case "$1" in
-      --base|-b)
-        base="${2:?--base には値が必要}"; shift 2 ;;
-      --base=*)
-        base="${1#*=}"; shift ;;
-      --target|-t|--to)
-        target_base="${2:?--target には値が必要}"; shift 2 ;;
-      --target=*|--to=*)
-        target_base="${1#*=}"; shift ;;
-      --label|-l)
-        label="${2:?--label には値が必要}"; shift 2 ;;
-      --label=*)
-        label="${1#*=}"; shift ;;
-      --release|-u)
-        release_url="${2:?--release にはURLが必要}"; shift 2 ;;
-      --release=*)
-        release_url="${1#*=}"; shift ;;
-      https://*|http://*)
-        # 先頭位置引数がURLなら release_url とみなす
-        if [ -z "$release_url" ]; then
-          release_url="$1"
-          shift
-        else
-          echo "⚠️ 複数のURLが渡されたため最初の1つを使用: $release_url"
-          shift
-        fi
-        ;;
-      --) shift; break ;;
-      -*)
-        echo "❌ 不明なオプション: $1"; return 1 ;;
-      *)
-        # 互換性: 古い呼び方 (base target label) をまだ許容
-        if [ "$base" = "origin/develop" ] && [ "$1" != "" ]; then
-          base="$1"; shift; continue
-        fi
-        if [ "$target_base" = "master" ] && [ "$1" != "" ]; then
-          target_base="$1"; shift; continue
-        fi
-        if [ "$label" = "リリース報告無し" ] && [ "$1" != "" ]; then
-          label="$1"; shift; continue
-        fi
-        shift ;;
-    esac
-  done
-
-  # 本文テンプレ
-  local body
-  if [ -n "$release_url" ]; then
-    # URL を1行だけ挿入
-    body=$(cat <<EOF
-以下をリリースします
-- $release_url
-EOF
-)
-  else
-    # 従来テンプレ
-    body=$(cat <<'EOF'
-以下をリリースします
-- aaa
-- bbb
-- [ ] label の付与について見直し
-EOF
-)
-  fi
-
-  # 1) 基準更新
-  git fetch origin || return 1
-
-  # 2) SHA 決定（12桁）
-  local sha
-  sha="$(git rev-parse --short=12 "$base")" || return 1
-
-  # 3) "release" ブランチ衝突チェック
-  if git show-ref --quiet --verify refs/heads/release || git ls-remote --exit-code --heads origin release >/dev/null 2>&1; then
-    echo "❌ 'release' ブランチが存在するので 'release/$sha' は作れないよ。削除するか命名を変えてね（例: release-$sha）"
-    return 1
-  fi
-
-  local branch="release/$sha"
-
-  # 4) 既存なら checkout、無ければ作成して push
-  if git rev-parse --verify "$branch" >/dev/null 2>&1; then
-    git switch "$branch" || return 1
-  else
-    git switch -c "$branch" "$base" || return 1
-    git push -u origin "$branch" || return 1
-  fi
-
-  # 5) ラベル存在チェック（PRのベース側リポで）
-  local repo_for_labels
-  repo_for_labels="$(gh repo view --json isFork,parent,nameWithOwner \
-    -q 'if .isFork then .parent.nameWithOwner else .nameWithOwner end')"
-
-  local resolved_label=""
-  if [ -n "$label" ]; then
-    # 「無し/なし」ゆらぎ吸収しつつ厳密一致優先
-    local label_variants=("$label" "${label//無し/なし}" "${label//なし/無し}")
-    mapfile -t _labels < <(gh label list --repo "$repo_for_labels" --json name --jq '.[].name')
-    for v in "${label_variants[@]}"; do
-      for existing in "${_labels[@]}"; do
-        if [[ "$v" == "$existing" ]]; then
-          resolved_label="$existing"; break 2
-        fi
-      done
-    done
-  fi
-
-  local label_opts=()
-  if [ -n "$resolved_label" ]; then
-    label_opts+=(--label "$resolved_label")
-  fi
-
-  # ⚠️ ここで確認プロンプト（必要なら復活させてね）
-  echo "これから PR を作成するよ:"
-  echo "  base:  $target_base"
-  echo "  head:  $branch"
-  echo "  title: release: $sha"
-  echo "  label: ${label_opts[*]:-(none)}"
-  if [ -n "$release_url" ]; then
-    echo "  url:   $release_url"
-  fi
-  echo "  body:"
-  echo "-----------------------------"
-  echo "$body"
-  echo "-----------------------------"
-
-  # 6) Draft で作成（本文テンプレを渡す）→ 直後にブラウザで編集
-  gh pr create \
-    --base "$target_base" \
-    --head "$branch" \
-    --title "release: $sha" \
-    --assignee @me \
-    "${label_opts[@]}" \
-    --body "$body" \
-    --draft || return 1
-
-  gh pr view --web || return 1
-
-  echo "✅ Draft PR created & opened: $branch -> $target_base （assignee: @me, label: ${label_opts[*]:-(none)}）"
-}
+[[ -f ~/.config/zsh-profiles/git-release-cut-pr.local.sh ]] && source ~/.config/zsh-profiles/git-release-cut-pr.local.sh
 
 #=============================
 # difffff
@@ -546,3 +410,4 @@ if [[ "$ENV_TYPE" == "production" ]]; then
 fi
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+eval "$(mise activate zsh)"
