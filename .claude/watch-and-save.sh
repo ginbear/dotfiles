@@ -7,7 +7,7 @@ set -euo pipefail
 OBSIDIAN_DIR="${HOME}/obsidian-local/Claude-Code"
 CLAUDE_PROJECTS_DIR="${HOME}/.claude/projects"
 STATE_FILE="${HOME}/.claude/watch-state.json"
-TODAY=$(date +%Y-%m-%d)
+TODAY=$(TZ=Asia/Tokyo /bin/date +%Y-%m-%d)
 
 # 状態ファイルの初期化
 if [[ ! -f "$STATE_FILE" ]]; then
@@ -19,6 +19,13 @@ extract_project_name() {
   local dir_name="$1"
   # -Users-ryoshimizu-ghq-github-com-Atrae-wevox-infrastructure -> wevox-infrastructure
   echo "$dir_name" | rev | cut -d'-' -f1-2 | rev | sed 's/^-//'
+}
+
+# リポジトリパスを抽出（ディレクトリ名から）
+extract_repository_path() {
+  local dir_name="$1"
+  # -Users-ryoshimizu-ghq-github-com-ginbear-zenn -> /Users/ryoshimizu/ghq/github.com/ginbear/zenn
+  echo "$dir_name" | sed 's/^-/\//' | sed 's/-com-/.com\//g' | sed 's/-/\//g'
 }
 
 # ノイズを除去
@@ -97,15 +104,17 @@ process_sessions() {
         # user/assistant メッセージのみ処理
         [[ "$msg_type" != "user" && "$msg_type" != "assistant" ]] && continue
 
-        # 今日の日付のみ処理
+        # 今日の日付のみ処理（タイムスタンプはUTCなのでJSTに変換）
         [[ -n "$timestamp" ]] || continue
-        local msg_date=$(echo "$timestamp" | cut -d'T' -f1)
+        local ts_clean="${timestamp%.???Z}"
+        local epoch=$(/bin/date -j -u -f "%Y-%m-%dT%H:%M:%S" "$ts_clean" "+%s" 2>/dev/null || echo "0")
+        local msg_date=$(TZ=Asia/Tokyo /bin/date -r "$epoch" "+%Y-%m-%d" 2>/dev/null || echo "$timestamp" | cut -d'T' -f1)
         [[ "$msg_date" != "$TODAY" ]] && continue
 
         local content=$(extract_content "$line")
         [[ -z "$content" || "$content" == "null" ]] && continue
 
-        local time=$(echo "$timestamp" | cut -d'T' -f2 | cut -d'.' -f1)
+        local time=$(TZ=Asia/Tokyo /bin/date -r "$epoch" "+%H:%M:%S")
         local role_label="User"
         [[ "$msg_type" == "assistant" ]] && role_label="Claude"
 
@@ -121,10 +130,23 @@ process_sessions() {
 
       # 一時ファイルに内容があれば本ファイルに追記
       if [[ -s "$temp_file" ]]; then
-        # ファイルが存在しなければヘッダーを追加
+        # ファイルが存在しなければフロントマターとヘッダーを追加
         if [[ ! -f "$output_file" ]]; then
-          echo "# Claude Code - ${project_name} (${TODAY})" > "$output_file"
-          echo "" >> "$output_file"
+          local repo_path=$(extract_repository_path "$(basename "$project_dir")")
+          local created_time=$(TZ=Asia/Tokyo date +%Y-%m-%dT%H:%M:%S%z)
+          cat > "$output_file" << EOF
+---
+created: ${created_time}
+project: ${project_name}
+repository: ${repo_path}
+session_id: ${session_id}
+tags:
+  - claude-code
+---
+
+# Claude Code - ${project_name} (${TODAY})
+
+EOF
         fi
         cat "$temp_file" >> "$output_file"
       fi
