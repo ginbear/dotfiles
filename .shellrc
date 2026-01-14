@@ -45,8 +45,6 @@ alias gist='gist -c -o -p'
 #=============================
 alias be='bundle exec'
 alias bi='bundle install --path vendor/bundler'
-alias re='rbenv exec'
-alias rv='rbenv versions'
 
 #=============================
 # Aliases - Terraform
@@ -68,8 +66,5 @@ alias ksb='kustomize build'
 #=============================
 # Tool initializations
 #=============================
-# rbenv
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
 # pyenv
 eval "$(pyenv init -)"
