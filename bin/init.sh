@@ -1,79 +1,94 @@
-#!/bin/sh
+#!/bin/bash
 
-# refs. https://github.com/glidenote/dotfiles/blob/master/bin/init.sh
-# ghq で get してきて、
-# sh bin/init.sh 
-# する事を想定
+# dotfiles セットアップスクリプト
+# Usage: ghq get して sh bin/init.sh を実行
 
-# gitで管理するファイルリスト
-FILELIST="
+set -e
+
+DOTFILES_DIR="${PWD}"
+
+#=============================
+# シンボリックリンクを作成するファイル
+#=============================
+DOTFILES="
 .gitignore
 .gitconfig
 .shellrc
-.bash_profile
 .zshrc
-.zlogout
 .p10k.zsh
-.peco
 .snippets
 .tmux.conf
 .config
 "
 
-VIMFILELIST="
-lightline.conf
-"
-
-CLAUDEFILELIST="
+CLAUDE_FILES="
 settings.json
 CLAUDE.md
 "
 
-# 必要ディレクトリの作成
-# cd ~
-# mkdir bin tmp work src
+#=============================
+# バックアップ
+#=============================
+backup_existing() {
+  local backup_dir="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+  local need_backup=false
 
-# 既存ディレクトリ、ファイルを待避させる
-if [ ! -e ~/old_files ]; then
-    mkdir ~/old_files
-    for FILE in ${FILELIST};
-    do
-        mv ~/${FILE} ~/old_files/
+  for file in ${DOTFILES}; do
+    if [[ -e "$HOME/$file" && ! -L "$HOME/$file" ]]; then
+      need_backup=true
+      break
+    fi
+  done
+
+  if $need_backup; then
+    echo "Backing up existing files to $backup_dir"
+    mkdir -p "$backup_dir"
+    for file in ${DOTFILES}; do
+      if [[ -e "$HOME/$file" && ! -L "$HOME/$file" ]]; then
+        mv "$HOME/$file" "$backup_dir/"
+      fi
     done
-fi
+  fi
+}
 
-# link張り直し
-for FILE in ${FILELIST};
-do
-    rm -rf ~/${FILE}
-    ln -s ${PWD}/${FILE} ${HOME}/${FILE}
-done
+#=============================
+# シンボリックリンク作成
+#=============================
+create_symlinks() {
+  echo "Creating symlinks..."
 
-# ディレクトリ配下の貼り直し
-for FILE in ${VIMFILELIST};
-do
-    rm -rf ~/.vim/${FILE}
-    mkdir ~/.vim
-    ln -s ${PWD}/.vim/${FILE} ${HOME}/.vim/${FILE}
-done
+  for file in ${DOTFILES}; do
+    rm -rf "$HOME/$file"
+    ln -s "$DOTFILES_DIR/$file" "$HOME/$file"
+    echo "  $file -> $DOTFILES_DIR/$file"
+  done
+}
 
-# .claude 配下の特定ファイルのみ貼り直し
-for FILE in ${CLAUDEFILELIST};
-do
-    rm -rf ~/.claude/${FILE}
-    mkdir -p ~/.claude
-    ln -s ${PWD}/.claude/${FILE} ${HOME}/.claude/${FILE}
-done
+create_claude_symlinks() {
+  echo "Creating Claude symlinks..."
+  mkdir -p "$HOME/.claude"
 
-# # go
-# mkdir ~/.go
-# 
-# # vim neobundle install
-# [ ! -e ~/.vim/bundle ] && git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-# sudo chown shimizu ~/.vim/bundle/.neobundle
-# 
-# # tssh deploy
-# ln -s ${PWD}/tssh/tssh /usr/local/bin
+  for file in ${CLAUDE_FILES}; do
+    rm -rf "$HOME/.claude/$file"
+    ln -s "$DOTFILES_DIR/.claude/$file" "$HOME/.claude/$file"
+    echo "  .claude/$file -> $DOTFILES_DIR/.claude/$file"
+  done
+}
 
-# lltsv
-go get github.com/sonots/lltsv
+#=============================
+# メイン
+#=============================
+main() {
+  echo "=== dotfiles setup ==="
+  echo "DOTFILES_DIR: $DOTFILES_DIR"
+  echo ""
+
+  backup_existing
+  create_symlinks
+  create_claude_symlinks
+
+  echo ""
+  echo "Done!"
+}
+
+main
