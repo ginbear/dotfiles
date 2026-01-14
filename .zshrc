@@ -293,24 +293,8 @@ k-role() {
 }
 
 #=============================
-# Private scripts
-#=============================
-[[ -f ~/.config/zsh-profiles/git-release-cut-pr.local.sh ]] && source ~/.config/zsh-profiles/git-release-cut-pr.local.sh
-
-#=============================
 # Powerlevel10k theme
 #=============================
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-#=============================
-# Production environment settings
-#=============================
-if [[ "$ENV_TYPE" == "production" ]]; then
-  typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=off
-  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-    dir
-    vcs
-    time
-  )
-fi
