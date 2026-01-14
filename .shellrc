@@ -1,58 +1,82 @@
-# commmon shell settings
-## local
-source ~/.shellrc.local
-export TERM=xterm-256color
+# Common shell settings
 
-## alias
+#=============================
+# Local settings
+#=============================
+source ~/.shellrc.local
+
+#=============================
+# Environment variables
+#=============================
+export TERM=xterm-256color
+export EDITOR=/usr/bin/vim
+export LC_CTYPE=en_US.UTF-8
+export GOPATH=$HOME/.go
+export PYENV_ROOT="$HOME/.pyenv"
+
+#=============================
+# PATH
+#=============================
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+export PATH="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+[ -d "$GOPATH" ] && export PATH="$GOPATH/bin:$PATH"
+
+#=============================
+# Aliases - General
+#=============================
 alias ls='lsd'
 alias ll='ls -l'
 alias la='ls -la'
+alias vi='nvim'
+alias grep='grep --color=auto'
+alias rg='rg --color=auto'
+alias date='gdate'
+alias batcat='bat --paging=auto --style=numbers,changes,grid'
+
+#=============================
+# Aliases - Git
+#=============================
 alias g='git'
 alias gb='gh repo view --web'
 alias gist='gist -c -o -p'
+
+#=============================
+# Aliases - Ruby/Bundler
+#=============================
 alias be='bundle exec'
 alias bi='bundle install --path vendor/bundler'
 alias re='rbenv exec'
 alias rv='rbenv versions'
-alias date='gdate'
-alias rg='rg --color=auto'
-# alias cat='bat -p'
-alias batcat='bat --paging=auto --style=numbers,changes,grid'
+
+#=============================
+# Aliases - Terraform
+#=============================
 alias tf='terraform'
 alias tfp='terraform plan'
 alias tfim='terraform import'
 alias tfsrm='terraform state rm'
 alias tg='terragrunt'
-alias vi='nvim'
+
+#=============================
+# Aliases - Kubernetes
+#=============================
 alias k='kubectl'
+alias kubectl='kubecolor'
 alias kst='kustomize'
 alias ksb='kustomize build'
+
+#=============================
+# Aliases - Editor
+#=============================
 alias c='cursor'
-alias kubectl="kubecolor"
-alias grep='grep --color=auto'
 
-export EDITOR=/usr/bin/vim
-export LC_CTYPE=en_US.UTF-8
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-
-# SSH-KEY 1password 利用中のため
-# [ -e ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
-
-# GO 
-if [ -d $HOME/.go ] ; then
-  export GOPATH=$HOME/.go
-  export PATH=$PATH:$GOPATH/bin
-fi
-
+#=============================
+# Tool initializations
+#=============================
 # rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
-export PATH=$PATH:$HOME/.local/bin
-
-# tenv
-export PATH="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH"
-
