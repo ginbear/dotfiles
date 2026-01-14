@@ -13,76 +13,128 @@ brew update
 brew upgrade
 
 #=============================
-# Basic tools
+# パッケージリスト
 #=============================
-brew install zsh
+BASIC_TOOLS=(
+  zsh
+  bat
+  coreutils
+  fzf
+  ghq
+  go
+  htop
+  ipcalc
+  jq
+  yq
+  nkf
+  neovim
+  tcptraceroute
+  trash
+  tree
+  watch
+  wget
+  ripgrep
+  sd
+  ghostty
+  powerlevel10k
+  lsd
+  atuin
+)
+
+GIT_TOOLS=(
+  gh
+  gist
+  tig
+)
+
+DEVOPS_TOOLS=(
+  envchain
+  tmux
+  pyenv
+  tfenv
+  mise
+  awscli
+)
+
+K8S_TOOLS=(
+  eksctl
+  kubent
+  kubeseal
+  krew
+  kubecolor
+  argocd
+)
+
+CONTAINER_TOOLS=(
+  colima
+  docker
+  docker-buildx
+  docker-compose
+  docker-credential-helper
+)
+
+KREW_PLUGINS=(
+  resource-capacity
+  score
+  sniff
+  stern
+  tree
+  neat
+  rolesum
+)
+
+CASK_APPS=(
+  firefox
+  visual-studio-code
+  karabiner-elements
+  bartender
+  the-unarchiver
+  skitch
+  notion
+  kindle
+  keyboardcleantool
+)
+
+#=============================
+# インストール関数
+#=============================
+install_packages() {
+  local label="$1"
+  shift
+  local packages=("$@")
+
+  echo "Installing $label..."
+  for pkg in "${packages[@]}"; do
+    brew install "$pkg" || echo "  Warning: $pkg failed"
+  done
+}
+
+install_casks() {
+  echo "Installing Cask apps..."
+  for app in "${CASK_APPS[@]}"; do
+    brew install --cask "$app" || echo "  Warning: $app failed"
+  done
+}
+
+install_krew_plugins() {
+  echo "Installing krew plugins..."
+  for plugin in "${KREW_PLUGINS[@]}"; do
+    kubectl krew install "$plugin" || echo "  Warning: $plugin failed"
+  done
+}
+
+#=============================
+# メイン
+#=============================
 mkdir -p ~/.zsh/
-brew install bat
-brew install coreutils
-brew install fzf
-brew install ghq
-brew install go
-brew install htop
-brew install ipcalc
-brew install jq
-brew install yq
-brew install nkf
-brew install neovim
-brew install tcptraceroute
-brew install trash
-brew install tree
-brew install watch
-brew install wget
-brew install ripgrep
-brew install sd
-brew install ghostty
-brew install powerlevel10k
-brew install lsd
-brew install atuin
 
-#=============================
-# Git tools
-#=============================
-brew install gh
-brew install gist
-brew install tig
-
-#=============================
-# DevOps tools
-#=============================
-brew install envchain
-brew install tmux
-brew install pyenv
-brew install tfenv
-brew install mise
-brew install awscli
-
-#=============================
-# Kubernetes tools
-#=============================
-brew install eksctl
-brew install kubent
-brew install kubeseal
-brew install krew
-brew install kubecolor
-brew install argocd
-
-#=============================
-# Container tools
-#=============================
-brew install colima docker docker-buildx docker-compose
-brew install docker-credential-helper
-
-#=============================
-# krew plugins
-#=============================
-kubectl krew install resource-capacity
-kubectl krew install score
-kubectl krew install sniff
-kubectl krew install stern
-kubectl krew install tree
-kubectl krew install neat
-kubectl krew install rolesum
+install_packages "Basic tools" "${BASIC_TOOLS[@]}"
+install_packages "Git tools" "${GIT_TOOLS[@]}"
+install_packages "DevOps tools" "${DEVOPS_TOOLS[@]}"
+install_packages "Kubernetes tools" "${K8S_TOOLS[@]}"
+install_packages "Container tools" "${CONTAINER_TOOLS[@]}"
+install_casks
+install_krew_plugins
 
 brew cleanup
 
