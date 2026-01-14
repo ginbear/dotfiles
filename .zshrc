@@ -82,8 +82,6 @@ source ~/.shellrc
 #=============================
 # Utility functions
 #=============================
-p() { peco | while read LINE; do $@ $LINE; done }
-
 fn-fzf() {
   local sel
   sel=$(
@@ -144,16 +142,6 @@ git-pr() {
   | fzf --with-nth=2.. --prompt="my PRs ($state)> " \
   | cut -f1 \
   | xargs -r -n1 gh pr view --web
-}
-
-git-pr-diff() {
-  local pr="${1:?usage: git-pr-diff <PR#> [pattern]}"
-  local pat="${2:-/bases/}"
-  gh pr diff "$pr" \
-  | awk -v p="$pat" '/^diff --git/ {show = ($0 ~ p)} {if (show) print}' \
-  | grep -v 'last-update-date' \
-  | grep -E '^(diff --git|index |--- |\+\+\+ |@@ |\+|-) ' \
-  | delta --keep-plus-minus-markers
 }
 
 #=============================
@@ -304,13 +292,6 @@ k-role() {
   kubectl rolesum "$name" -n "$namespace"
 }
 
-ks-build() {
-  local dir=$(find . -name kustomization.yaml | sed 's|/kustomization.yaml||' | fzf)
-  if [[ -n "$dir" ]]; then
-    kustomize build "$dir"
-  fi
-}
-
 #=============================
 # Private scripts
 #=============================
@@ -333,8 +314,3 @@ if [[ "$ENV_TYPE" == "production" ]]; then
     time
   )
 fi
-
-#=============================
-# IDE integrations
-#=============================
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
