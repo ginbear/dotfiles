@@ -99,23 +99,24 @@ fn-fzf() {
 fzf-snippets() {
   # 1. カテゴリ選択（ALLを先頭に追加）
   local category=$(
-    { echo "ALL"; grep "^# " ~/.snippets | sed 's/^# //'; } | \
+    { echo "ALL"; grep "^# " ~/.snippets | sed 's/^# //' | sed 's/ *$//'; } | \
     fzf --prompt="Category> " --height=40%
   )
-  [[ -z "$category" ]] && return
+  [[ -z "$category" ]] && zle redisplay && return
 
   # 2. スニペット選択
   local snippet
   if [[ "$category" == "ALL" ]]; then
     snippet=$(grep -v "^#" ~/.snippets | grep -v "^$" | fzf --prompt="Snippet> " --height=60%)
   else
-    snippet=$(awk "/^# ${category}$/,/^# /" ~/.snippets | grep -v "^#" | grep -v "^$" | fzf --prompt="$category> " --height=60%)
+    snippet=$(sed -n "/^# ${category}/,/^# /p" ~/.snippets | grep -v "^#" | grep -v "^$" | fzf --prompt="$category> " --height=60%)
   fi
-  [[ -z "$snippet" ]] && return
+  [[ -z "$snippet" ]] && zle redisplay && return
 
   # 3. コメント削除してコピー
-  echo "$snippet" | sed 's/ *##.*//' | tr -d '\n' | pbcopy
-  echo "Copied: $(echo "$snippet" | sed 's/ *##.*//' | cut -c1-50)..."
+  local cmd=$(echo "$snippet" | sed 's/ *##.*//')
+  echo -n "$cmd" | pbcopy
+  zle redisplay
 }
 zle -N fzf-snippets
 bindkey '^x' fzf-snippets

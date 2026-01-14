@@ -1,250 +1,81 @@
-# misc
-sed -e 's/,$//g' | gsed -e 's/"time": /date -r /e'                           ## mkr の epoctime unixtime を変換する
-stat                                                                         ## file の詳細な情報を表示
-grep -v -E "^\s*#|^\s*$"                                                     ## config だけを見たいんや！
-grep --color=auto                                                            ## grep をカラフルに見たいんや！ 永続的に設定したいとき export GREP_OPTIONS='--color=auto'
-awk '/^# Time: 140218 11:30:56/, /^# Time: 140218 12:15:52/' /var/tmp/z      ## awk で範囲を抽出
-sed -n -e '/^# Time: 150222  2:44:11/,$p'                                    ## sed で範囲を抽出。条件から最後まで
-cat hoge | perl -nle 'print if $. >= 156514'                                 ## 特定行以降を表示
-cat hoge 2>&1 | tee result_$(hostname -s).$(date +%Y%m%d-%H%M%S).log         ## tee で結果残し
-sudo sh -c 'echo test > test.txt'                                            ## 管理者権限でファイルをリダイレクトする
-while :; do date; df ; sleep 5 ; done                                        ## 永久 Loop . Disk 容量を記録しつづける
-sudo ionice -c 2 -n 7 nice -n 19 du -scm /* | sort -rn                       ## ディスク使用量を確認
-more /etc/stunnel/{pop3,smtp}s.conf | cat                                    ## 複数ファイルでファイル名を入れる
-head -9999 /etc/stunnel/{pop3,smtp}s.conf                                    ## 同じく複数ファイルでファイル名を入れる
-ps auxwwf | grep $TARGET | awk '{print "kill ",$2}' | sudo sh                ## 特定の grep を kill
-ps auxwwf | awk '($3 >- 0.0)'                                                ## CPU 使用率 0.0 以上の対象を出す
-lsof -i:80
-ghq list -p | p cd
-ping ${IPADDR} | perl -MPOSIX -ne 'print strftime("%Y-%m-%d %H:%M:%S ",localtime), $_'  ## ping に実行時間を付与する
-ssh -L 8443:127.0.0.1:8443 dareka@target-host.com                            ## localhost の 8443 を接続先の 8443 に接続させる、sslscan の時に使った
-cat hoge | egrep  -o '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n  ## IP アドレスだけ抽出してソートする
-cat hoge  |  awk --posix '$5 ~ /[0-9]{6,}/'                                  ## 5 カラム目が 6 桁以上
-cat /var/log/xferlog | awk '{sum[$1]+=$2} ; END { for (key in sum) {print key, sum[key] } }' ## 連想配列を使って $1 をキーに集計していく
-ps ax -orss,cmd | sort -rn<                                                  ## メモリを使っている順
-eval "`echo "$slave_status" | sed -ne 's/: \(.*\)/="\1"/p'`";                ## 一気に変数作成
-grep -cnr                                                                    ## わーっと探したいときに
-top -> cxz , sort key -> < >                                                 ## top の使い方
-find ... -exec sleep 0.1 \; -delete                                          ## ファイルをゆっくり削除する ref goo.gl/HnE0eq
+# shell
 exec $SHELL -l                                                               ## shell の再立ち上げと同等
-install -o $uid -g $gid -d /path/to/directory                                ## replace mkdir && chown
-echo hoge | ruby -n -e  'puts $_ if $_ =~ /hoge/'                       ## ruby の正規表現ワライナー
-find ./ -type f -name '*.pp' -print0 | LC_ALL=C xargs -0 sed -i '' -e "s/hoge/fuga/g"  ## manifest で一括置換
-ssh-keygen -y -f ~/.ssh/id_dsa                                               ## 秘密鍵から公開鍵を出力する
-ssh-keygen -l -f $HOME/.ssh/id_rsa.pub                                       ## 公開鍵から bit 長と種別を確認する
-strace -v -s 4096 -f -F -o ~/strace_$(date +%y%m%d-%H%M%S).log -p XXX        ## strace よく使うオプション達
-ltrace -p $( pgrep xinetd ) -f                                               ## ltrace よく使うパターン
-gstack $(pgrep in.proftpd )                                                  ## gdb で backtrace 取るのと同じ内容を出す
-date +%Y%m%d -d '1 days ago'
+lsof -i:80                                                                   ## ポート使用プロセス確認
+ps ax -orss,cmd | sort -rn                                                   ## メモリを使っている順
+cat hoge 2>&1 | tee result_$(hostname -s).$(date +%Y%m%d-%H%M%S).log         ## tee で結果残し
+grep -v -E "^\s*#|^\s*$"                                                     ## config だけを見たいんや！
+while :; do date; df ; sleep 5 ; done                                        ## 永久 Loop . Disk 容量を記録しつづける
+sudo sh -c 'echo test > test.txt'                                            ## 管理者権限でファイルをリダイレクトする
+ps auxwwf | grep $TARGET | awk '{print "kill ",$2}' | sudo sh                ## 特定の grep を kill
+cat hoge | egrep -o '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n  ## IP アドレスだけ抽出してソートする
+sudo ionice -c 2 -n 7 nice -n 19 du -scm /* | sort -rn                       ## ディスク使用量を確認
+date +%Y%m%d -d '1 days ago'                                                 ## 昨日の日付
 set-window-option synchronize-panes on                                       ## tmux キーブロードキャスト
-hoge         ALL=(ALL)       NOPASSWD: ALL                                   ## sudo file でパスワード無しで権限を与える場合
-/usr/sbin/lsof -p $(pgrep slapd) | grep IPv4 | awk '{print $8}' | cut -c30- | awk -F : '{print $1}' | sort -n | uniq -c | sort -nr | head ## LDAP 向いてる奴リスト
-sudo /usr/sbin/slapcat                                                       ## LDAP ldif 形式表示
-find . | xargs grep ""                                                       ## cat するとき、一緒にファイル名を表示する
-sudo less /var/log/maillog | grep status=deferred | awk '{for(i=12;i<NF;i++){printf("%s%s",$i,OFS=" ")}print $NF}' | sort | uniq -c | sort -nr ## 任意の列以降を表示
-cat hogehoge | xargs -t -L1 -I{} echo {} | pv -ls $(wc -l hogehoge | cut -d" " -f1) > /dev/null ## pv を使って行カウントをする
-puts a b c | each -t bash -c "echo {}; dig {}.pepabo.com CNAM +short"        ## zipper の便利コマンドより
-journalctl -ex -u redis-sentinel --since "2019-09-08 20:00:00" --no-pager    ## jounarlctl をざっと見たい時
-consul members | grep role-name                                              ## シュッとリストをだす
 
-# yum
-sudo yum install yum-plugin-changelog                                        ## changelog を yum で見たい
-sudo yum changelog 10 glibc | grep -C3 -i CVE-2015-7547                      ## yum changelog 利用方法
-sudo yum update --security                                                   ## security 周りの update 
-sudo yum update kernel-headers kernel-tools kernel-tools-libs kernel         ## kenel 周りを上げるなら付随もろもろ
-sudo yum history                                                             ## 履歴から undo とか redo とか出来る. ref https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/sec-Yum-Transaction_History.html
-
-# rpm
-rpm -qV openssh-clients openssh libssh2 openssh-server | awk '$2!="c" {print $0}'  ## rpm でチェックサム確認
-rpm -qa --queryformat \"%{name}-%{version}-%{release}.%{arch}\n\"                  ## arch 情報付きの rpm -qa
-rpm -q --changelog bind                                                            ## リリースの内容を見る
-
-# find
-find ./ -daystart -ctime +2
-find ./ -daystart -ctime -2
-find . -maxdepth 1 -type f -name "*.txt" -print0 | xargs -0 rm　             ## カレントディレクトリ内で.txtファイルを探し、ファイル名に空白が含む物も併せて削除する
-find . -maxdepth 1 -type f \! \( -name "*.txt" -o -name "*.rb" \)            ## カレントディレクトリ内で.txt、.rbファイル 「以外」を探す
-
-# sar
-sar -W -f /var/log/sa/sa13  ## 13日の Swap I/O 量を見る pswpin/s pswpout/s
-sar -r                      ## メモリ見たい             kbmemfree kbmemused  %memused kbbuffers  kbcached kbswpfree kbswpused  %swpused 
-sar -b 1 0                  ## I/O みたい               tps      rtps      wtps   bread/s   bwrtn/s
-sar -B 1 0                  ## ページングみたい         pgpgin/s pgpgout/s   fault/s  majflt/s
-sar -q 1 0                  ## L/A みたい
-sar -n DEV 1 0              ## トラフィック見たい
-
-# rsync
-pkill -STOP rsync && sleep 300 && pkill -CONT rsync &                 ## rsync 一時停止
-sudo rsync -av --progress --bwlimit=1000 /tmp/test.txt 1.1.1.1:/tmp/  ## 1MB/s 制限でファイル転送
-
-# iptables 
-iptables -L -nv                                                                                           ## iptables ヒット数状況を確認する
-/sbin/iptables-save -c | grep -i DROP                                                                ## カウントのチェック、これは DROP だけに絞ってある
-/sbin/iptables -I RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp -s xxx.xxx.xxx.xxx -j DROP  ## 特定 IP を DROP するお！
-/sbin/iptables -L --line-numbers -n                                                                  ## iptables の結果に number を追記, -n は名前解決しない
-/sbin/iptables -D RH-Firewall-1-INPUT <rule num>                                                     ## number から削除
-/sbin/iptables -I RH-Firewall-1-INPUT <rule num> -s $IPADD -p tcp -m state --state NEW -m tcp --dport $TARGET-PORT -j ACCEPT  ## 指定箇所に追加
-diff -BbwE  -u <(cat /etc/sysconfig/iptables | grep -vE "^$|^#") <(sudo /sbin/iptables-save)         ## iptables の設定ファイルとオンメモリ差分を確認したい
-
-# openssl
-openssl x509 -noout -modulus -in *.crt | openssl md5  ## 以下のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
-openssl rsa  -noout -modulus -in *.key | openssl md5  ## 上記のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
-openssl req  -noout -modulus -in *.csr | openssl md5  ## 上記のコマンドと組み合わせて、同じ md5 値であれば同じ組み合わせと分かる
-openssl s_client -connect <DOMAIN>:443 -tls1          ## tls で接続（接続を期待）
-openssl s_client -connect <DOMAIN>:443 -ssl3          ## ssl3 で接続 (接続不可を期待)
-echo "" | openssl s_client -connect <DOMAIN>:443 -servername <SERVERNAME> -cipher "EDH"  -showcerts 2>&1 | grep 'Temp' ## SNI だと servername もつける、このコマンドは 暗号化キー（DH keypair）のビット数を確認するもの
-
-# netstat
-netstat -ltapn | grep ESTABLISHED | more
-netstat -ltan | grep ":80 " | awk '{print $5}' | awk -F : '{print $4}' | sort | uniq -c | sort -nr | head
-netstat -antpo  ## 各ステートの時間が見える、timewait で何秒待ってるとか
-
-# dstat
-dstat -Tclmdrn
-dstat -Tclm
-dstat -Tclr
-dstat -Tclnd
-dstat -Tcldr
-dstat --top-cpu --top-cputime
-dstat --top-io --top-bio
-dstat --top-io-adv --top-bio-adv
-dstat -ta --top-io-adv --top-bio-adv  ## なんか便利！
+# ssh
+ssh -L 8443:127.0.0.1:8443 user@target-host.com                              ## ポートフォワード
+ssh-keygen -l -f ~/.ssh/id_rsa.pub                                           ## 公開鍵から bit 長と種別を確認する
+ssh-keygen -y -f ~/.ssh/id_rsa                                               ## 秘密鍵から公開鍵を出力する
 
 # git
-git push origin HEAD                                            ## 現行の Branch を git push, git pushh を alias にしている
-git diff FETCH_HEAD                                             ## マージ前の差分チェック
-git merge FETCH_HEAD                                            ## マージ
-git branch -d hoge                                              ## ブランチ削除
-git push origin :hoge                                           ## リモートブランチ削除
-git checkout -b other_branch origin/other_branch                ## リモートブランチを取得
-git config --list --global                                      ## git の global config を確認する
-git commit --amend -m "(新しいコミットメッセージ)"              ## 直前のコミットログを編集する
-git fetch ; git merge origin/hoge                               ## リモートブランチが更新されてそれを取り込みたい場合
-git reset --soft HEAD^                                          ## 直前の commit を取り消したい
-git reset --hard origin/<branch name>                           ## branch 上で git pull した後、stage を最新にするための作業
-git fetch ; git diff hoge orgin/hoge; git merge origin/hoge;    ## remote buranch の更新を local branch にマージしたい場合
-git branch --merged | grep -v '*' | xargs -I % git branch -d %  ## local の不要ブランチを削除
-git branch --set-upstream-to=origin/branch-name branch-name     ## 自分で remote に push した branch に別の人が編集しそれを取り込みたい場合、git pull の前に行う
-git diff --name-only abcdef12^ abcdef12                         ## 差分からファイル名だけを表示する
-git restore --source=HEAD^ fileA fileB                          ## 直前のコミットから一部のファイルだけ戻したいとき
-git log --oneline -10                                           ## git log をみやすく
-git log --graph --oneline --decorate --all -10                  ## もりもり git log
+git log --oneline -10                                                        ## git log をみやすく
+git diff FETCH_HEAD                                                          ## マージ前の差分チェック
+git reset --soft HEAD^                                                       ## 直前の commit を取り消したい
+git commit --amend -m "(新しいコミットメッセージ)"                           ## 直前のコミットログを編集する
+git branch -d hoge                                                           ## ブランチ削除
+git branch --merged | grep -v '*' | xargs -I % git branch -d %               ## local の不要ブランチを削除
+git restore --source=HEAD^ fileA fileB                                       ## 直前のコミットから一部のファイルだけ戻したいとき
+git diff --name-only abcdef12^ abcdef12                                      ## 差分からファイル名だけを表示する
+git push origin HEAD                                                         ## 現行の Branch を git push
+git push origin :hoge                                                        ## リモートブランチ削除
+git fetch ; git merge origin/hoge                                            ## リモートブランチの更新を取り込む
+git checkout -b other_branch origin/other_branch                             ## リモートブランチを取得
+git reset --hard origin/<branch name>                                        ## stage を最新にする
+git branch --set-upstream-to=origin/branch-name branch-name                  ## upstream 設定
+git config --list --global                                                   ## git の global config を確認する
+git log --graph --oneline --decorate --all -10                               ## もりもり git log
+git merge FETCH_HEAD                                                         ## マージ
+gh pr view -w                                                                ## PRをブラウザで開く
+gh pr checks --watch                                                         ## カレントブランチのPRのCIをみる
+gh pr checkout <target>                                                      ## リモートブランチをローカルチェックアウト
+gh pr create --assignee @me --fill-verbose --draft && gh pr view --web       ## PR作る
 
-# gh
-gh pr view -w                                                   ## PRをブラウザで開く
-gh pr checks --watch                                            ## カレンとブランチのPRのCIをみる
-gh pr checkout <target>                                         ## リモートブランチをローカルチェックイン, push 不要
-gh pr create --assignee @me --fill-verbose --draft && gh pr view --web ## RP作る、fill-verbose で自動入力
-
-# apache
-/usr/local/apache2/bin/httpd -SM                                ## いろいろ確認
-/sbin/service httpd configtest                                  ## config check
-wget -q -O - http://127.0.0.1/server-status/?auto               ## server-status を CUI で確認したい
-tail -n 5000 /usr/local/apache2/logs/access_log | awk '{print $1}'  | sort | uniq -c | sort -gr | head -n 4  ## $1 = IP-Address
-cat /var/log/httpd/access_log | awk '/23\/Feb\/2015:17:00:0/, /23\/Feb\/2015:17:15:0/'  | wc -l ## 影響範囲をしぼりましょう
-sudo ps ax -opid,cmd,wchan | grep httpd                         ## futex で止まっているもの
-php -r 'phpinfo();                                              ## php info の結果をコマンドラインで確認する
-tail -n 5000 /var/log/lighttpd/access.log | cut -f 4 -d " " | sed -e "s/[0-9]:[0-5][0-9]$//" | sort | uniq -c ## 10 分毎のアクセス数統計
-
-# lb keepalive
-/sbin/ipvsadm -Ln --sort                                        ## 振り分け状況とコネクション状況を参照
-/sbin/ipvsadm -L -n --sort | cut -c-49                          ## 比較用
-/sbin/ipvsadm -e -t 210.172.182.xxx:443 -r 192.168.182.xxx -w 0 ## weight をオンサービスで設定
-
-# mysql
-mysql -e "show processlist"
-mysql -e "show full processlist"
-mysql -e "show slave status\G" 
-mysql -e "select Host, User from mysql.user;"                            ## user 一覧
-mysql -e "show grants for user-name@192.168.0.1"                         ## grant 文で結果が出るので、ユーザの作成に大変便利
-mysql -e "show processlist\G" | grep State: | sort | uniq -c | sort -rn  ## MySQL State 多い順
-mysql -e "show status like '%innodb_row_lock%' ;"                        ## Lock 待ちカウント（current_watis）
-mysql -e "SELECT PASSWORD('hoge');"                                      ## Password hash を出してみる. old_passwords の設定有無により生成される hash が異なるので注意
-mysql -e 'show databases;' -N --batch                                    ## -N で先頭行を外す。--batch で table 枠を無くす
-
-# mysql shell
-status;                                                                  ## MySQL 作業前の記録に。version, user, uptime 情報など
-system hostname;                                                         ## MySQL OS のコマンドを実行
-select user();                                                           ## MySQL 接続ユーザの確認
-pager less;                                                              ## MySQL pager 設定 grep も設定可能
-show variables like '%tmp%';                                             ## mysql テンポラリテーブルを大きく使用する際に確認するコマンド。mysql で disk 使用率が上がったら確認するといいかも
-PURGE MASTER LOGS TO 'mysql-bin.000365';                                 ## mysql の binglog を削除するするコマンド。指定した binglog は削除対象外となる
-SET GLOBAL sql_slave_skip_counter = 100;                                 ## MySQL エラーを skip
-change master to master_log_file='mysql4-bin.012', master_log_pos=4;     ## ポジションだけ変えたい場合
-CHANGE MASTER TO MASTER_HOST='<Master host IP>', MASTER_USER='<repuser>', MASTER_PASSWORD='xxx', MASTER_PORT=3306, MASTER_LOG_FILE='mysql1000n-bin.123456', MASTER_LOG_POS=4;   ## フルで設定したい場合
-
-# mysql tools
-mysqlbinlog --no-defaults -vv  mysql-bin.017427 | less                                     ## binlog 閲覧
-mysqlbinlog --no-defaults -v --start-datetime="2015-03-18 6:30:00" mysql-bin.000100        ## start time も選べるよ
-mk-slave-restart -uroot --password xxx --error-numbers 1062 --verbose >> ~/skip_query.log  ## mk-slave-restart mysql
-
-# mysql watch
-less ~/log/$(ls -t ~/log/ | head -1)                                                                                           ## MySQL 最新の保存した processlist を閲覧
-[ -d ~/log ] || mkdir ~/log ; mysql -e "show full processlist" > ~/log/$(date +%Y%m%d_%H%M%S)_MySQL_show_full_processlist.log  ## MySQL Processlist 保存
-[ -d ~/log ] || mkdir ~/log ; mysql -e "show slave status" > ~/log/$(date +%Y%m%d_%H%M%S)_MySQL_show_slave_status.log          ## MySQL SlaveStatus 保存
-while [ 1 ]; do date "+%Y-%m-%d %H:%M:%S" && mysql -uroot -e "show master status\G" && sleep 1 && echo; done                   ## master status 定期観察
-while [ 1 ]; do echo -n $(date +%Y-%m-%d-%H.%M.%S); mysql -uroot -e "show processlist" | wc -l | awk '{ printf(" %6s ",$1); for (i = 0; i < $1; i++) {printf("*")}; print "" }'; sleep 1; done ## プロセス数定期観察
-mysqladmin ext -i1 | awk '/Queries/{q=$4-qp;qp=$4} /Threads_connected/{tc=$4} /Threads_running/{printf "%5d %5d %5d\n", q, tc, $4}'  ## MySQL  1秒あたりの、クエリ数、Threds_connected、Threads_runnig（実行中のクエリの数）
-while [ 1 ];  do date; mysql -e "start slave io_thread;";  mysql -e "show slave status\G;";  sleep 3;  mysql -e "stop slave io_thread;";  mysql -e "show slave status\G;";  sleep 10; done | tee -a replication.log   ## 徐々に追い付かせる、事前に start slave sql_thread; させておく
-
-# vim
-c-w s ## 画面 - 分割 vim
-c-w v ## 画面 | 分割 vim
-c-w [hjkl] ## 画面移動 vim
-c-w o ## 画面閉じる vim
-:echo expand("%:p")  ## vim ファイルパスを取得
-:%s/\v^|$/|/g       ## 先頭末尾に | を挿入する
-
-# python
-pyenv install --list                ## install 可能な version を確認
-pyenv global <system|version>       ## Version の指定
-pip install python-openstackclient python-neutronclient python-novaclient ## Openstack client の install
-
-# kubectl config & namespace
-kubectl config get-contexts                             ## 現在の context 一覧を表示（どれが使われているかチェック）→ 関数: kctx
-kubectl config use-context <context-name>               ## context を切り替え（例：dev / staging / prod）→ 関数: kctx
-kubectl get ns                                           ## namespace 一覧を表示 → 関数: kns
-kubectl config set-context --current --namespace=<namespace>  ## 現在の context に namespace を設定 → 関数: kns
-
-# pod 操作
-kubectl get all                                          ## とりあえず全体俯瞰したいときに
-kubectl get pods -o wide                                 ## pod 一覧を表示（IP や Node 情報も含まれる）→ 関数: kpod
-kubectl describe pod <pod-name>                          ## pod の詳細情報（イベント、Volume、状態など）→ 関数: kpod
-kubectl logs <pod-name>                                  ## pod のログを表示（シングルコンテナ向け）→ 関数: klog
-klogc                                                    ## pod → container を選んでログ表示（マルチコンテナ対応）
-kubectl exec -it <pod-name> -- /bin/bash                 ## pod に bash で入る（login shell）→ 関数: kexec（sh fallback 付き）
-kubectl get pods --all-namespaces --field-selector spec.nodeName=<nodename> -o wide  ## 特定のnodeにいる pod の一覧
-stern <your-pod-regex> --container <your-container-name> ## 複数 log 調査
-k tree deploy kube-state-metrics                         ## krew で入れた tree コマンドのサンプル
-
-# 調査で使ったやつ
-k -n kube-system get configmap cluster-autoscaler-status -o yaml | sed -n '1,200p'
-k -n kube-system logs deploy/cluster-autoscaler -f | egrep -i 'unschedulable|NoScaleUp|unfeasible|BestOption|not viable|Skipping|nodegroup|scale up|predicates'
-
-# misc
-kubectl get daemonset --all-namespaces                         ## daemon sest のリスト
-kubectl get replicaset --sort-by=.metadata.creationTimestamp | tail -r  ## replicaset 一覧を最近生まれた順に表示
-kubectl port-forward -n kube-system svc/kube-state-metrics 8080:8080  ## portfoward , この後別 temirnal で curl -s localhost:8080/metrics とかする
-
-# argoCD 関連
-kubectl get applications.argoproj.io -A                  ## クラスタ上の Application 一覧
-
-# kustomize 関連
-kustomize build overlays/dev | yq 'select(.kind == "Ingress" and .metadata.name == "hoge")' ## kustomize で手元のmanifestを生成(標準出力に出る)
-kustomize build admin/dev | k diff -f -
-kst                                                      ## kustomize 関連コマンド確認用の alias（例：help, version など）
-ksb                                                      ## `kustomize build` のショートカット
-ksbf                                                     ## fzf などでファイルを選んで build 実行（用途に応じて overlay 切り替えなど）
-helm list -A                                             ## helm で何入ってるか調査
-
-# 備考
-# - kctx: context を fzf で選んで use-context
-# - kns: namespace を fzf で選んで set-context
-# - kpod: pod を fzf で選んで describe / logs などに使える
-# - kexec: pod を選んで bash or sh に入る（bash が無ければ自動で sh に fallback）
-# - klogc: pod → container を fzf で選択して logs 表示（マルチコンテナ対応）
+# kubernetes
+kubectl get pods -o wide                                                     ## pod 一覧（IP, Node 情報含む）
+kubectl get all                                                              ## 全体俯瞰
+kubectl logs <pod-name>                                                      ## pod ログ
+kubectl describe pod <pod-name>                                              ## pod 詳細
+kubectl exec -it <pod-name> -- /bin/bash                                     ## pod に入る → 関数: k-exec
+kubectl get ns                                                               ## namespace 一覧 → 関数: kns
+kubectl config get-contexts                                                  ## context 一覧 → 関数: kctx
+kubectl config use-context <context-name>                                    ## context 切り替え → 関数: kctx
+kubectl config set-context --current --namespace=<namespace>                 ## namespace 設定 → 関数: kns
+kubectl port-forward -n <ns> svc/<svc> 8080:8080                             ## ポートフォワード
+stern <pod-regex> --container <container-name>                               ## 複数 pod のログ調査
+kubectl get daemonset --all-namespaces                                       ## daemonset リスト
+kubectl get replicaset --sort-by=.metadata.creationTimestamp                 ## replicaset を作成順に表示
+kubectl get pods --all-namespaces --field-selector spec.nodeName=<nodename> -o wide  ## 特定 node の pod 一覧
+kubectl get applications.argoproj.io -A                                      ## ArgoCD Application 一覧
+kustomize build overlays/dev | yq 'select(.kind == "Ingress")'               ## kustomize で manifest 生成
+kustomize build path/ | kubectl diff -f -                                    ## kustomize diff
+helm list -A                                                                 ## helm リリース一覧
 
 # terraform
-terraform workspace list
-terraform workspace select hoge
-terraform plan --target=foo
+terraform plan --target=<resource>                                           ## 特定リソースのみ plan
+terraform workspace list                                                     ## workspace 一覧
+terraform workspace select <name>                                            ## workspace 切り替え
+
+# openssl
+openssl s_client -connect <DOMAIN>:443                                       ## SSL 接続テスト
+openssl x509 -noout -modulus -in *.crt | openssl md5                         ## 証明書の md5（組み合わせ確認用）
+openssl rsa  -noout -modulus -in *.key | openssl md5                         ## 秘密鍵の md5（組み合わせ確認用）
+openssl req  -noout -modulus -in *.csr | openssl md5                         ## CSR の md5（組み合わせ確認用）
+echo "" | openssl s_client -connect <DOMAIN>:443 -servername <SNI> -showcerts 2>&1 | grep 'Temp'  ## DH キー長確認
+
+# linux
+find ./ -daystart -ctime -2                                                  ## 2日以内に変更されたファイル
+find ./ -daystart -ctime +2                                                  ## 2日より前に変更されたファイル
+find . -maxdepth 1 -type f -name "*.txt" -print0 | xargs -0 rm               ## 空白含むファイル名も削除
+find . -maxdepth 1 -type f \! \( -name "*.txt" -o -name "*.rb" \)            ## 特定拡張子以外を探す
+sudo rsync -av --progress --bwlimit=1000 /tmp/test.txt host:/tmp/            ## 帯域制限付き rsync
+pkill -STOP rsync && sleep 300 && pkill -CONT rsync &                        ## rsync 一時停止
