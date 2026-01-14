@@ -8,7 +8,6 @@ source ~/.shellrc.local
 #=============================
 # Environment variables
 #=============================
-export TERM=xterm-256color
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
 export GOPATH=$HOME/.go
@@ -18,7 +17,6 @@ export PYENV_ROOT="$HOME/.pyenv"
 # PATH
 #=============================
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-export PATH="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 [ -d "$GOPATH" ] && export PATH="$GOPATH/bin:$PATH"
@@ -66,11 +64,6 @@ alias k='kubectl'
 alias kubectl='kubecolor'
 alias kst='kustomize'
 alias ksb='kustomize build'
-
-#=============================
-# Aliases - Editor
-#=============================
-alias c='cursor'
 
 #=============================
 # Tool initializations
