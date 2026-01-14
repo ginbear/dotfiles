@@ -22,14 +22,12 @@ BASIC_TOOLS=(
   fzf
   ghq
   go
-  htop
   ipcalc
   jq
   yq
   nkf
   neovim
   tcptraceroute
-  trash
   tree
   watch
   wget
@@ -84,13 +82,9 @@ KREW_PLUGINS=(
 )
 
 CASK_APPS=(
-  firefox
   visual-studio-code
   karabiner-elements
-  bartender
   the-unarchiver
-  skitch
-  notion
   kindle
   keyboardcleantool
 )
