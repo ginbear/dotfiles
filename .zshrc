@@ -97,7 +97,25 @@ fn-fzf() {
 }
 
 fzf-snippets() {
-  local SNIPPETS=$(cat ~/.snippets | fzf --query="$LBUFFER" | sed -e "s/ *##.*//" | tr -d '\r\n' | pbcopy)
+  # 1. カテゴリ選択（ALLを先頭に追加）
+  local category=$(
+    { echo "ALL"; grep "^# " ~/.snippets | sed 's/^# //'; } | \
+    fzf --prompt="Category> " --height=40%
+  )
+  [[ -z "$category" ]] && return
+
+  # 2. スニペット選択
+  local snippet
+  if [[ "$category" == "ALL" ]]; then
+    snippet=$(grep -v "^#" ~/.snippets | grep -v "^$" | fzf --prompt="Snippet> " --height=60%)
+  else
+    snippet=$(awk "/^# ${category}$/,/^# /" ~/.snippets | grep -v "^#" | grep -v "^$" | fzf --prompt="$category> " --height=60%)
+  fi
+  [[ -z "$snippet" ]] && return
+
+  # 3. コメント削除してコピー
+  echo "$snippet" | sed 's/ *##.*//' | tr -d '\n' | pbcopy
+  echo "Copied: $(echo "$snippet" | sed 's/ *##.*//' | cut -c1-50)..."
 }
 zle -N fzf-snippets
 bindkey '^x' fzf-snippets
