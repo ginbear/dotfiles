@@ -180,6 +180,7 @@ aws-profile() {
   echo "exec: aws sso login --profile $AWS_PROFILE_SELECTED"
   aws sso login --profile "$AWS_PROFILE_SELECTED"
 }
+alias ap='aws-profile'
 
 #=============================
 # Kubernetes functions

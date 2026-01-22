@@ -52,6 +52,7 @@ DEVOPS_TOOLS=(
   tfenv
   mise
   awscli
+  chezmoi
 )
 
 K8S_TOOLS=(

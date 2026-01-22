@@ -46,6 +46,7 @@ kubectl get all                                                              ## 
 kubectl logs <pod-name>                                                      ## pod ログ
 kubectl describe pod <pod-name>                                              ## pod 詳細
 kubectl exec -it <pod-name> -- /bin/bash                                     ## pod に入る → 関数: k-exec
+kubectl top nodes                                                            ## Node ごとの負荷を見るコマンド
 kubectl get ns                                                               ## namespace 一覧 → 関数: kns
 kubectl config get-contexts                                                  ## context 一覧 → 関数: kctx
 kubectl config use-context <context-name>                                    ## context 切り替え → 関数: kctx
@@ -59,6 +60,7 @@ kubectl get applications.argoproj.io -A                                      ## 
 kustomize build overlays/dev | yq 'select(.kind == "Ingress")'               ## kustomize で manifest 生成
 kustomize build path/ | kubectl diff -f -                                    ## kustomize diff
 helm list -A                                                                 ## helm リリース一覧
+kubectl logs <pod> | jq -r '[(.ts | strftime("%Y-%m-%d %H:%M:%S")), .level, .msg] | @tsv' ## timesttamp 変換
 
 # terraform
 terraform plan --target=<resource>                                           ## 特定リソースのみ plan
