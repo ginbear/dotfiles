@@ -67,6 +67,10 @@ export ATUIN_NOBIND="true"
 eval "$(atuin init zsh)"
 bindkey '^r' atuin-search
 
+# navi (snippet manager)
+eval "$(navi widget zsh)"
+bindkey '^x' _navi_widget
+
 # NVM
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
@@ -96,30 +100,6 @@ fn-fzf() {
   print -z "$sel "
 }
 
-fzf-snippets() {
-  # 1. カテゴリ選択（ALLを先頭に追加）
-  local category=$(
-    { echo "ALL"; grep "^# " ~/.snippets | sed 's/^# //' | sed 's/ *$//'; } | \
-    fzf --prompt="Category> " --height=40%
-  )
-  [[ -z "$category" ]] && zle redisplay && return
-
-  # 2. スニペット選択
-  local snippet
-  if [[ "$category" == "ALL" ]]; then
-    snippet=$(grep -v "^#" ~/.snippets | grep -v "^$" | fzf --prompt="Snippet> " --height=60%)
-  else
-    snippet=$(sed -n "/^# ${category}/,/^# /p" ~/.snippets | grep -v "^#" | grep -v "^$" | fzf --prompt="$category> " --height=60%)
-  fi
-  [[ -z "$snippet" ]] && zle redisplay && return
-
-  # 3. コメント削除してコピー
-  local cmd=$(echo "$snippet" | sed 's/ *##.*//')
-  echo -n "$cmd" | pbcopy
-  zle redisplay
-}
-zle -N fzf-snippets
-bindkey '^x' fzf-snippets
 
 fzf-ghq-look() {
   local dir=$(ghq list -p | fzf)

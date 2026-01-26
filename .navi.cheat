@@ -1,0 +1,237 @@
+% shell
+
+# shell の再立ち上げと同等
+exec $SHELL -l
+
+# ポート使用プロセス確認
+lsof -i:<port>
+
+# メモリを使っている順
+ps ax -orss,cmd | sort -rn
+
+# tee で結果残し
+<command> 2>&1 | tee result_$(hostname -s).$(date +%Y%m%d-%H%M%S).log
+
+# config だけを見たいんや！（コメント・空行除外）
+grep -v -E "^\s*#|^\s*$" <file>
+
+# 永久 Loop . Disk 容量を記録しつづける
+while :; do date; df ; sleep 5 ; done
+
+# 管理者権限でファイルをリダイレクトする
+sudo sh -c 'echo <text> > <file>'
+
+# 特定の grep を kill
+ps auxwwf | grep <target> | awk '{print "kill ",$2}' | sudo sh
+
+# IP アドレスだけ抽出してソートする
+cat <file> | egrep -o '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n
+
+# ディスク使用量を確認（低優先度）
+sudo ionice -c 2 -n 7 nice -n 19 du -scm /* | sort -rn
+
+# 昨日の日付
+date +%Y%m%d -d '1 days ago'
+
+# tmux キーブロードキャスト
+set-window-option synchronize-panes on
+
+% ssh
+
+# ポートフォワード
+ssh -L <local_port>:127.0.0.1:<remote_port> <user>@<host>
+
+# 公開鍵から bit 長と種別を確認する
+ssh-keygen -l -f <pubkey_file>
+
+# 秘密鍵から公開鍵を出力する
+ssh-keygen -y -f <privkey_file>
+
+% git
+
+# git log をみやすく
+git log --oneline -10
+
+# マージ前の差分チェック
+git diff FETCH_HEAD
+
+# 直前の commit を取り消したい
+git reset --soft HEAD^
+
+# 直前のコミットログを編集する
+git commit --amend -m "<new_message>"
+
+# ブランチ削除
+git branch -d <branch>
+
+$ branch: git branch --format='%(refname:short)'
+
+# local の不要ブランチを削除
+git branch --merged | grep -v '*' | xargs -I % git branch -d %
+
+# 直前のコミットから一部のファイルだけ戻したいとき
+git restore --source=HEAD^ <file>
+
+# 差分からファイル名だけを表示する
+git diff --name-only <commit>^ <commit>
+
+# 現行の Branch を git push
+git push origin HEAD
+
+# リモートブランチ削除
+git push origin :<branch>
+
+# リモートブランチの更新を取り込む
+git fetch ; git merge origin/<branch>
+
+# リモートブランチを取得
+git checkout -b <branch> origin/<branch>
+
+# stage を最新にする
+git reset --hard origin/<branch>
+
+# upstream 設定
+git branch --set-upstream-to=origin/<branch> <branch>
+
+# git の global config を確認する
+git config --list --global
+
+# もりもり git log
+git log --graph --oneline --decorate --all -10
+
+# マージ
+git merge FETCH_HEAD
+
+# PRをブラウザで開く
+gh pr view -w
+
+# カレントブランチのPRのCIをみる
+gh pr checks --watch
+
+# リモートブランチをローカルチェックアウト
+gh pr checkout <pr_number>
+
+# PR作る
+gh pr create --assignee @me --fill-verbose --draft && gh pr view --web
+
+% kubernetes
+
+# pod 一覧（IP, Node 情報含む）
+kubectl get pods -o wide
+
+# 全体俯瞰
+kubectl get all
+
+# pod ログ
+kubectl logs <pod>
+
+$ pod: kubectl get pods --no-headers -o custom-columns=":metadata.name"
+
+# pod 詳細
+kubectl describe pod <pod>
+
+# pod に入る
+kubectl exec -it <pod> -- /bin/bash
+
+# Node ごとの負荷を見るコマンド
+kubectl top nodes
+
+# namespace 一覧
+kubectl get ns
+
+# context 一覧
+kubectl config get-contexts
+
+# context 切り替え
+kubectl config use-context <context>
+
+$ context: kubectl config get-contexts -o name
+
+# namespace 設定
+kubectl config set-context --current --namespace=<namespace>
+
+$ namespace: kubectl get ns --no-headers -o custom-columns=":metadata.name"
+
+# ポートフォワード
+kubectl port-forward -n <namespace> svc/<service> <local_port>:<remote_port>
+
+$ service: kubectl get svc -n <namespace> --no-headers -o custom-columns=":metadata.name"
+
+# 複数 pod のログ調査
+stern <pod_regex> --container <container>
+
+# daemonset リスト
+kubectl get daemonset --all-namespaces
+
+# replicaset を作成順に表示
+kubectl get replicaset --sort-by=.metadata.creationTimestamp
+
+# 特定 node の pod 一覧
+kubectl get pods --all-namespaces --field-selector spec.nodeName=<node> -o wide
+
+$ node: kubectl get nodes --no-headers -o custom-columns=":metadata.name"
+
+# ArgoCD Application 一覧
+kubectl get applications.argoproj.io -A
+
+# kustomize で manifest 生成
+kustomize build <overlay_path> | yq 'select(.kind == "<kind>")'
+
+# kustomize diff
+kustomize build <path> | kubectl diff -f -
+
+# helm リリース一覧
+helm list -A
+
+# timestamp 変換（jq）
+kubectl logs <pod> | jq -r '[(.ts | strftime("%Y-%m-%d %H:%M:%S")), .level, .msg] | @tsv'
+
+% terraform
+
+# 特定リソースのみ plan
+terraform plan --target=<resource>
+
+# workspace 一覧
+terraform workspace list
+
+# workspace 切り替え
+terraform workspace select <workspace>
+
+$ workspace: terraform workspace list | grep -v '*' | sed 's/^  //'
+
+% openssl
+
+# SSL 接続テスト
+openssl s_client -connect <domain>:443
+
+# 証明書の md5（組み合わせ確認用）
+openssl x509 -noout -modulus -in <crt_file> | openssl md5
+
+# 秘密鍵の md5（組み合わせ確認用）
+openssl rsa -noout -modulus -in <key_file> | openssl md5
+
+# CSR の md5（組み合わせ確認用）
+openssl req -noout -modulus -in <csr_file> | openssl md5
+
+# DH キー長確認
+echo "" | openssl s_client -connect <domain>:443 -servername <sni> -showcerts 2>&1 | grep 'Temp'
+
+% linux
+
+# 2日以内に変更されたファイル
+find ./ -daystart -ctime -2
+
+# 2日より前に変更されたファイル
+find ./ -daystart -ctime +2
+
+# 空白含むファイル名も削除
+find . -maxdepth 1 -type f -name "*.txt" -print0 | xargs -0 rm
+
+# 特定拡張子以外を探す
+find . -maxdepth 1 -type f \! \( -name "*.txt" -o -name "*.rb" \)
+
+# 帯域制限付き rsync
+sudo rsync -av --progress --bwlimit=1000 <source> <dest>
+
+# rsync 一時停止
+pkill -STOP rsync && sleep 300 && pkill -CONT rsync &

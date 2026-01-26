@@ -37,6 +37,7 @@ BASIC_TOOLS=(
   powerlevel10k
   lsd
   atuin
+  navi
 )
 
 GIT_TOOLS=(
@@ -84,7 +85,7 @@ KREW_PLUGINS=(
 
 CASK_APPS=(
   visual-studio-code
-  karabiner-elements
+  cmd-eikana
   the-unarchiver
   kindle
   keyboardcleantool

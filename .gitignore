@@ -5,6 +5,7 @@
 *.log
 .config/*
 !.config/ghostty
+!.config/navi
 !.config/nvim
 !.config/zsh-profiles
 !.config/gh

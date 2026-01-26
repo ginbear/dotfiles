@@ -31,7 +31,7 @@ alias vi='nvim'
 alias grep='grep --color=auto'
 alias rg='rg --color=auto'
 alias date='gdate'
-alias batcat='bat --paging=auto --style=numbers,changes,grid'
+alias cat='bat --paging=never'
 
 #=============================
 # Aliases - Git
