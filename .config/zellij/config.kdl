@@ -1,0 +1,65 @@
+// Zellij Configuration
+// tmux.conf から移植
+
+// デフォルトシェル
+default_shell "zsh"
+
+// コピーモード: vi キーバインド (tmux: set-window-option -g mode-keys vi)
+copy_command "pbcopy"
+scrollback_editor "nvim"
+
+// テーマ (tmux ステータスラインの色味に合わせた設定)
+theme "custom"
+themes {
+    custom {
+        fg "#ffffff"
+        bg "#1c1c1c"       // colour234 相当
+        black "#1c1c1c"
+        red "#ff5555"
+        green "#50fa7b"
+        yellow "#f1fa8c"
+        blue "#6272a4"
+        magenta "#ff79c6"
+        cyan "#00afff"     // colour39 相当 (tmux のアクティブウィンドウ色)
+        white "#d4d4d4"    // colour252 相当
+        orange "#ffb86c"
+    }
+}
+
+// セッション名を表示 (tmux: status-left に #S)
+session_serialization true
+
+// ウィンドウ/ペイン番号を1始まり (tmux: base-index 1)
+// Zellij はデフォルトで1始まり
+
+// エスケープ遅延なし (tmux: escape-time 0)
+// Zellij はデフォルトで遅延なし
+
+// スクロールバック (tmux: history-limit 10000)
+scroll_buffer_size 10000
+
+// キーバインド設定
+// tmux の prefix + hjkl によるペイン移動・リサイズを移植
+keybinds clear-defaults=false {
+    // Normal モード: tmux の prefix なしで Alt キーベースに変更
+    normal {
+        // ペイン移動 (tmux: prefix + h/j/k/l)
+        bind "Alt h" { MoveFocus "Left"; }
+        bind "Alt l" { MoveFocus "Right"; }
+        bind "Alt j" { MoveFocus "Down"; }
+        bind "Alt k" { MoveFocus "Up"; }
+
+        // ペインリサイズ (tmux: prefix + Ctrl-h/j/k/l)
+        bind "Alt H" { Resize "Increase Left"; }
+        bind "Alt L" { Resize "Increase Right"; }
+        bind "Alt J" { Resize "Increase Down"; }
+        bind "Alt K" { Resize "Increase Up"; }
+
+        // 新規ペイン
+        bind "Alt -" { NewPane "Down"; }
+        bind "Alt \\" { NewPane "Right"; }
+    }
+
+    // Scroll モード (tmux の copy-mode 相当)
+    // v で選択開始、y でコピーは Zellij デフォルトで対応済み
+}

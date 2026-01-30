@@ -38,6 +38,7 @@ BASIC_TOOLS=(
   lsd
   atuin
   navi
+  zellij
 )
 
 GIT_TOOLS=(

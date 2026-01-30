@@ -10,4 +10,5 @@
 !.config/zsh-profiles
 !.config/gh
 !.config/gh/config.yml
+!.config/zellij
 .config/gh/hosts.yml
