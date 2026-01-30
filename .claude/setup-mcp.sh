@@ -33,6 +33,19 @@ else
   echo "  Install: https://docs.datadoghq.com/bits_ai/mcp_server/setup/"
 fi
 
+# Zellij (ghq + npm build が必要)
+ZELLIJ_MCP_DIR="$(ghq root)/github.com/GitJuhb/zellij-mcp-server"
+if [ ! -d "$ZELLIJ_MCP_DIR" ]; then
+  echo "Cloning zellij-mcp-server..."
+  ghq get https://github.com/GitJuhb/zellij-mcp-server.git
+fi
+if [ ! -f "$ZELLIJ_MCP_DIR/dist/index.js" ]; then
+  echo "Building zellij-mcp-server..."
+  (cd "$ZELLIJ_MCP_DIR" && npm install && npm run build)
+fi
+echo "Adding Zellij MCP server..."
+claude mcp add -s user zellij -- node "$ZELLIJ_MCP_DIR/dist/index.js"
+
 # Notion (HTTP transport)
 echo "Adding Notion MCP server..."
 claude mcp add -s user --transport http "claude.ai Notion" https://mcp.notion.com/mcp
