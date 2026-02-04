@@ -32,6 +32,3 @@ git add -A && git commit -m "..." && git push
 chezmoi update
 ```
 
-## Legacy
-
-以前のsymlink方式から移行済み。`bin/init.sh` は参考用に残存。
