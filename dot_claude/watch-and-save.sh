@@ -17,14 +17,12 @@ fi
 # プロジェクト名を抽出（パスから）
 extract_project_name() {
   local dir_name="$1"
-  # -Users-ryoshimizu-ghq-github-com-Atrae-wevox-infrastructure -> wevox-infrastructure
   echo "$dir_name" | rev | cut -d'-' -f1-2 | rev | sed 's/^-//'
 }
 
 # リポジトリパスを抽出（ディレクトリ名から）
 extract_repository_path() {
   local dir_name="$1"
-  # -Users-ryoshimizu-ghq-github-com-ginbear-zenn -> /Users/ryoshimizu/ghq/github.com/ginbear/zenn
   echo "$dir_name" | sed 's/^-/\//' | sed 's/-com-/.com\//g' | sed 's/-/\//g'
 }
 
