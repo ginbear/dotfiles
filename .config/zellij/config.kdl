@@ -41,6 +41,13 @@ scroll_buffer_size 10000
 // キーバインド設定
 // tmux の prefix + hjkl によるペイン移動・リサイズを移植
 keybinds clear-defaults=false {
+    // Ctrl+G を Lock モードから解放 (zsh の ghq 呼び出しに使用)
+    // 代わりに Ctrl+L で Lock モードに入る
+    shared {
+        unbind "Ctrl g"
+        bind "Ctrl l" { SwitchToMode "locked"; }
+    }
+
     // Normal モード: tmux の prefix なしで Alt キーベースに変更
     normal {
         // ペイン移動 (tmux: prefix + h/j/k/l)

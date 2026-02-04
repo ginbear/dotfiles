@@ -21,7 +21,13 @@
       "Bash(wc:*)",
       "Bash(file:*)",
       "Read(*)",
-      "WebFetch(domain:*)"
+      "WebFetch(domain:*)",
+      "WebSearch",
+      "mcp__github__get_issue",
+      "mcp__github__list_issues",
+      "mcp__github__search_issues",
+      "mcp__github__search_code",
+      "mcp__github__get_file_contents"
     ]
   },
   "alwaysThinkingEnabled": true,

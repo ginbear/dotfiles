@@ -1,0 +1,6 @@
+[".claude/team"]
+    type = "git-repo"
+    url = "git@github.com:Atrae/wevox-sre-claude-config.git"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--ff-only"]
