@@ -298,17 +298,3 @@ k-role() {
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-#=============================
-# Chezmoi update reminder (runs once after first prompt)
-#=============================
-_chezmoi_reminder() {
-  local state_file="$HOME/.cache/chezmoi-last-update"
-  local now=$(date +%s)
-  local last=$([[ -f "$state_file" ]] && cat "$state_file" || echo 0)
-  local week=$((7 * 24 * 60 * 60))
-  (( now - last > week )) && echo "\n⚠️  chezmoi update を1週間以上実行していません。czu を実行してください"
-  add-zsh-hook -d precmd _chezmoi_reminder
-}
-autoload -Uz add-zsh-hook
-add-zsh-hook precmd _chezmoi_reminder
-
