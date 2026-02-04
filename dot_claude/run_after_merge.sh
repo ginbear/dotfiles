@@ -38,3 +38,22 @@ if [ -d "$PERSONAL_DIR/skills" ]; then
 fi
 
 echo "[OK] Claude commands/skills merged"
+
+# Copy secrets from ghq dotfiles (not tracked in git)
+DOTFILES_GHQ="$HOME/ghq/github.com/ginbear/dotfiles"
+if [ -d "$DOTFILES_GHQ" ]; then
+    # gh hosts.yml
+    if [ -f "$DOTFILES_GHQ/dot_config/gh/hosts.yml" ]; then
+        mkdir -p "$HOME/.config/gh"
+        cp "$DOTFILES_GHQ/dot_config/gh/hosts.yml" "$HOME/.config/gh/"
+    fi
+    # raycast
+    if [ -d "$DOTFILES_GHQ/dot_config/raycast" ]; then
+        cp -r "$DOTFILES_GHQ/dot_config/raycast" "$HOME/.config/"
+    fi
+    # karabiner
+    if [ -d "$DOTFILES_GHQ/dot_config/karabiner" ]; then
+        cp -r "$DOTFILES_GHQ/dot_config/karabiner" "$HOME/.config/"
+    fi
+    echo "[OK] Secrets copied from ghq dotfiles"
+fi
