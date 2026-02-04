@@ -52,10 +52,5 @@ if [ -d "$DOTFILES_GHQ" ]; then
         rm -rf "$HOME/.config/raycast"
         cp -r "$DOTFILES_GHQ/dot_config/raycast" "$HOME/.config/"
     fi
-    # karabiner
-    if [ -d "$DOTFILES_GHQ/dot_config/karabiner" ]; then
-        rm -rf "$HOME/.config/karabiner"
-        cp -r "$DOTFILES_GHQ/dot_config/karabiner" "$HOME/.config/"
-    fi
     echo "[OK] Secrets copied from ghq dotfiles"
 fi

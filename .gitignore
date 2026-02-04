@@ -8,11 +8,7 @@
 dot_config/gh/hosts.yml
 dot_config/raycast/
 dot_config/argocd/
-dot_config/atuin/
 dot_config/configstore/
 dot_config/git/
-dot_config/karabiner/
-dot_config/wireshark/
-dot_config/AWS VPN Client/
 dot_config/AWSVPNClient/
 dot_config/chezmoi/
