@@ -64,6 +64,11 @@ alias kst='kustomize'
 alias ksb='kustomize build'
 
 #=============================
+# Aliases - Chezmoi
+#=============================
+alias czu='chezmoi update && mkdir -p ~/.cache && date +%s > ~/.cache/chezmoi-last-update'
+
+#=============================
 # Tool initializations
 #=============================
 # pyenv
