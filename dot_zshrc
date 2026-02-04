@@ -293,7 +293,13 @@ k-role() {
 }
 
 #=============================
-# Chezmoi update reminder
+# Powerlevel10k theme
+#=============================
+source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+#=============================
+# Chezmoi update reminder (after p10k to avoid instant prompt warning)
 #=============================
 () {
   local state_file="$HOME/.cache/chezmoi-last-update"
@@ -302,10 +308,4 @@ k-role() {
   local week=$((7 * 24 * 60 * 60))
   (( now - last > week )) && echo "⚠️  chezmoi update を1週間以上実行していません。czu を実行してください"
 }
-
-#=============================
-# Powerlevel10k theme
-#=============================
-source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
