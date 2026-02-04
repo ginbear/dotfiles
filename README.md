@@ -1,31 +1,37 @@
 # dotfiles
 
-Personal dotfiles for macOS.
+Personal dotfiles for macOS, managed with [chezmoi](https://www.chezmoi.io/).
 
 ## Setup
 
 ```bash
-# 1. Clone repository
-ghq get https://github.com/ginbear/dotfiles.git
-cd $(ghq root)/github.com/ginbear/dotfiles
+# 1. Install chezmoi and initialize
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply ginbear
 
-# 2. Create symlinks
-sh bin/init.sh
-
-# 3. Install Homebrew packages
+# 2. Install Homebrew packages
 sh bin/setup_mac_homebrew.sh
 ```
 
-## Contents
+## Update
 
-| File/Directory | Description |
-|----------------|-------------|
-| `.zshrc` | Zsh configuration |
-| `.shellrc` | Common shell settings (aliases, PATH, etc.) |
-| `.p10k.zsh` | Powerlevel10k theme config |
-| `.gitconfig` | Git configuration |
-| `.config/ghostty/` | Ghostty terminal config |
-| `.config/nvim/` | Neovim config |
-| `.claude/` | Claude Code settings |
-| `bin/init.sh` | Symlink setup script |
-| `bin/setup_mac_homebrew.sh` | Homebrew packages installer |
+```bash
+chezmoi update   # git pull + external repos + apply
+```
+
+## Workflow
+
+```bash
+# 1. Edit in ghq repo
+cd ~/ghq/github.com/ginbear/dotfiles
+vim dot_zshrc
+
+# 2. Commit and push
+git add -A && git commit -m "..." && git push
+
+# 3. Apply changes
+chezmoi update
+```
+
+## Legacy
+
+以前のsymlink方式から移行済み。`bin/init.sh` は参考用に残存。
