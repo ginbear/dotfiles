@@ -78,6 +78,9 @@ bindkey '^x' _navi_widget
 # mise
 eval "$(mise activate zsh)"
 
+# zsh-autosuggestions
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
 #=============================
 # Common settings (aliases, etc.)
 #=============================

@@ -39,6 +39,7 @@ BASIC_TOOLS=(
   atuin
   navi
   zellij
+  zsh-autosuggestions
 )
 
 GIT_TOOLS=(
@@ -64,6 +65,7 @@ K8S_TOOLS=(
   krew
   kubecolor
   argocd
+  k9s
 )
 
 CONTAINER_TOOLS=(
