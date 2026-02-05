@@ -17,29 +17,28 @@ require("lazy").setup({
   -- Treesitter: 構文ハイライト
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = false,
     build = ":TSUpdate",
-    main = "nvim-treesitter.configs",
-    opts = {
-      ensure_installed = {
-        "lua",
-        "vim",
-        "vimdoc",
-        "bash",
-        "python",
-        "javascript",
-        "typescript",
-        "json",
-        "yaml",
-        "markdown",
-        "go",
-        "terraform",
-      },
-      highlight = {
-        enable = true,
-      },
-      indent = {
-        enable = true,
-      },
-    },
+    config = function()
+      local treesitter = require("nvim-treesitter")
+      treesitter.setup()
+
+      -- 言語パーサーをインストール
+      local languages = {
+        "lua", "vim", "vimdoc", "bash", "python",
+        "javascript", "typescript", "json", "yaml",
+        "markdown", "go", "terraform",
+      }
+      treesitter.install(languages)
+
+      -- ファイルタイプごとにハイライトとインデントを有効化
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = languages,
+        callback = function()
+          vim.treesitter.start()
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
   },
 })
