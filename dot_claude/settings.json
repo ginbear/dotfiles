@@ -78,5 +78,9 @@
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "sre-incident-team@wevox-sre-tools": true,
+    "wevox-sre-tools@wevox-sre-tools": true
   }
 }
