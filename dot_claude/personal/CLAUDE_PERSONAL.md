@@ -12,6 +12,9 @@
 ## Dotfiles / chezmoi
 
 - dotfilesの管理には `chezmoi` を使用する
+- chezmoi ソースディレクトリは ghq 管理のリポジトリへのシンボリックリンク:
+  - `~/.local/share/chezmoi` → `~/ghq/github.com/ginbear/dotfiles`
+  - どちらのパスでもアクセス可能だが、ghq 側のパスを使う
 - `~/` 配下のdotfilesを直接編集しない。必ずchezmoiのソースディレクトリで編集する
 - **ワークフロー**: ソース編集 → gitコミット → `chezmoi apply`（この順序を厳守）
 - `chezmoi apply` はユーザーの確認なしに実行しない
