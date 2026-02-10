@@ -1,7 +1,26 @@
 # Personal Preferences
 
-# Private Settings (company-specific)
-@~/.claude/CLAUDE.local.md
+## Development Environment
+
+- ローカルリポジトリの管理には必ず `ghq` を使用する（`git clone` は使わない）
+  - リポジトリ取得: `ghq get <repo>` (NOT `git clone`)
+  - リポジトリ一覧: `ghq list`
+  - リポジトリパス: `ghq root`/`ghq list --full-path`
+  - リポジトリは `~/ghq/` 配下に配置される
+- 複数リポジトリにまたがる調査時は、対象リポジトリのローカルパスをユーザーに確認してから作業する
+
+## Dotfiles / chezmoi
+
+- dotfilesの管理には `chezmoi` を使用する
+- `~/` 配下のdotfilesを直接編集しない。必ずchezmoiのソースディレクトリで編集する
+- **ワークフロー**: ソース編集 → gitコミット → `chezmoi apply`（この順序を厳守）
+- `chezmoi apply` はユーザーの確認なしに実行しない
+
+## Timezone
+
+- Kubernetes CronJob や schedule 設定は **UTC** で記述する
+- ユーザーが JST で時刻を指定した場合、**必ず UTC に変換**してから設定ファイルに記述する
+- 変換結果はユーザーに確認を取る（例: JST 09:00 → UTC 00:00）
 
 ## Git Commit Style
 
@@ -29,6 +48,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 - Always validate manifests with `kubectl kustomize` before committing
 - After Dockerfile changes, remind to run build.sh
+- **変更作業の前に必ず調査を先行する**: 関連ファイル/リポジトリの特定 → 現状の理解 → 変更計画の提示 → ユーザー承認後に実行
+- PRにブランチ・コミットを作成する前に、diff概要をユーザーに見せて確認を取る
+- `.claude/settings.local.json` などローカル専用ファイルをPRに含めない
 - You can run these commands without asking permission:
   - `kubectl kustomize`
   - `kubectl get/describe/logs` (read-only operations)
