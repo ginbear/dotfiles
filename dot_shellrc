@@ -11,13 +11,11 @@ source ~/.shellrc.local
 export EDITOR=/usr/bin/vim
 export LC_CTYPE=en_US.UTF-8
 export GOPATH=$HOME/.go
-export PYENV_ROOT="$HOME/.pyenv"
 
 #=============================
 # PATH
 #=============================
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 [ -d "$GOPATH" ] && export PATH="$GOPATH/bin:$PATH"
 
@@ -63,8 +61,3 @@ alias kubectl='kubecolor'
 alias kst='kustomize'
 alias ksb='kustomize build'
 
-#=============================
-# Tool initializations
-#=============================
-# pyenv
-eval "$(pyenv init -)"

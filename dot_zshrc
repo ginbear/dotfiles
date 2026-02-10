@@ -12,7 +12,6 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export FZF_DEFAULT_OPTS='--height 70% --reverse --border --tiebreak=length,index'
-export NVM_DIR="$HOME/.nvm"
 
 #=============================
 # Zsh basic settings
@@ -57,7 +56,11 @@ fpath=(
   $fpath
 )
 autoload -Uz compinit
-compinit -u
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 
 #=============================
 # External tools initialization
@@ -70,10 +73,6 @@ bindkey '^r' atuin-search
 # navi (snippet manager)
 eval "$(navi widget zsh)"
 bindkey '^x' _navi_widget
-
-# NVM
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # mise
 eval "$(mise activate zsh)"
