@@ -47,6 +47,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 - Do NOT include "Generated with Claude Code" in PR description
 
+## Investigation Workflow
+
+K8sリソースやインフラの調査時は以下の順序で実施する:
+1. `kubectl get/describe` で現在の状態を確認
+2. `kubectl logs` でエラー詳細を確認
+3. **ローカルマニフェスト/Terraformを Grep/Read で検索**し、設定の意図を把握
+4. 必要に応じて Datadog でメトリクス/ログを確認
+5. 調査結果をまとめてからアクション提案（勝手に修正しない）
+
 ## Kubernetes/DevOps Workflow
 
 - Always validate manifests with `kubectl kustomize` before committing
