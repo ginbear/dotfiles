@@ -10,12 +10,21 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 # Check 1: Block git commit on protected branches
 CONFIG="$HOME/.claude/protected-branches"
 if [[ "$COMMAND" == *"git commit"* ]] && [[ -f "$CONFIG" ]]; then
-  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  # Resolve target repo: support "git -C <path>" and "cd <path> && git commit"
+  GIT_DIR_ARGS=()
+  if [[ "$COMMAND" =~ git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then
+    GIT_DIR_ARGS=(-C "${BASH_REMATCH[1]}")
+  elif [[ "$COMMAND" =~ cd[[:space:]]+([^[:space:];&]+) ]]; then
+    GIT_DIR_ARGS=(-C "${BASH_REMATCH[1]}")
+  fi
+  BRANCH=$(git "${GIT_DIR_ARGS[@]}" rev-parse --abbrev-ref HEAD 2>/dev/null)
   if [ -n "$BRANCH" ]; then
     while IFS= read -r protected; do
       [[ -z "$protected" || "$protected" == \#* ]] && continue
       if [[ "$BRANCH" == "$protected" ]]; then
-        echo "BLOCKED: Cannot commit directly on protected branch '$BRANCH'. Create a feature branch first." >&2
+        REPO_PATH="CWD"
+        [[ ${#GIT_DIR_ARGS[@]} -gt 0 ]] && REPO_PATH="${GIT_DIR_ARGS[1]}"
+        echo "BLOCKED: Cannot commit directly on protected branch '$BRANCH' ($REPO_PATH). Create a feature branch first." >&2
         exit 2
       fi
     done < "$CONFIG"
