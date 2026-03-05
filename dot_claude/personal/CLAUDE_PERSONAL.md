@@ -16,6 +16,7 @@
   - `~/.local/share/chezmoi` → `~/ghq/github.com/ginbear/dotfiles`
   - どちらのパスでもアクセス可能だが、ghq 側のパスを使う
 - `~/` 配下のdotfilesを直接編集しない。必ずchezmoiのソースディレクトリで編集する
+- **よくある間違い**: `~/.claude/` 配下を直接編集してはいけない。`~/ghq/github.com/ginbear/dotfiles/dot_claude/` を編集する
 - **ワークフロー**: ソース編集 → gitコミット → `chezmoi apply`（この順序を厳守）
 - `chezmoi apply` はユーザーの確認なしに実行しない
 
@@ -46,6 +47,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ## PR Style
 
 - Do NOT include "Generated with Claude Code" in PR description
+- PR作成前に `git diff` の全体を確認し、意図した変更のみが含まれていることを検証する
+- 複数環境（dev/stg/prd）にまたがる変更では、各環境の現在値を git 上で確認してから diff を作成する（実態と乖離していないか検証）
+- 以下のファイルは絶対に PR に含めない: `.claude/settings.local.json`, `.env`, `*.tfvars`（機密情報）
+
+## 回答の正確性
+
+- ツールの機能・設定項目について確信がない場合は「未確認」と明示し、公式ドキュメントや `--help` で確認してから回答する
+- 「できない」「存在しない」と断言する前に、実際にコマンドやドキュメントで検証する
 
 ## Investigation Workflow
 
@@ -55,6 +64,15 @@ K8sリソースやインフラの調査時は以下の順序で実施する:
 3. **ローカルマニフェスト/Terraformを Grep/Read で検索**し、設定の意図を把握
 4. 必要に応じて Datadog でメトリクス/ログを確認
 5. 調査結果をまとめてからアクション提案（勝手に修正しない）
+
+### リソース状態の報告ルール
+- kubectl の出力を部分的に見て「正常」と断言しない。STATUS/READY カラムを必ず確認する
+- 「動いている」と報告する前に、Pod の STATUS が Running かつ READY が期待値であることを確認する
+- 不確かな場合は「未確認」と明示し、確認コマンドを提示する
+
+### セキュリティ調査の注意事項
+- ユーザーが指定した CVE 番号は正確にそのまま使う。類似の CVE に勝手に置き換えない
+- CVE の詳細を調べる際は、公式ソース（NVD, GitHub Advisory）を参照して正確性を検証する
 
 ## Kubernetes/DevOps Workflow
 
