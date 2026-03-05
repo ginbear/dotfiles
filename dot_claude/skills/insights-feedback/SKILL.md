@@ -61,7 +61,7 @@ git -C ~/.claude/team branch --show-current
 - セッションの効率性に関する指標
 - **データの対象期間**（いつからいつまでのセッションが対象か）
 
-### Phase 2: 現状の CLAUDE.md を読み込む
+### Phase 2: 現状の CLAUDE.md と rules を読み込む
 
 以下のファイルを読み込んで現状を把握する:
 
@@ -71,9 +71,16 @@ cat ~/ghq/github.com/ginbear/dotfiles/dot_claude/CLAUDE.md
 cat ~/ghq/github.com/ginbear/dotfiles/dot_claude/personal/CLAUDE_PERSONAL.md
 ```
 
+rules ファイルも読み込む:
+```bash
+ls ~/ghq/github.com/ginbear/dotfiles/dot_claude/rules/
+# 各 .md ファイルを読み込む（シンボリックリンク先のチーム rules も含む）
+```
+
 チーム設定も参照用に読む:
 ```bash
 cat ~/.claude/team/dot_claude/CLAUDE_TEAM.md
+ls ~/.claude/team/dot_claude/rules/
 ```
 
 ### Phase 3: 分析 & 改善提案の生成
@@ -93,8 +100,14 @@ insight の結果と現在の設定を照らし合わせ、以下の観点で分
 - **冗長・重複した記述** → 統合して簡素化
 - **もう使っていないツール/ワークフローの記述** → 削除
 
+#### 配置先の判断（CLAUDE.md vs .claude/rules/）
+- **プロジェクト概要、環境情報、ワークフロー全般** → CLAUDE.md 系（セッション開始時に注入）
+- **特定ファイル種別に紐づくコーディング規約・禁止事項** → `.claude/rules/*.md`（該当ファイル初出時に注入）
+- rules には YAML frontmatter の `paths` で適用条件を指定する（例: `**/*.tf` で Terraform ファイルのみ）
+- 既存の rules ファイルに追記すべきか、新規 rules ファイルを作るべきかも判断する
+
 #### 構造改善
-- **肥大化の兆候** → セクション分割、別ファイル化の提案
+- **肥大化の兆候** → セクション分割、別ファイル化（rules 移行を含む）の提案
 - **優先度の並び替え** → 重要な指示を上位に配置
 
 ### Phase 4: レポート出力
@@ -114,7 +127,7 @@ insight の結果と現在の設定を照らし合わせ、以下の観点で分
 
 #### 1. [追加/修正/削除] 提案タイトル
 **根拠**: insight でこういうパターンが見つかった
-**対象**: CLAUDE_PERSONAL.md
+**対象**: CLAUDE_PERSONAL.md / .claude/rules/xxx.md
 **変更内容**:
 ```diff
 + 追加する行
