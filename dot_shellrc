@@ -60,4 +60,6 @@ alias k='kubectl'
 alias kubectl='kubecolor'
 alias kst='kustomize'
 alias ksb='kustomize build'
+alias kx='kbectx'
+alias kn='kubens'
 

@@ -66,6 +66,7 @@ K8S_TOOLS=(
   kubecolor
   argocd
   k9s
+  kubectx
 )
 
 CONTAINER_TOOLS=(
