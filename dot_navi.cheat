@@ -186,6 +186,16 @@ helm list -A
 # timestamp 変換（jq）
 kubectl logs <pod> | jq -r '[(.ts | strftime("%Y-%m-%d %H:%M:%S")), .level, .msg] | @tsv'
 
+# SealedSecret の暗号化値を生成
+echo -n "<secret_value>" | kubeseal --raw \
+  --name <secret_name> \
+  --namespace <namespace> \
+  --from-file=/dev/stdin
+
+$ secret_value: echo ""
+$ secret_name: echo ""
+$ namespace: echo "backend-dev" --- --fzf-overrides '--no-sort'
+
 % terraform
 
 # 特定リソースのみ plan
