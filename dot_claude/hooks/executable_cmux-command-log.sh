@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # PostToolUse hook: Bash コマンドと出力先頭をログファイルに追記
-# cmux ペインで tail -f して表示する想定
-# CMUX_COMMAND_LOG=1 で有効化。セッションごとに別ファイルに出力。
+# Ghostty / cmux ペインで tail -f して表示する想定
+# CLAUDE_COMMAND_LOG=1 で有効化。セッションごとに別ファイルに出力。
+# (旧: CMUX_COMMAND_LOG=1 でも有効)
 
 set -euo pipefail
 
-[[ "${CMUX_COMMAND_LOG:-}" == "1" ]] || exit 0
+[[ "${CLAUDE_COMMAND_LOG:-${CMUX_COMMAND_LOG:-}}" == "1" ]] || exit 0
 
 INPUT=$(cat)
 
