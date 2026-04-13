@@ -17,6 +17,8 @@
       "Bash(find *)",
       "Bash(grep *)",
       "Bash(curl *)",
+      "Bash(claude mcp get *)",
+      "Bash(gh search *)",
       "Bash(gh api *)",
       "Bash(gh pr view *)",
       "Bash(gh pr list *)",
