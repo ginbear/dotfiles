@@ -105,6 +105,13 @@ K8sリソースやインフラの調査時は以下の順序で実施する:
   - `terragrunt hclfmt --check`
   - `terragrunt hclfmt`
 
+## Bash コマンドのルール
+
+- 他リポジトリや別ディレクトリを参照する際は、原則 `cd` せず**絶対パスを引数に渡す**
+  - これにより `settings.json` の許可パターン（`Bash(grep *)`, `Bash(ls *)` 等）が正しくマッチし、不要な確認プロンプトを回避できる
+  - 例: `grep -r 'pattern' /absolute/path/to/repo/` (NOT `cd /path && grep -r 'pattern' .`)
+- `cd` が必要なケース（ツールが cwd 依存、相対パス出力が必要等）ではやむを得ず使ってよいが、理由がない限り絶対パスを優先する
+
 ## Code Style
 
 - Use 2-space indentation for YAML
