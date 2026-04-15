@@ -93,6 +93,7 @@ CASK_APPS=(
   the-unarchiver
   kindle
   keyboardcleantool
+  gcloud-cli
 )
 
 #=============================
