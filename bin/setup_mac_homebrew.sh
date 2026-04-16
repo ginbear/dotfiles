@@ -56,6 +56,7 @@ DEVOPS_TOOLS=(
   mise
   awscli
   chezmoi
+  uv
 )
 
 K8S_TOOLS=(
