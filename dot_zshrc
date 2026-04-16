@@ -300,3 +300,8 @@ k-role() {
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# >>> Takumi Guard PyPI Proxy >>>
+export PIP_INDEX_URL="https://pypi.flatt.tech/simple/"
+export UV_INDEX_URL="https://pypi.flatt.tech/simple/"
+# <<< Takumi Guard PyPI Proxy <<<
+
