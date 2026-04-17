@@ -1,5 +1,6 @@
 #!/bin/bash
-# Prevent commits on protected branches and block staging of local-only files
+# Prevent commits on protected branches, block staging of sensitive files,
+# and enforce development workflows (ghq, etc.)
 #
 # Protected branch names are read from ~/.claude/protected-branches (one per line).
 # Create that file locally to enable branch protection.
@@ -45,6 +46,12 @@ if [[ "$COMMAND" == *"git add"* ]]; then
     echo "BLOCKED: .tfvars files should not be committed (contains secrets)." >&2
     exit 2
   fi
+fi
+
+# Check 3: Block git clone (use ghq get instead)
+if [[ "$COMMAND" == *"git clone"* ]]; then
+  echo "BLOCKED: git clone is not allowed. Use 'ghq get <repo>' instead." >&2
+  exit 2
 fi
 
 exit 0

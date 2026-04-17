@@ -2,8 +2,8 @@
 
 ## Development Environment
 
-- ローカルリポジトリの管理には必ず `ghq` を使用する（`git clone` は使わない）
-  - リポジトリ取得: `ghq get <repo>` (NOT `git clone`)
+- ローカルリポジトリの管理には `ghq` を使用する（`git clone` は PreToolUse hook でブロックされる）
+  - リポジトリ取得: `ghq get <repo>`
   - リポジトリ一覧: `ghq list`
   - リポジトリパス: `ghq root`/`ghq list --full-path`
   - リポジトリは `~/ghq/` 配下に配置される
@@ -16,7 +16,8 @@
   - `~/.local/share/chezmoi` → `~/ghq/github.com/ginbear/dotfiles`
   - どちらのパスでもアクセス可能だが、ghq 側のパスを使う
 - `~/` 配下のdotfilesを直接編集しない。必ずchezmoiのソースディレクトリで編集する
-- **よくある間違い**: `~/.claude/` 配下を直接編集してはいけない。`~/ghq/github.com/ginbear/dotfiles/dot_claude/` を編集する
+- `~/.claude/` 配下の直接編集は permissions deny でブロックされる。`~/ghq/github.com/ginbear/dotfiles/dot_claude/` を編集すること
+  - テスト時は `Bash(cp ...)` で一時デプロイ可能（deny は Edit/Write ツールのみ対象）
 - **ワークフロー**: ソース編集 → gitコミット → `chezmoi apply`（この順序を厳守）
 - `chezmoi apply` はユーザーの確認なしに実行しない
 
@@ -87,11 +88,6 @@ K8sリソースやインフラの調査時は以下の順序で実施する:
 - **変更作業の前に必ず調査を先行する**: 関連ファイル/リポジトリの特定 → 現状の理解 → 変更計画の提示 → ユーザー承認後に実行
 - **複雑な変更の提案前に前提を明示する**: 解決策を提案する前に (1) 対象のリソース/ワークロード種別, (2) リポジトリ内の既存パターン, (3) 自分の前提条件 を列挙し、ユーザーに確認を取る。前提が間違っていると解決策全体が手戻りになる
 - PRにブランチ・コミットを作成する前に、diff概要をユーザーに見せて確認を取る
-- `.claude/settings.local.json` などローカル専用ファイルをPRに含めない
-- You can run these commands without asking permission:
-  - `kubectl kustomize`
-  - `kubectl get/describe/logs` (read-only operations)
-  - `git status/diff/log`
 
 ## Terraform/Terragrunt Workflow
 
@@ -101,9 +97,6 @@ K8sリソースやインフラの調査時は以下の順序で実施する:
   terragrunt hclfmt --check
   ```
 - フォーマットエラーがあれば `terragrunt hclfmt` で自動修正してからコミット
-- You can run these commands without asking permission:
-  - `terragrunt hclfmt --check`
-  - `terragrunt hclfmt`
 
 ## Bash コマンドのルール
 

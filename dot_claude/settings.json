@@ -89,6 +89,10 @@
       "mcp__*__aws___list_regions",
       "mcp__*__aws___get_regional_availability",
       "mcp__*__aws___retrieve_agent_sop"
+    ],
+    "deny": [
+      "Edit(~/.claude/**)",
+      "Write(~/.claude/**)"
     ]
   },
   "alwaysThinkingEnabled": true,
