@@ -31,10 +31,20 @@ if [[ "$COMMAND" == *"git commit"* ]] && [[ -f "$CONFIG" ]]; then
   fi
 fi
 
-# Check 2: Block git add of local-only files
-if [[ "$COMMAND" == *"git add"* ]] && [[ "$COMMAND" == *"settings.local.json"* ]]; then
-  echo "BLOCKED: settings.local.json should not be committed." >&2
-  exit 2
+# Check 2: Block git add of sensitive files
+if [[ "$COMMAND" == *"git add"* ]]; then
+  if [[ "$COMMAND" == *"settings.local.json"* ]]; then
+    echo "BLOCKED: settings.local.json should not be committed." >&2
+    exit 2
+  fi
+  if [[ "$COMMAND" == *".env"* ]]; then
+    echo "BLOCKED: .env files should not be committed (contains secrets)." >&2
+    exit 2
+  fi
+  if [[ "$COMMAND" == *".tfvars"* ]]; then
+    echo "BLOCKED: .tfvars files should not be committed (contains secrets)." >&2
+    exit 2
+  fi
 fi
 
 exit 0

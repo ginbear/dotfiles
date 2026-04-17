@@ -49,7 +49,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - Do NOT include "Generated with Claude Code" in PR description
 - PR作成前に `git diff` の全体を確認し、意図した変更のみが含まれていることを検証する
 - 複数環境（dev/stg/prd）にまたがる変更では、各環境の現在値を git 上で確認してから diff を作成する（実態と乖離していないか検証）
-- 以下のファイルは絶対に PR に含めない: `.claude/settings.local.json`, `.env`, `*.tfvars`（機密情報）
+- 機密ファイル（`.env`, `*.tfvars`, `settings.local.json`）の `git add` は PreToolUse hook で機械的にブロックされる
 
 ## 回答の正確性
 
