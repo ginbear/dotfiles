@@ -11,7 +11,6 @@ ICON_MODEL=$(printf "\xf3\xb0\x9a\xa9")  # U+F06A9 nf-md-assistant
 ICON_DIR=$(printf "\xef\x90\x93")        # U+F413 nf-oct-file_directory
 ICON_GIT=$(printf "\xee\x82\xa0")        # U+E0A0 nf-dev-git_branch
 ICON_CONTEXT=$(printf "\xef\x83\xa4")    # U+F0E4 nf-fa-tachometer
-ICON_COST=$(printf "\xef\x85\x95")       # U+F155 nf-fa-dollar
 ICON_RATE=$(printf "\xef\x80\x97")       # U+F017 nf-fa-clock_o
 
 # ─────────────────────────────────────────────────────────────
@@ -49,14 +48,32 @@ if git -C "$CURRENT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
 fi
 
 # ─────────────────────────────────────────────────────────────
-# Context usage percentage
+# Context usage: absolute value with warning thresholds
+# Resuming a large session after cache expiry (5min TTL)
+# consumes rate limits proportional to context size.
 # ─────────────────────────────────────────────────────────────
-if [ -n "$USAGE" ] && [ "$USAGE" != "null" ]; then
-    TOKENS=$(echo "$USAGE" | jq '(.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
-    PCT=$((TOKENS * 100 / CTX_SIZE))
-else
-    PCT=0
-fi
+CTX_WARN_THRESHOLD=150000   # ⚠ consider /compact before stepping away
+CTX_CRIT_THRESHOLD=300000   # 🔴 strongly consider /compact or new session
+
+ICON_WARN=$(printf "\xef\x81\xb1")    # U+F071 nf-fa-exclamation_triangle
+ICON_CRIT=$(printf "\xef\x81\xaa")    # U+F06A nf-fa-exclamation_circle
+
+format_tokens() {
+    local tokens=$1
+    if [ "$tokens" -ge 1000000 ]; then
+        local m=$((tokens / 1000000))
+        local remainder=$(( (tokens % 1000000) / 100000 ))
+        if [ "$remainder" -eq 0 ]; then
+            echo "${m}M"
+        else
+            echo "${m}.${remainder}M"
+        fi
+    elif [ "$tokens" -ge 1000 ]; then
+        echo "$((tokens / 1000))k"
+    else
+        echo "${tokens}"
+    fi
+}
 
 # ─────────────────────────────────────────────────────────────
 # Format cost
@@ -71,6 +88,23 @@ else
             printf "%.2f", $1
         }
     }')
+fi
+
+if [ -n "$USAGE" ] && [ "$USAGE" != "null" ]; then
+    TOKENS=$(echo "$USAGE" | jq '(.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
+else
+    TOKENS=0
+fi
+
+TOKENS_FMT=$(format_tokens "$TOKENS")
+CTX_SIZE_FMT=$(format_tokens "$CTX_SIZE")
+
+if [ "$TOKENS" -ge "$CTX_CRIT_THRESHOLD" ]; then
+    CTX_STR="${ICON_CRIT} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}"
+elif [ "$TOKENS" -ge "$CTX_WARN_THRESHOLD" ]; then
+    CTX_STR="${ICON_WARN} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}"
+else
+    CTX_STR="${ICON_CONTEXT} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}"
 fi
 
 # ─────────────────────────────────────────────────────────────
@@ -115,6 +149,6 @@ fi
 # ─────────────────────────────────────────────────────────────
 # Output (no ANSI colors for maximum compatibility)
 # ─────────────────────────────────────────────────────────────
-OUTPUT="${ICON_MODEL} ${MODEL}  ${ICON_DIR} ${DIR_NAME}${GIT_BRANCH}  ${ICON_CONTEXT} ${PCT}%  ${ICON_COST}${COST_STR}"
+OUTPUT="${ICON_MODEL} ${MODEL}  ${ICON_DIR} ${DIR_NAME}${GIT_BRANCH}  ${CTX_STR}"
 [ -n "$RATE_STR" ] && OUTPUT="${OUTPUT}  ${ICON_RATE} ${RATE_STR}"
 echo "$OUTPUT"
