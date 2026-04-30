@@ -99,10 +99,14 @@ fi
 TOKENS_FMT=$(format_tokens "$TOKENS")
 CTX_SIZE_FMT=$(format_tokens "$CTX_SIZE")
 
+CLR_YELLOW=$(printf '\033[33m')
+CLR_RED=$(printf '\033[31m')
+CLR_RESET=$(printf '\033[0m')
+
 if [ "$TOKENS" -ge "$CTX_CRIT_THRESHOLD" ]; then
-    CTX_STR="${ICON_CRIT} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}"
+    CTX_STR="${CLR_RED}${ICON_CRIT} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}${CLR_RESET}"
 elif [ "$TOKENS" -ge "$CTX_WARN_THRESHOLD" ]; then
-    CTX_STR="${ICON_WARN} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}"
+    CTX_STR="${CLR_YELLOW}${ICON_WARN} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}${CLR_RESET}"
 else
     CTX_STR="${ICON_CONTEXT} ${TOKENS_FMT}(\$${COST_STR})/${CTX_SIZE_FMT}"
 fi
@@ -147,7 +151,7 @@ if [ -n "$SEVEN_D_PCT" ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
-# Output (no ANSI colors for maximum compatibility)
+# Output
 # ─────────────────────────────────────────────────────────────
 OUTPUT="${ICON_MODEL} ${MODEL}  ${ICON_DIR} ${DIR_NAME}${GIT_BRANCH}  ${CTX_STR}"
 [ -n "$RATE_STR" ] && OUTPUT="${OUTPUT}  ${ICON_RATE} ${RATE_STR}"
