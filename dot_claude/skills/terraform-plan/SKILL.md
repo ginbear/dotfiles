@@ -41,7 +41,7 @@ HEADER
 
 # Plan 実行（必ず cd で対象ディレクトリに移動してから実行）
 # workspace がある場合は workspace select を先に実行（各 Bash 呼び出しはシェルが独立するため）
-cd <実行ディレクトリの絶対パス> && <terraform or terragrunt> plan 2>&1 | tee -a "$LOG_FILE"
+cd <実行ディレクトリの絶対パス> && <terraform or terragrunt> workspace select <workspace> && <terraform or terragrunt> plan 2>&1 | tee -a "$LOG_FILE"
 ```
 
 ## Step 3: 結果の検証

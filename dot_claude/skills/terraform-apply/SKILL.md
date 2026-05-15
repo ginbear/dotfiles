@@ -44,10 +44,10 @@ cat > "$LOG_FILE" <<HEADER
 HEADER
 
 # Apply 実行（必ず cd で対象ディレクトリに移動してから実行）
-# workspace がある場合は workspace select を先に実行
+# workspace がある場合は workspace select を先に実行（各 Bash 呼び出しはシェルが独立するため）
 # -auto-approve はユーザーが承認した場合のみ付与
 # -target が指定されている場合は -target=<resource> を付与（複数可）
-cd <実行ディレクトリの絶対パス> && <terraform or terragrunt> apply [-target=<resource> ...] 2>&1 | tee -a "$LOG_FILE"
+cd <実行ディレクトリの絶対パス> && <terraform or terragrunt> workspace select <workspace> && <terraform or terragrunt> apply [-target=<resource> ...] 2>&1 | tee -a "$LOG_FILE"
 ```
 
 ## Step 3: Apply 結果の検証
