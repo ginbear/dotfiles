@@ -70,14 +70,7 @@
       "mcp__claude_ai_Notion__notion-get-teams",
       "mcp__claude_ai_Notion__notion-get-users",
       "mcp__claude_ai_Notion__notion-query-data-sources",
-      "mcp__claude_ai_Notion__notion-query-meeting-notes",
-      "mcp__*__aws___read_documentation",
-      "mcp__*__aws___search_documentation",
-      "mcp__*__aws___recommend",
-      "mcp__*__aws___suggest_aws_commands",
-      "mcp__*__aws___list_regions",
-      "mcp__*__aws___get_regional_availability",
-      "mcp__*__aws___retrieve_agent_sop"
+      "mcp__claude_ai_Notion__notion-query-meeting-notes"
     ],
     "deny": [
       "Edit(~/.claude/**)",
@@ -161,5 +154,6 @@
     "sre-incident-team@wevox-sre-tools": true,
     "wevox-sre-tools@wevox-sre-tools": true
   },
-  "advisorModel": "opus"
+  "advisorModel": "opus",
+  "theme": "dark-ansi"
 }
