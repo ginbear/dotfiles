@@ -70,14 +70,7 @@
       "mcp__claude_ai_Notion__notion-get-teams",
       "mcp__claude_ai_Notion__notion-get-users",
       "mcp__claude_ai_Notion__notion-query-data-sources",
-      "mcp__claude_ai_Notion__notion-query-meeting-notes",
-      "mcp__aws-dev__aws___read_documentation",
-      "mcp__aws-dev__aws___search_documentation",
-      "mcp__aws-dev__aws___recommend",
-      "mcp__aws-dev__aws___suggest_aws_commands",
-      "mcp__aws-dev__aws___list_regions",
-      "mcp__aws-dev__aws___get_regional_availability",
-      "mcp__aws-dev__aws___retrieve_agent_sop"
+      "mcp__claude_ai_Notion__notion-query-meeting-notes"
     ],
     "deny": [
       "Edit(~/.claude/**)",
