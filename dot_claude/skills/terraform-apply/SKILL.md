@@ -66,24 +66,41 @@ HEADER
 # workspace がある場合は workspace select を先に実行（各 Bash 呼び出しはシェルが独立するため）
 # -target が指定されている場合は -target=<resource> を付与（複数可、apply時に再指定は不要）
 cd <実行ディレクトリの絶対パス> && <terraform or terragrunt> workspace select <workspace> && <terraform or terragrunt> plan -out="$PLAN_FILE" [-target=<resource> ...] 2>&1 | tee -a "$LOG_FILE"
+
+# 作成直後に checksum を記録し、PLAN_FILE のパスと checksum をこのステップの出力として明示する
+PLAN_SHA256=$(shasum -a 256 "$PLAN_FILE" | awk '{print $1}')
+echo "PLAN_FILE=${PLAN_FILE}"     | tee -a "$LOG_FILE"
+echo "PLAN_SHA256=${PLAN_SHA256}" | tee -a "$LOG_FILE"
 ```
 
 - `PLAN_FILE` は `~/terraform-logs/` 配下に保存する（リポジトリ配下に置かない。gitignore 対象かどうかを気にする必要がなくなる。plan ファイルには state のスナップショットが含まれるため機密情報を含みうる点に留意）
 - plan の出力を確認し、期待した差分のみであることを確認する。想定外の差分がある場合はここで止めてユーザーに報告する
+- **重要**: このステップの出力に表示された `PLAN_FILE` と `PLAN_SHA256` の値を、以降の Step 3・Step 4 で**そのまま文字列コピーして使う**。別の Bash 呼び出し（シェルが独立している）で `date` 等を使って再計算・再構成しては絶対にならない。値が手元にない場合は推測せず Step 2 をやり直す
 
 ## Step 3: 適用前の最終確認（必須の人間チェックポイント）
 
-Step 2 の plan 出力（サマリー + リソース単位の差分）をそのままユーザーに提示し、**明示的な適用の意思表示（「apply して」等）をチャット上で得るまで次に進まない**。この確認は毎回省略しない。特に prd 環境では必須。
+Step 2 の plan 出力（サマリー + リソース単位の差分）に加えて、**Step 2 で得た `PLAN_FILE` の絶対パスと `PLAN_SHA256`** をそのままユーザーに提示し、**明示的な適用の意思表示（「apply して」等）をチャット上で得るまで次に進まない**。この確認は毎回省略しない。特に prd 環境では必須。
 
 ## Step 4: 保存済み Plan を Apply
 
-ユーザーの確認が得られたら、保存した plan ファイルをそのまま適用する。
+ユーザーの確認が得られたら、Step 2 で確定した `PLAN_FILE`（文字列コピーしたもの）に対して、apply 直前に checksum を再照合してから適用する。
 
 ```bash
+# PLAN_FILE / EXPECTED_SHA256 は Step 2 の出力からそのまま埋め込む（再計算しない）
+PLAN_FILE="<Step2で確認したPLAN_FILEの絶対パス>"
+EXPECTED_SHA256="<Step2で確認したPLAN_SHA256>"
+
+ACTUAL_SHA256=$(shasum -a 256 "$PLAN_FILE" | awk '{print $1}')
+if [ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]; then
+  echo "ABORT: plan file checksum mismatch. expected=$EXPECTED_SHA256 actual=$ACTUAL_SHA256 file=$PLAN_FILE"
+  exit 1
+fi
+
 # workspace がある場合は workspace select を先に実行
 cd <実行ディレクトリの絶対パス> && <terraform or terragrunt> workspace select <workspace> && <terraform or terragrunt> apply "$PLAN_FILE" 2>&1 | tee -a "$LOG_FILE"
 ```
 
+- checksum が一致しない場合は**絶対に apply を実行せず**、ユーザーに報告して Step 2 からやり直す（ファイル取り違え・書き換えの検知）
 - 対話プロンプトは発生しない（`-auto-approve` 不要）
 - **`Saved plan is stale` / `Saved plan does not match the given state` エラーが出た場合**: 他の操作で state が変わっている。**Step 2 からやり直す**（古い plan を強制適用しない）
 
