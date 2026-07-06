@@ -12,3 +12,5 @@ dot_config/configstore/
 dot_config/git/
 dot_config/AWSVPNClient/
 dot_config/chezmoi/
+
+**/.claude/settings.local.json
