@@ -1,0 +1,9 @@
+[keys]
+prefix = "ctrl+t"
+
+[theme]
+name = "terminal"
+auto_switch = true
+
+[ui.toast]
+delivery = "system"
