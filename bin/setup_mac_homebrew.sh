@@ -90,7 +90,7 @@ KREW_PLUGINS=(
 
 CASK_APPS=(
   visual-studio-code
-  cmd-eikana
+  # cmd-eikana # Gatekeeper非対応で非推奨のため削除。後継: https://github.com/dominion525/cmd-eikana (Homebrew非対応、GitHub Releasesから手動install)
   the-unarchiver
   kindle
   keyboardcleantool
