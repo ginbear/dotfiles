@@ -1,3 +1,9 @@
+#!/bin/bash
+set -e
+
+# chezmoi-managed content. Edit this file (not the deployed ~/.zshrc) to
+# change the managed portion, then commit + chezmoi apply as usual.
+cat <<'CHEZMOI_ZSHRC_MANAGED'
 #=============================
 # Powerlevel10k instant prompt (MUST be at the top)
 #=============================
@@ -304,4 +310,16 @@ source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 export PIP_INDEX_URL="https://pypi.flatt.tech/simple/"
 export UV_INDEX_URL="https://pypi.flatt.tech/simple/"
 # <<< Takumi Guard PyPI Proxy <<<
+CHEZMOI_ZSHRC_MANAGED
 
+# Pass through, verbatim, any content that an external device-management
+# agent appends directly to the live ~/.zshrc outside of chezmoi's control.
+# We deliberately do not know or store what that content is in this repo;
+# whatever currently exists on disk is preserved as-is so `chezmoi apply`
+# never reports a diff for it.
+current="$(cat)"
+marker='# >>> Managed by'
+if grep -qF "$marker" <<<"$current"; then
+  printf '\n\n'
+  awk -v m="$marker" 'index($0,m){f=1} f' <<<"$current"
+fi

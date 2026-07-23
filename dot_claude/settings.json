@@ -77,26 +77,16 @@
       "Write(~/.claude/**)"
     ]
   },
-  "alwaysThinkingEnabled": true,
+  "model": "sonnet",
   "hooks": {
-    "SessionStart": [
+    "Notification": [
       {
+        "matcher": "permission_prompt",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/cmux-log-pane.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/protect-branches.sh"
+            "command": "~/.claude/notify-with-delay.sh '確認が必要です'",
+            "async": true
           }
         ]
       }
@@ -113,24 +103,44 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/protect-branches.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-log-pane.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ryoshimizu/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "~/.claude/notify-sound.sh"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "permission_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/notify-with-delay.sh '確認が必要です'",
-            "async": true
           }
         ]
       }
@@ -154,6 +164,7 @@
     "sre-incident-team@wevox-sre-tools": true,
     "wevox-sre-tools@wevox-sre-tools": true
   },
+  "alwaysThinkingEnabled": true,
   "advisorModel": "opus",
   "theme": "dark-ansi"
 }
