@@ -79,7 +79,22 @@ echo "PLAN_SHA256=${PLAN_SHA256}" | tee -a "$LOG_FILE"
 
 ## Step 3: 適用前の最終確認（必須の人間チェックポイント）
 
-Step 2 の plan 出力（サマリー + リソース単位の差分）に加えて、**Step 2 で得た `PLAN_FILE` の絶対パスと `PLAN_SHA256`** をそのままユーザーに提示し、**明示的な適用の意思表示（「apply して」等）をチャット上で得るまで次に進まない**。この確認は毎回省略しない。特に prd 環境では必須。
+Step 2 の plan 出力から、以下を整理してユーザーに提示する:
+- **env**: workspace名を人間が読める形に変換して明記する（例: dev→development, stg→staging, prd→production。workspace が無い場合は対象ディレクトリ名）
+- **-target の有無**: 指定した場合は対象リソースのアドレス一覧も併記する
+- **結果サマリー**: `Plan: N to add, N to change, N to destroy` の行
+- **変更内容サマリー**: リソースごとの diff を簡潔に（何が add/change/destroy されるか、change の場合は変更前後の値）
+
+その上で、**Step 2 で得た `PLAN_FILE` の絶対パスと `PLAN_SHA256`** を提示する。加えて、ユーザーが plan 全文を自分の手元で確認できる `show` コマンドを組み立て、**クリップボードにコピーする**（長いコマンドはチャット上で折り返され、コピペ時に途切れる/整形が崩れることがあるため、テキストとして貼るだけでなく必ずクリップボード経由でも渡す）:
+
+```bash
+# macOS の場合。<terraform or terragrunt> / -chdir の要否は Step 2 と揃える
+echo '<terraform or terragrunt> -chdir=<実行ディレクトリの絶対パス> show "<PLAN_FILE>"' | pbcopy
+```
+
+コピー後、「plan 確認用のコマンドをクリップボードにコピーしました。ターミナルに貼り付けて全文を確認できます」とユーザーに伝える。
+
+**明示的な適用の意思表示（「apply して」等）をチャット上で得るまで次に進まない**。この確認は毎回省略しない。特に prd 環境では必須。
 
 ## Step 4: 保存済み Plan を Apply
 
