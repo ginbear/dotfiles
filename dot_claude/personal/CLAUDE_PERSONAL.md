@@ -53,6 +53,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - 機密ファイル（`.env`, `*.tfvars`, `settings.local.json`）の `git add` は PreToolUse hook で機械的にブロックされる
 - `git add -A` / `git add .` を使わない。ステージは**ファイルをパス指定で個別に `git add`** する（hook 対象外の認証情報・生成物の巻き込みを防ぐ）
 - PR にレビューコメントが付いている場合、「対応した」と報告する前に未解決コメントを 0 にする。対応しないと判断したものは理由をコメントして resolve する
+- ブランチを作る前に `git fetch origin` する。起点は fetch 直後の `origin/<base>` を明示的に指定する（古いローカル ref を起点にすると後で conflict になる）
 
 ## 回答の正確性
 
