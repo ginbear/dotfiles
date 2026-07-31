@@ -8,6 +8,10 @@
       "Bash(git status)",
       "Bash(git diff *)",
       "Bash(git log *)",
+      "Bash(git -C * status)",
+      "Bash(git -C * diff *)",
+      "Bash(git -C * log *)",
+      "Bash(git -C * branch *)",
       "Bash(ls *)",
       "Bash(tree *)",
       "Bash(pwd)",
@@ -165,6 +169,7 @@
     "wevox-sre-tools@wevox-sre-tools": true
   },
   "alwaysThinkingEnabled": true,
+  "outputStyle": "Concise Artifacts",
   "advisorModel": "opus",
   "theme": "dark-ansi"
 }
