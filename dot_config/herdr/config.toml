@@ -8,3 +8,12 @@ auto_switch = true
 
 [ui.toast]
 delivery = "system"
+
+[ui.sidebar.spaces]
+rows = [["state_icon", "workspace"], ["branch", "git_status"]]
+
+[ui.sound]
+enabled = true
+
+[experimental]
+pane_history = true
