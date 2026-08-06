@@ -10,6 +10,9 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply ginbear
 
 # 2. Install Homebrew packages
 sh bin/setup_mac_homebrew.sh
+
+# 3. Install herdr plugins
+sh bin/setup_herdr_plugins.sh
 ```
 
 ## Update
