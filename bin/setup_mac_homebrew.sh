@@ -46,6 +46,7 @@ GIT_TOOLS=(
   gh
   gist
   tig
+  hunk
 )
 
 DEVOPS_TOOLS=(
