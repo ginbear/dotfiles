@@ -49,6 +49,8 @@
         d4 = diff HEAD~~~~         # HEADから4つ前とdiff
         d5 = diff HEAD~~~~~        # HEADから5つ前とdiff
         d10 = diff HEAD~~~~~~~~~~  # HEADから10前とdiff
+        hdiff = -c core.pager=\"hunk pager\" diff   # hunkでdiffを見る
+        hshow = -c core.pager=\"hunk pager\" show   # hunkでshowを見る
         # mergeの際にconflictが起きたファイルを編集
         edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`"
         # mergeの際にconflictが起きたファイルをadd
