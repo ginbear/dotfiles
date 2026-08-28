@@ -6,14 +6,11 @@
       "Bash(kubectl describe *)",
       "Bash(kubectl logs *)",
       "Bash(git status)",
+      "Bash(git status *)",
       "Bash(git diff *)",
       "Bash(git log *)",
-      "Bash(git -C * status)",
-      "Bash(git -C * status *)",
-      "Bash(git -C * diff *)",
-      "Bash(git -C * log *)",
-      "Bash(git -C * branch)",
-      "Bash(git -C * branch *)",
+      "Bash(git branch)",
+      "Bash(git branch *)",
       "Bash(ls *)",
       "Bash(tree *)",
       "Bash(pwd)",
@@ -79,8 +76,7 @@
       "mcp__claude_ai_Notion__notion-query-meeting-notes"
     ],
     "deny": [
-      "Edit(~/.claude/**)",
-      "Write(~/.claude/**)"
+      "Edit(~/.claude/**)"
     ]
   },
   "model": "opus[1m]",
