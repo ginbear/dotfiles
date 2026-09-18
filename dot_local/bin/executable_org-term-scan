@@ -1,0 +1,126 @@
+#!/bin/bash
+#
+# public リポジトリへのコミット / PR 作成に、組織名・サービス名・内部リポジトリ名が
+# 混入していないかを調べる。
+#
+# 設計:
+#   検知語そのものはリポジトリに置かない。書いた時点でそれが混入になる。
+#   ~/.claude/org-terms から読む。~/.claude/protected-branches と同じ流儀。
+#
+#   非公開 org のリポジトリは検査しない。内部の名前が正当に出てくるため。
+#   org が判定できないときは検査する（fail-closed）。
+#
+# 使い方:
+#   org-term-scan --files <path>...   ファイルを検査する。.pre-commit-config.yaml から呼ばれる
+#   org-term-scan --text              標準入力を検査する。Claude Code の PreToolUse フックから呼ばれる
+#
+#   --repo <dir> で判定に使うリポジトリを指定する。省略時は cwd。
+#
+# 回避:
+#   恒久的に許す行は ~/.claude/org-terms-allow に書く。一度だけなら ALLOW_ORG_TERMS=1 を付ける。
+#
+set -uo pipefail
+
+TERMS_FILE="${ORG_TERMS_FILE:-$HOME/.claude/org-terms}"
+ALLOW_FILE="${ORG_TERMS_ALLOW_FILE:-$HOME/.claude/org-terms-allow}"
+PRIVATE_ORGS_FILE="${ORG_PRIVATE_ORGS_FILE:-$HOME/.claude/private-orgs}"
+
+[ "${ALLOW_ORG_TERMS:-0}" = "1" ] && exit 0
+
+MODE=""
+REPO_DIR="."
+FILES=()
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --files) MODE="files"; shift ;;
+    --text)  MODE="text";  shift ;;
+    --repo)  REPO_DIR="${2:-.}"; shift 2 ;;
+    *)       FILES+=("$1"); shift ;;
+  esac
+done
+
+if [ -z "$MODE" ]; then
+  echo "usage: org-term-scan --files <path>... | --text [--repo <dir>]" >&2
+  exit 64
+fi
+
+# 配布前の端末で全コミットが止まると困るので、警告だけ出して通す。
+if [ ! -f "$TERMS_FILE" ]; then
+  echo "org-term-scan: ${TERMS_FILE} が無いため検査を飛ばします。" >&2
+  exit 0
+fi
+
+PATTERN=$(grep -vE '^[[:space:]]*(#|$)' "$TERMS_FILE" | paste -sd'|' -)
+[ -z "$PATTERN" ] && exit 0
+
+# 非公開 org 配下なら検査しない。
+ORIGIN=$(git -C "$REPO_DIR" remote get-url origin 2>/dev/null || echo "")
+if [ -n "$ORIGIN" ] && [ -f "$PRIVATE_ORGS_FILE" ]; then
+  ORG=$(printf '%s' "$ORIGIN" | sed -E 's#\.git$##; s#^.*[:/]([^/:]+)/[^/]+$#\1#' | tr '[:upper:]' '[:lower:]')
+  while IFS= read -r private_org; do
+    [[ -z "$private_org" || "$private_org" == \#* ]] && continue
+    if [ "$ORG" = "$(printf '%s' "$private_org" | tr '[:upper:]' '[:lower:]')" ]; then
+      exit 0
+    fi
+  done < "$PRIVATE_ORGS_FILE"
+fi
+
+# 1行1ルール "<パスの一部>::<許す文字列>"。ファイル単位で外すと以後の混入も素通りするため場所を限定する。
+ALLOW_RULES=()
+if [ -f "$ALLOW_FILE" ]; then
+  while IFS= read -r rule; do
+    [[ -z "$rule" || "$rule" == \#* ]] && continue
+    ALLOW_RULES+=("$rule")
+  done < <(grep -vE '^[[:space:]]*(#|$)' "$ALLOW_FILE")
+fi
+
+# $1 = ファイルパス（text モードでは空）, $2 = 行の中身
+is_allowed() {
+  local file="$1" content="$2" rule scope allowed
+  [ ${#ALLOW_RULES[@]} -eq 0 ] && return 1
+  for rule in "${ALLOW_RULES[@]}"; do
+    if [[ "$rule" == *"::"* ]]; then
+      scope="${rule%%::*}"
+      allowed="${rule#*::}"
+      [[ -z "$file" || "$file" != *"$scope"* ]] && continue
+    else
+      allowed="$rule"
+    fi
+    [[ -n "$allowed" && "$content" == *"$allowed"* ]] && return 0
+  done
+  return 1
+}
+
+report() {
+  echo "org-term-scan: 組織名・内部リポジトリ名が含まれています。" >&2
+  cat >&2
+  echo "" >&2
+  echo "汎用表記（org/repo 等）に置き換えてください。" >&2
+  echo "恒久的に許す場合は ${ALLOW_FILE} に追記、一度だけ通す場合は ALLOW_ORG_TERMS=1 を付けて再実行してください。" >&2
+}
+
+HITS=""
+
+if [ "$MODE" = "files" ]; then
+  [ ${#FILES[@]} -eq 0 ] && exit 0
+  while IFS= read -r hit; do
+    [ -z "$hit" ] && continue
+    loc="${hit%%:*}:$(printf '%s' "${hit#*:}" | cut -d: -f1)"
+    is_allowed "${hit%%:*}" "$hit" && continue
+    HITS="${HITS}${loc}"$'\n'
+  done < <(grep -I -H -n -i -E "$PATTERN" "${FILES[@]}" 2>/dev/null)
+else
+  while IFS= read -r hit; do
+    [ -z "$hit" ] && continue
+    is_allowed "" "$hit" && continue
+    HITS="${HITS}$(printf '%s' "$hit" | grep -i -E -o "$PATTERN")"$'\n'
+  done < <(grep -i -E "$PATTERN" 2>/dev/null)
+fi
+
+HITS=$(printf '%s' "$HITS" | grep -v '^$' | sort -u)
+if [ -n "$HITS" ]; then
+  printf '%s\n' "$HITS" | report
+  exit 1
+fi
+exit 0

@@ -1,0 +1,325 @@
+#!/bin/bash
+set -e
+
+# chezmoi-managed content. Edit this file (not the deployed ~/.zshrc) to
+# change the managed portion, then commit + chezmoi apply as usual.
+cat <<'CHEZMOI_ZSHRC_MANAGED'
+#=============================
+# Powerlevel10k instant prompt (MUST be at the top)
+#=============================
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+#=============================
+# Environment variables & PATH
+#=============================
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export LC_ALL=en_US.UTF-8
+export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+export FZF_DEFAULT_OPTS='--height 70% --reverse --border --tiebreak=length,index'
+
+#=============================
+# Zsh basic settings
+#=============================
+bindkey -e  # Emacs keybindings (Ctrl-A, Ctrl-E, etc.)
+
+# Word deletion settings
+autoload -U backward-kill-word-match
+zle -N backward-kill-space backward-kill-word-match
+zle -N backward-kill-punct backward-kill-word-match
+zstyle ':zle:backward-kill-space' word-style whitespace
+zstyle ':zle:backward-kill-punct' word-style normal
+bindkey '^W'   backward-kill-space   # Ctrl-W: delete to whitespace
+bindkey '^[^?' backward-kill-punct   # Esc+Backspace: delete to punctuation
+
+autoload -U select-word-style
+select-word-style bash
+
+#=============================
+# History
+#=============================
+export HISTFILE=${HOME}/.zsh_history
+export HISTSIZE=1000
+export SAVEHIST=100000
+setopt hist_ignore_dups
+setopt EXTENDED_HISTORY
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt hist_verify
+setopt hist_reduce_blanks
+setopt hist_save_no_dups
+setopt hist_no_store
+setopt hist_expand
+setopt inc_append_history
+
+#=============================
+# Completion
+#=============================
+fpath=(
+  /usr/local/share/zsh-completions
+  ~/.zsh/completion
+  $fpath
+)
+autoload -Uz compinit
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
+#=============================
+# External tools initialization
+#=============================
+# Atuin (history search)
+export ATUIN_NOBIND="true"
+eval "$(atuin init zsh)"
+bindkey '^r' atuin-search
+
+# navi (snippet manager)
+eval "$(navi widget zsh)"
+bindkey '^x' _navi_widget
+
+# mise
+eval "$(mise activate zsh)"
+
+# zsh-autosuggestions
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+#=============================
+# Common settings (aliases, etc.)
+#=============================
+source ~/.shellrc
+
+#=============================
+# Utility functions
+#=============================
+fn-fzf() {
+  local sel
+  sel=$(
+    print -l ${(k)functions} | while read -r fn; do
+      [[ ${functions_source[$fn]} == "$HOME/.zshrc" ]] && echo "$fn"
+    done |
+    sort |
+    fzf --prompt="Zshrc Function> " \
+        --preview='functions {} | sed -n "1,200p"' \
+        --preview-window=down,60%
+  ) || return
+  print -z "$sel "
+}
+
+
+fzf-ghq-look() {
+  local dir=$(ghq list -p | fzf)
+  if [[ -n "$dir" ]]; then
+    cd "$dir"
+  fi
+}
+zle -N fzf-ghq-look
+bindkey '^G' fzf-ghq-look
+
+#=============================
+# Git functions
+#=============================
+gsw() {
+  local branch=$(git branch | sed 's/^[* ] //' | fzf)
+  [[ -n "$branch" ]] && git switch "$branch"
+}
+
+git-pr() {
+  local state="${1:-open}"
+  local q="is:pr author:@me sort:updated-desc"
+  [ "$state" != "all" ] && q="$q state:$state"
+
+  gh api graphql -F q="$q" -f query='
+    query($q: String!) {
+      search(query: $q, type: ISSUE, first: 100) {
+        nodes {
+          ... on PullRequest {
+            url
+            title
+            number
+            updatedAt
+            repository { nameWithOwner }
+          }
+        }
+      }
+    }' \
+  | jq -r '.data.search.nodes[] | "\(.url)\t[\(.repository.nameWithOwner)] #\(.number)  \(.title)  (updated: \(.updatedAt))"' \
+  | fzf --with-nth=2.. --prompt="my PRs ($state)> " \
+  | cut -f1 \
+  | xargs -r -n1 gh pr view --web
+}
+
+#=============================
+# AWS functions
+#=============================
+aws-profile() {
+  local AWS_PROFILE_SELECTED
+  AWS_PROFILE_SELECTED=$(rg -oP '^\[\K[^\]]+' ~/.aws/config | cut -f 2 -d " " | sort | uniq | fzf)
+
+  if [ -z "$AWS_PROFILE_SELECTED" ]; then
+    echo "プロファイルが選択されませんでした。"
+    return 1
+  fi
+
+  export AWS_PROFILE="$AWS_PROFILE_SELECTED"
+  echo "Switched to profile: $AWS_PROFILE"
+  echo "exec: aws sso login --profile $AWS_PROFILE_SELECTED"
+  aws sso login --profile "$AWS_PROFILE_SELECTED"
+}
+alias ap='aws-profile'
+
+#=============================
+# Kubernetes functions
+#=============================
+kctx() {
+  local current choice ctx
+  current="$(kubectl config current-context 2>/dev/null)"
+
+  choice="$(
+    kubectl config get-contexts -o name | while read -r real; do
+      display="$(sed -E 's#^arn:aws:eks:[^:]+:[0-9]+:cluster/##' <<<"$real")"
+      display="${display##*/}"
+      mark=" "
+      [[ "$real" == "$current" ]] && mark="*"
+      printf "%s\t%s\t%s\n" "$mark" "$display" "$real"
+    done | fzf \
+      --prompt='select context > ' \
+      --header=$'CURRENT\tNAME' \
+      --delimiter='\t' \
+      --with-nth=1,2 \
+      --nth=2 \
+      --select-1 --exit-0
+  )" || return
+
+  ctx="$(awk -F'\t' '{print $3}' <<<"$choice")"
+  [[ -n "$ctx" ]] || return
+  kubectl config use-context "$ctx"
+}
+
+kns() {
+  local current choice ns
+  current="$(kubectl config view --minify -o 'jsonpath={..namespace}' 2>/dev/null)"
+  [[ -z "$current" ]] && current="default"
+
+  choice="$(
+    kubectl get ns --no-headers \
+      | awk -v cur="$current" '{
+          mark = ($1==cur) ? "*" : "-";
+          printf "%s\t%s\t%s\t%s\n", mark, $1, $2, $3
+        }' \
+      | column -t -s $'\t' \
+      | fzf \
+          --prompt='select namespace > ' \
+          --with-nth=1,2,3,4 \
+          --nth=2 \
+          --delimiter='[[:space:]]+' \
+          --select-1 --exit-0
+  )" || return
+
+  ns="$(awk '{print $2}' <<<"$choice")"
+  [[ -n "$ns" ]] || return
+
+  kubectl config set-context --current --namespace="$ns"
+  echo "Switched to namespace: $ns"
+}
+
+k-desc-pod() {
+  local line
+  line="$(
+    kubectl get pods -A \
+    | fzf \
+        --header='↑↓で選択 / NAME列だけで検索 / Enterで describe（右でプレビュー）' \
+        --header-lines=1 \
+        --delimiter='\s+' \
+        --nth=2 \
+        --preview '
+          ns=$(awk "{print \$1}" <<< {}); \
+          name=$(awk "{print \$2}" <<< {}); \
+          [[ "$ns" == "NAMESPACE" ]] && echo "header" && exit 0; \
+          kubectl describe pod -n "$ns" "$name" 2>/dev/null | sed -n "1,120p"
+        ' \
+        --preview-window=right:40%:wrap
+  )" || return
+
+  local ns name
+  ns="$(awk '{print $1}' <<<"$line")"
+  name="$(awk '{print $2}' <<<"$line")"
+
+  [[ -n "$ns" && -n "$name" ]] || return
+  kubectl describe pod -n "$ns" "$name"
+}
+
+k-log-pod() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf --prompt="選んだpodのlogを取得するよ: ")
+  if [[ -n "$pod" ]]; then
+    kubectl logs "$pod"
+  fi
+}
+
+k-log-multic() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf --prompt="選んだpodのlogを取得するよ（マルチコンテナ対応）: ")
+  if [[ -z "$pod" ]]; then return; fi
+
+  local containers=$(kubectl get pod "$pod" -o jsonpath='{.spec.containers[*].name}')
+  local container=$(echo "$containers" | tr ' ' '\n' | fzf)
+  if [[ -n "$container" ]]; then
+    kubectl logs "$pod" -c "$container"
+  fi
+}
+
+k-exec() {
+  local pod=$(kubectl get pod --no-headers -o custom-columns=":metadata.name" | fzf --prompt="選んだpodにshell loginするよ: ")
+  if [[ -n "$pod" ]]; then
+    local bash_path
+    bash_path=$(kubectl exec "$pod" -- which bash 2>/dev/null)
+    if [[ -n "$bash_path" ]]; then
+      kubectl exec -it "$pod" -- "$bash_path"
+    else
+      kubectl exec -it "$pod" -- /bin/sh
+    fi
+  fi
+}
+
+k-role() {
+  local serviceaccount namespace name
+
+  serviceaccount=$(
+    kubectl get serviceaccount \
+      --all-namespaces \
+      -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name \
+    | fzf --prompt="Select a Role: " --header-lines=1
+  )
+
+  [[ -z "$serviceaccount" ]] && return 1
+
+  namespace=$(echo "$serviceaccount" | awk '{print $1}')
+  name=$(echo "$serviceaccount" | awk '{print $2}')
+
+  kubectl rolesum "$name" -n "$namespace"
+}
+
+#=============================
+# Powerlevel10k theme
+#=============================
+source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# >>> Takumi Guard PyPI Proxy >>>
+export PIP_INDEX_URL="https://pypi.flatt.tech/simple/"
+export UV_INDEX_URL="https://pypi.flatt.tech/simple/"
+# <<< Takumi Guard PyPI Proxy <<<
+CHEZMOI_ZSHRC_MANAGED
+
+# Pass through, verbatim, any content that an external device-management
+# agent appends directly to the live ~/.zshrc outside of chezmoi's control.
+# We deliberately do not know or store what that content is in this repo;
+# whatever currently exists on disk is preserved as-is so `chezmoi apply`
+# never reports a diff for it.
+current="$(cat)"
+marker='# >>> Managed by'
+if grep -qF "$marker" <<<"$current"; then
+  printf '\n\n'
+  awk -v m="$marker" 'index($0,m){f=1} f' <<<"$current"
+fi

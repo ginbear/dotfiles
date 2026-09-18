@@ -1,0 +1,65 @@
+# Common shell settings
+
+#=============================
+# Local settings
+#=============================
+source ~/.shellrc.local
+
+#=============================
+# Environment variables
+#=============================
+export EDITOR=/usr/bin/vim
+export LC_CTYPE=en_US.UTF-8
+export GOPATH=$HOME/.go
+
+#=============================
+# PATH
+#=============================
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+[ -d "$GOPATH" ] && export PATH="$GOPATH/bin:$PATH"
+
+#=============================
+# Aliases - General
+#=============================
+alias ls='lsd'
+alias ll='ls -l'
+alias la='ls -la'
+alias vi='nvim'
+alias grep='grep --color=auto'
+alias rg='rg --color=auto'
+alias date='gdate'
+alias cat='bat --paging=never'
+
+#=============================
+# Aliases - Git
+#=============================
+alias g='git'
+alias gb='gh repo view --web'
+alias gist='gist -c -o -p'
+
+#=============================
+# Aliases - Ruby/Bundler
+#=============================
+alias be='bundle exec'
+alias bi='bundle install --path vendor/bundler'
+
+#=============================
+# Aliases - Terraform
+#=============================
+alias tf='terraform'
+alias tfp='terraform plan'
+alias tfim='terraform import'
+alias tfsrm='terraform state rm'
+alias tg='terragrunt'
+
+#=============================
+# Aliases - Kubernetes
+#=============================
+alias k='kubectl'
+alias kubectl='kubecolor'
+alias kst='kustomize'
+alias ksb='kustomize build'
+alias kx='kubectx'
+alias kn='kubens'
+

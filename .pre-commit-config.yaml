@@ -1,0 +1,11 @@
+---
+# core.hooksPath に配布済みの shim が、このファイルのあるリポジトリでだけ prek を起動する。
+repos:
+  - repo: local
+    hooks:
+      - id: org-term-scan
+        name: 組織名・内部リポジトリ名の検査
+        # chezmoi apply 前の端末で全コミットが止まらないよう、未配布なら黙って通す。
+        entry: "bash -c 'command -v org-term-scan >/dev/null 2>&1 || exit 0; exec org-term-scan --files \"$@\"' --"
+        language: system
+        stages: [pre-commit]

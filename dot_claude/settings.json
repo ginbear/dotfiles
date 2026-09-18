@@ -1,0 +1,173 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl kustomize *)",
+      "Bash(kubectl get *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl logs *)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch)",
+      "Bash(git branch *)",
+      "Bash(ls *)",
+      "Bash(tree *)",
+      "Bash(pwd)",
+      "Bash(which *)",
+      "Bash(wc *)",
+      "Bash(file *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(curl *)",
+      "Bash(claude mcp get *)",
+      "Bash(gh search *)",
+      "Bash(gh api *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr status *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh repo view *)",
+      "Bash(gh release view *)",
+      "Bash(gh release list *)",
+      "Grep",
+      "Read",
+      "WebFetch",
+      "WebSearch",
+      "mcp__fetch__fetch_html",
+      "mcp__fetch__fetch_json",
+      "mcp__fetch__fetch_markdown",
+      "mcp__fetch__fetch_readable",
+      "mcp__fetch__fetch_txt",
+      "mcp__fetch__fetch_youtube_transcript",
+      "mcp__datadog__search_datadog_dashboards",
+      "mcp__datadog__search_datadog_events",
+      "mcp__datadog__search_datadog_hosts",
+      "mcp__datadog__search_datadog_incidents",
+      "mcp__datadog__search_datadog_logs",
+      "mcp__datadog__search_datadog_metrics",
+      "mcp__datadog__search_datadog_monitors",
+      "mcp__datadog__search_datadog_notebooks",
+      "mcp__datadog__search_datadog_rum_events",
+      "mcp__datadog__search_datadog_service_dependencies",
+      "mcp__datadog__search_datadog_services",
+      "mcp__datadog__search_datadog_spans",
+      "mcp__datadog__get_datadog_incident",
+      "mcp__datadog__get_datadog_metric",
+      "mcp__datadog__get_datadog_metric_context",
+      "mcp__datadog__get_datadog_notebook",
+      "mcp__datadog__get_datadog_trace",
+      "mcp__datadog__get_widget_reference",
+      "mcp__datadog__analyze_datadog_logs",
+      "mcp__datadog__aggregate_events",
+      "mcp__datadog__aggregate_rum_events",
+      "mcp__datadog__aggregate_spans",
+      "mcp__datadog__check_datadog_mcp_setup",
+      "mcp__claude_ai_Notion__notion-fetch",
+      "mcp__claude_ai_Notion__notion-search",
+      "mcp__claude_ai_Notion__notion-get-comments",
+      "mcp__claude_ai_Notion__notion-get-teams",
+      "mcp__claude_ai_Notion__notion-get-users",
+      "mcp__claude_ai_Notion__notion-query-data-sources",
+      "mcp__claude_ai_Notion__notion-query-meeting-notes"
+    ],
+    "deny": [
+      "Edit(~/.claude/**)"
+    ]
+  },
+  "model": "opus[1m]",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/notify-with-delay.sh '確認が必要です'",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-command-log.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/protect-branches.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-log-pane.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/herdr-agent-state.sh session",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/notify-sound.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/cancel-notify.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "sre-incident-team@wevox-sre-tools": true,
+    "wevox-sre-tools@wevox-sre-tools": true
+  },
+  "alwaysThinkingEnabled": true,
+  "outputStyle": "Concise Artifacts",
+  "advisorModel": "opus",
+  "theme": "dark-ansi"
+}

@@ -1,0 +1,12 @@
+# Exclude personal history and session data
+history.jsonl
+
+# Private settings (company-specific)
+CLAUDE.local.md
+debug/
+file-history/
+projects/
+session-env/
+shell-snapshots/
+statsig/
+todos/
