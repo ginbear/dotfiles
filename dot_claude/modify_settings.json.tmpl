@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# settings.json を管理しつつ、autoMode だけはライブ側の値をそのまま残す。
+#
+# 設計:
+#   autoMode には組織名・AWS アカウント ID・バケット名・CI シークレット名が入るため、
+#   公開リポジトリには置けない。managed な値は settings.base.json に持ち、
+#   autoMode はターゲットから読み戻して合成する。リポジトリには一度も入らない。
+#
+#   settings.base.json は .chezmoiignore でターゲットへの配布を止めている。
+#
+set -uo pipefail
+
+jq -n \
+  --slurpfile base {{ .chezmoi.sourceDir }}/dot_claude/settings.base.json \
+  --slurpfile live /dev/stdin \
+  '$base[0] + (if ($live|length) > 0 and ($live[0].autoMode != null) then {autoMode: $live[0].autoMode} else {} end)'
