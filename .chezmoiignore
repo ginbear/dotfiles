@@ -1,0 +1,2 @@
+# modify_settings.json.tmpl がソースとして読むだけのファイル。配布先は無い。
+.claude/settings.base.json
