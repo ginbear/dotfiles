@@ -5,6 +5,7 @@
 [core]
         editor = /usr/bin/vim
         excludesfile = ~/.gitignore
+        hooksPath = /usr/local/share/credential-leak-scan/hooks
 #	pager = delta
 [ghq]
         root = ~/ghq
