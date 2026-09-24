@@ -17,7 +17,7 @@
 #   --repo <dir> で判定に使うリポジトリを指定する。省略時は cwd。
 #
 # 回避:
-#   恒久的に許す行は ~/.claude/org-terms-allow に書く。一度だけなら ALLOW_ORG_TERMS=1 を付ける。
+#   恒久的に許す行は ~/.claude/org-terms-allow に書く。一度だけなら ALLOW_ORG_TERMS=1（直接シェル/--files 限定）。
 #
 set -uo pipefail
 
@@ -97,7 +97,13 @@ report() {
   cat >&2
   echo "" >&2
   echo "汎用表記（org/repo 等）に置き換えてください。" >&2
-  echo "恒久的に許す場合は ${ALLOW_FILE} に追記、一度だけ通す場合は ALLOW_ORG_TERMS=1 を付けて再実行してください。" >&2
+  echo "恒久的に許す場合は ${ALLOW_FILE} に追記してください。" >&2
+  if [ "$MODE" = "files" ]; then
+    echo "一度だけ通す場合は ALLOW_ORG_TERMS=1 を付けて再実行してください。" >&2
+  else
+    # --text は PreToolUse フック経由。コマンド文字列に前置しても、静的解析するだけのフックには反映されない。
+    echo "一度だけ通す場合は、Claude Code 経由ではなくユーザー自身のシェルで ALLOW_ORG_TERMS=1 を付けて実行してください（コマンドに前置しても、フック実行には反映されません）。" >&2
+  fi
 }
 
 HITS=""
