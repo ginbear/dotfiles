@@ -55,29 +55,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## PR Style
 
-- Do NOT include "Generated with Claude Code" in PR description
 - PR作成前に `git diff` の全体を確認し、意図した変更のみが含まれていることを検証する
 - 複数環境（dev/stg/prd）にまたがる変更では、各環境の現在値を git 上で確認してから diff を作成する（実態と乖離していないか検証）
-- 機密ファイル（`.env`, `*.tfvars`, `settings.local.json`）の `git add` は PreToolUse hook で機械的にブロックされる
 - `git add -A` / `git add .` を使わない。ステージは**ファイルをパス指定で個別に `git add`** する（hook 対象外の認証情報・生成物の巻き込みを防ぐ）
-- PR にレビューコメントが付いている場合、「対応した」と報告する前に未解決コメントを 0 にする。対応しないと判断したものは理由をコメントして resolve する
 - ブランチを作る前に `git fetch origin` する。起点は fetch 直後の `origin/<base>` を明示的に指定する（古いローカル ref を起点にすると後で conflict になる）
 
-## 回答の正確性
-
-- ツールの機能・設定項目について確信がない場合は「未確認」と明示し、公式ドキュメントや `--help` で確認してから回答する
-- 「できない」「存在しない」と断言する前に、実際にコマンドやドキュメントで検証する
-- AWS/Datadog 等の料金・インスタンスタイプ・設定上限値を提示する際は、Web検索または公式ドキュメントで検証してから回答する。未検証の場合は「未検証」と明記する
-
 ## Investigation Workflow
-
-K8sリソースやインフラの調査時は以下の順序で実施する:
-1. `kubectl get/describe` で現在の状態を確認
-2. `kubectl logs` でエラー詳細を確認
-3. **ローカルマニフェスト/Terraformを Grep/Read で検索**し、設定の意図を把握
-4. 必要に応じて Datadog でメトリクス/ログを確認
-   - ログクエリでは **faceted なフィールドのみ** 使用する。0 件の場合、フィールドが faceted か確認してからクエリを再構築する
-5. 調査結果をまとめてからアクション提案（勝手に修正しない）
 
 ### 結論の述べ方
 - 根本原因は根拠（Datadog/kubectl/docs）で検証してから断定する。弱いシグナル1つで環境・対象を早期に絞り込まない
@@ -105,7 +88,6 @@ K8sリソースやインフラの調査時は以下の順序で実施する:
 ## Kubernetes/DevOps Workflow
 
 - Always validate manifests with `kubectl kustomize` before committing
-- After Dockerfile changes, remind to run build.sh
 - **変更作業の前に必ず調査を先行する**: 関連ファイル/リポジトリの特定 → 現状の理解 → 変更計画の提示 → ユーザー承認後に実行
 - **複雑な変更の提案前に前提を明示する**: 解決策を提案する前に (1) 対象のリソース/ワークロード種別, (2) リポジトリ内の既存パターン, (3) 自分の前提条件 を列挙し、ユーザーに確認を取る。前提が間違っていると解決策全体が手戻りになる
 - PRにブランチ・コミットを作成する前に、diff概要をユーザーに見せて確認を取る
