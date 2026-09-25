@@ -111,12 +111,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ## Bash コマンドのルール
 
 - 既存ファイルの書き換えには **Edit / Write ツールを使う**。`python3 - <<'PY'` や `sed -i` のような heredoc / インプレース置換でファイルを書き換えない（差分がレビューできず、`cd` を伴って許可パターンからも外れる）
-- 他リポジトリや別ディレクトリを参照する際は、原則 `cd` せず**絶対パスを引数に渡す**
-  - これにより `settings.json` の許可パターン（`Bash(grep *)`, `Bash(ls *)` 等）が正しくマッチし、不要な確認プロンプトを回避できる
-  - 例: `grep -r 'pattern' /absolute/path/to/repo/` (NOT `cd /path && grep -r 'pattern' .`)
-  - git は `git -C <absolute-path> <subcommand>` を使う（`status` / `diff` / `log` / `branch` は許可済み）
-- `cd` が必要なケース（ツールが cwd 依存、相対パス出力が必要等）ではやむを得ず使ってよいが、理由がない限り絶対パスを優先する
-- **並列実行時の cd 明示**: 複数の Bash コマンドを並列実行する際、全てのコマンドに `cd <absolute-path> &&` を含める。片方だけ cd して片方は省略するパターンを禁止
 
 ## コマンド実行ポリシー
 
