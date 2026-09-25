@@ -83,6 +83,9 @@ UNRESOLVED_MSG="コミット/push 対象のリポジトリを解決できませ�
 
 # "git -C <path> commit" は "git commit" に一致しないので、部分一致の前に -C を畳む。
 NORMALIZED=$(printf '%s' "$COMMAND" | sed -E 's#git[[:space:]]+-C[[:space:]]+[^[:space:]]+[[:space:]]+#git #g')
+# コマンド形の検査は heredoc 本文を除いた版で行う。コミットメッセージ中の例示で誤爆させないため。
+SCAN_NORM=$(printf '%s' "$SCAN_CMD" | sed -E 's#git[[:space:]]+-C[[:space:]]+[^[:space:]]+[[:space:]]+#git #g')
+CMD_START="(^|[;&|(]|${NL})[[:space:]]*"
 
 # Check 1: Block git commit on protected branches
 CONFIG="$HOME/.claude/protected-branches"
@@ -104,23 +107,23 @@ if [[ "$NORMALIZED" == *"git commit"* ]] && [[ -f "$CONFIG" ]]; then
 fi
 
 # Check 2: Block git add of sensitive files
-if [[ "$NORMALIZED" == *"git add"* ]]; then
-  if [[ "$COMMAND" == *"settings.local.json"* ]]; then
+if [[ "$SCAN_NORM" == *"git add"* ]]; then
+  if [[ "$SCAN_NORM" == *"settings.local.json"* ]]; then
     echo "BLOCKED: settings.local.json should not be committed." >&2
     exit 2
   fi
-  if [[ "$COMMAND" == *".env"* ]]; then
+  if [[ "$SCAN_NORM" == *".env"* ]]; then
     echo "BLOCKED: .env files should not be committed (contains secrets)." >&2
     exit 2
   fi
-  if [[ "$COMMAND" == *".tfvars"* ]]; then
+  if [[ "$SCAN_NORM" == *".tfvars"* ]]; then
     echo "BLOCKED: .tfvars files should not be committed (contains secrets)." >&2
     exit 2
   fi
 fi
 
 # Check 3: Block git clone (use ghq get instead)
-if [[ "$NORMALIZED" == *"git clone"* ]]; then
+if [[ "$SCAN_NORM" == *"git clone"* ]]; then
   echo "BLOCKED: git clone is not allowed. Use 'ghq get <repo>' instead." >&2
   exit 2
 fi
@@ -169,10 +172,6 @@ if command -v org-term-scan >/dev/null 2>&1; then
     fi
   fi
 fi
-
-# 以降のチェックは heredoc 本文を除いた版で判定する。コミットメッセージ中の例示で誤爆させないため。
-SCAN_NORM=$(printf '%s' "$SCAN_CMD" | sed -E 's#git[[:space:]]+-C[[:space:]]+[^[:space:]]+[[:space:]]+#git #g')
-CMD_START="(^|[;&|(]|${NL})[[:space:]]*"
 
 # Check 5: Block staging everything at once
 if [[ "$SCAN_NORM" =~ ${CMD_START}git[[:space:]]+add([[:space:]]+[^[:space:]\;\&\|]+)*[[:space:]]+(\.|-A|--all|:/)([[:space:]\;\&\|\)]|$) ]]; then
