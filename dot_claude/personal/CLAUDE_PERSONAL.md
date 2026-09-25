@@ -57,7 +57,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 - PR作成前に `git diff` の全体を確認し、意図した変更のみが含まれていることを検証する
 - 複数環境（dev/stg/prd）にまたがる変更では、各環境の現在値を git 上で確認してから diff を作成する（実態と乖離していないか検証）
-- `git add -A` / `git add .` を使わない。ステージは**ファイルをパス指定で個別に `git add`** する（hook 対象外の認証情報・生成物の巻き込みを防ぐ）
 - ブランチを作る前に `git fetch origin` する。起点は fetch 直後の `origin/<base>` を明示的に指定する（古いローカル ref を起点にすると後で conflict になる）
 
 ## Investigation Workflow
@@ -100,17 +99,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Terraform/Terragrunt Workflow
 
-- **Terragrunt 変更時は push 前に必ずフォーマットチェックを実行**:
-  ```bash
-  cd <terragrunt-root-dir>
-  terragrunt hclfmt --check
-  ```
-- フォーマットエラーがあれば `terragrunt hclfmt` で自動修正してからコミット
 - **plan/apply の実行は `/terraform-plan`, `/terraform-apply` skill を使用する**（ログ保存・検証・記録投稿を一貫して行うため）
-
-## Bash コマンドのルール
-
-- 既存ファイルの書き換えには **Edit / Write ツールを使う**。`python3 - <<'PY'` や `sed -i` のような heredoc / インプレース置換でファイルを書き換えない（差分がレビューできず、`cd` を伴って許可パターンからも外れる）
 
 ## コマンド実行ポリシー
 
