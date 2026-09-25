@@ -78,9 +78,9 @@
 ## コマンド実行ポリシー
 
 - **参照系コマンドは Claude Code が実行**して内容を確認する（`kubectl get/describe`, `aws ... describe`, `git log/diff` 等）
-- **更新系コマンドは原則ユーザーが実行**する。**コピペしやすい形**でコマンドを提示する（`kubectl apply/delete`, `git push` 等）。内容によっては Claude に対応を依頼してもよい（例: terraform/terragrunt apply は `/terraform-apply` skill 経由）
+- 更新系コマンドは原則ユーザーが実行する（`kubectl apply/delete`, `git push` 等）。内容によっては Claude に対応を依頼してもよい（例: terraform/terragrunt apply は `/terraform-apply` skill 経由）
 - 破壊的・インフラ変更は、レビューして1つずつ実行できるよう**リソースごとの個別コマンド**で提示する。依頼がない限りスクリプトにまとめない
-- コマンドで何かを確認したら、ユーザーが再確認できるよう**実行したコマンドをコピペしやすい形で必ず併記**する
+- 回答中のコマンドはコピペしてそのまま実行できる形で書く。更新系はユーザーが実行する分を、参照系は確認に使ったものを必ず併記する
 
 ## Code Style
 
