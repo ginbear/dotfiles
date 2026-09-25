@@ -2,13 +2,8 @@
 
 ## Development Environment
 
-- ローカルリポジトリの管理には `ghq` を使用する（`git clone` は PreToolUse hook でブロックされる）
-  - リポジトリ取得: `ghq get <repo>`
-  - リポジトリ一覧: `ghq list`
-  - リポジトリパス: `ghq root`/`ghq list --full-path`
-  - リポジトリは `~/ghq/` 配下に配置される
+- ローカルリポジトリは `ghq` で `~/ghq/` 配下に管理している
 - 複数リポジトリにまたがる調査時は、対象リポジトリのローカルパスをユーザーに確認してから作業する
-- **公開リポジトリ（dotfiles等）には会社名・サービス名・内部リポジトリ名を書かない**。コミットメッセージ・PR説明・コメント・設定ファイルの例も含む。汎用的な表現に置き換える
 
 ## Dotfiles / chezmoi
 
@@ -40,18 +35,6 @@
 - **Commit titles**: Write in English (first line)
 - **Commit body**: Write explanations in Japanese
 - Use conventional commits format when appropriate: `feat/fix/docs/refactor/test`
-- Always include Co-Authored-By: Claude
-
-### Example format:
-```
-Fix kernel headers and modprobe issues
-
-カーネルヘッダーとmodprobeの問題を修正：
-- kmodパッケージをインストール
-- /lib/modulesをマウント
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
 
 ## PR Style
 
@@ -118,7 +101,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Output Style
 
-- 書き出す成果物（PR 説明・手順書・docs 等）の分量と根拠の規範は output style `Concise Artifacts`（`dot_claude/output-styles/concise-artifacts.md`）に置いている。ここには重複して書かない
 - コマンド出力や raw output は要約・整形せずそのまま貼る。整形はユーザーが明示的に要求した場合のみ
 - **出力・コンテンツの捏造禁止**: コマンド出力を一から捏造しない。別環境・別コマンドの出力を書き換えて報告しない。出力が得られなかった場合はコマンドを再実行する。技術記事でも、検証していない技術的主張を事実として記述しない
 - ターミナルへの応答で PR / issue に言及するときはクリックできるリンクにする。複数リポジトリを並行して扱うため、番号だけではどのリポジトリか判別できない
