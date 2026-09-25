@@ -121,14 +121,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Code Style
 
-- Prefer explicit over implicit in configuration files
 - **コメントの原則**（[t_wadaの整理](https://x.com/t_wada/status/904916106153828352)）: コードには How、テストコードには What、コミットログには Why、コードコメントには Why not
   - コメントアウトはコードを読めばわかることを書かない。過去の経緯も書かない（背景は PR description に書く）。コードを読んでもわからないことに限定して簡潔に記載する
-- **コメントは1行にする。2行が必要なら書く前に相談する。3行以上は書かない**
+- **コメントは最大1行**。収まらない分はコミットメッセージか PR 説明に書く
 - 既存コメントを消せるなら、追記より削除を先に検討する
 - 使い捨ての整形・パース（JSON/YAML の抽出等）は言語を問わずワンライナーでよい
-- **リポジトリに残すスクリプトは shell を優先**する。運用手順書から呼ぶスクリプトは、実行環境に処理系を追加せず読めることを優先する
-  - shell で書くと処理が入り組む場合は Ruby、次に Python。どれを選んだかと理由を PR 説明に1行書く
 
 ## Output Style
 
