@@ -97,7 +97,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ## Production Safety
 
 - prd 環境への exec / write / 破壊的コマンド（`kubectl exec`, `delete`, `apply` 等）は**実行前に必ずユーザーへ確認**する。先に dev/stg または read-only の代替を提示する
-- PR に prd スコープを含める場合は明示的に確認を取る。デフォルトは非prd（dev/stg）優先
 
 ## Terraform/Terragrunt Workflow
 
@@ -107,9 +106,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
   terragrunt hclfmt --check
   ```
 - フォーマットエラーがあれば `terragrunt hclfmt` で自動修正してからコミット
-- **期待と異なる結果での停止**: terraform/terragrunt の plan/apply が 0 changes を返したが変更が期待される場合、次の環境やコメント作成に進まずユーザーに報告して指示を仰ぐ。「既に適用済み」と自己判断しない
 - **plan/apply の実行は `/terraform-plan`, `/terraform-apply` skill を使用する**（ログ保存・検証・記録投稿を一貫して行うため）
-- **実行前のスコープ確認**: `terragrunt plan/apply` や `terragrunt run-all` を実行する前に、対象のモジュール・ディレクトリをユーザーに確認する。「全モジュール」に対する `run-all` は特に確認必須
 
 ## Bash コマンドのルール
 

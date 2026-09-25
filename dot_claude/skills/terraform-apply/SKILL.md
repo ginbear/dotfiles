@@ -41,6 +41,8 @@ hashicorp/terraform (`internal/backend/local/backend_local.go`) の実装で確�
 - 記録の投稿先（PR コメント / Issue コメント / なし）
 - `-target` リソース一覧（plan で `-target` 適用が選択された場合）
 
+`run-all` で複数ユニットを対象にする場合は、引数で指定済みでも対象ユニット一覧を提示して確認を取る。
+
 `-auto-approve` の使用有無は確認不要（本 skill では使用しない）。
 
 ## Step 2: Plan をファイルに保存

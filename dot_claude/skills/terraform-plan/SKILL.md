@@ -15,6 +15,8 @@ Terraform または Terragrunt の plan を **target なし**で実行し、今�
 - terraform か terragrunt か
 - workspace（該当する場合）
 
+`run-all` で複数ユニットを対象にする場合は、引数で指定済みでも対象ユニット一覧を提示して確認を取る。
+
 ## Step 2: Plan 実行（target なし）とログ保存
 
 **必ず `-target` なしで実行する。** 今回の変更以外の既存ドリフトを検出するため。
