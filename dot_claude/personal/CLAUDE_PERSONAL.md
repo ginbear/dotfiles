@@ -19,9 +19,7 @@
 
 ## Timezone
 
-- Kubernetes CronJob や schedule 設定は **UTC** で記述する
-- ユーザーが JST で時刻を指定した場合、**必ず UTC に変換**してから設定ファイルに記述する
-- 変換結果はユーザーに確認を取る（例: JST 09:00 → UTC 00:00）
+- schedule は UTC で書き、ユーザーに見せるときは JST を併記する（例: `0 0 * * *` = JST 09:00）
 
 ## Git Commit Style
 
