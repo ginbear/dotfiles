@@ -83,6 +83,9 @@ UNRESOLVED_MSG="コミット/push 対象のリポジトリを解決できませ�
 
 # "git -C <path> commit" は "git commit" に一致しないので、部分一致の前に -C を畳む。
 NORMALIZED=$(printf '%s' "$COMMAND" | sed -E 's#git[[:space:]]+-C[[:space:]]+[^[:space:]]+[[:space:]]+#git #g')
+# コマンド形の検査は heredoc 本文を除いた版で行う。コミットメッセージ中の例示で誤爆させないため。
+SCAN_NORM=$(printf '%s' "$SCAN_CMD" | sed -E 's#git[[:space:]]+-C[[:space:]]+[^[:space:]]+[[:space:]]+#git #g')
+CMD_START="(^|[;&|(]|${NL})[[:space:]]*"
 
 # Check 1: Block git commit on protected branches
 CONFIG="$HOME/.claude/protected-branches"
@@ -104,23 +107,23 @@ if [[ "$NORMALIZED" == *"git commit"* ]] && [[ -f "$CONFIG" ]]; then
 fi
 
 # Check 2: Block git add of sensitive files
-if [[ "$NORMALIZED" == *"git add"* ]]; then
-  if [[ "$COMMAND" == *"settings.local.json"* ]]; then
+if [[ "$SCAN_NORM" == *"git add"* ]]; then
+  if [[ "$SCAN_NORM" == *"settings.local.json"* ]]; then
     echo "BLOCKED: settings.local.json should not be committed." >&2
     exit 2
   fi
-  if [[ "$COMMAND" == *".env"* ]]; then
+  if [[ "$SCAN_NORM" == *".env"* ]]; then
     echo "BLOCKED: .env files should not be committed (contains secrets)." >&2
     exit 2
   fi
-  if [[ "$COMMAND" == *".tfvars"* ]]; then
+  if [[ "$SCAN_NORM" == *".tfvars"* ]]; then
     echo "BLOCKED: .tfvars files should not be committed (contains secrets)." >&2
     exit 2
   fi
 fi
 
 # Check 3: Block git clone (use ghq get instead)
-if [[ "$NORMALIZED" == *"git clone"* ]]; then
+if [[ "$SCAN_NORM" == *"git clone"* ]]; then
   echo "BLOCKED: git clone is not allowed. Use 'ghq get <repo>' instead." >&2
   exit 2
 fi
@@ -166,6 +169,50 @@ if command -v org-term-scan >/dev/null 2>&1; then
           exit 2
         fi
       fi
+    fi
+  fi
+fi
+
+# Check 5: Block staging everything at once
+if [[ "$SCAN_NORM" =~ ${CMD_START}git[[:space:]]+add([[:space:]]+[^[:space:]\;\&\|]+)*[[:space:]]+(\.|-A|--all|:/)([[:space:]\;\&\|\)]|$) ]]; then
+  echo "BLOCKED: git add -A / git add . is not allowed. Stage files by path." >&2
+  exit 2
+fi
+
+# Check 6: Block in-place rewrites and interpreter heredocs (use Edit / Write)
+if [[ "$SCAN_NORM" =~ ${CMD_START}(xargs[[:space:]]+)?(sed|perl)([[:space:]]+-[^[:space:]]*)*[[:space:]]+(-[a-zA-Z]*i[a-zA-Z]*|--in-place) ]]; then
+  echo "BLOCKED: in-place rewrite (sed -i / perl -i) is not allowed. Use the Edit / Write tools." >&2
+  exit 2
+fi
+if [[ "$SCAN_NORM" =~ ${CMD_START}(python3?|ruby|perl|node)([[:space:]]+-)?[[:space:]]*\<\< ]]; then
+  echo "BLOCKED: interpreter heredoc is not allowed. File edits: use Edit / Write. Read-only parsing: use a one-liner (python3 -c / jq)." >&2
+  exit 2
+fi
+
+# Check 7: Block commits with unformatted Terragrunt HCL
+if [[ "$SCAN_NORM" == *"git commit"* ]]; then
+  if [[ $REPO_UNRESOLVED -eq 1 ]]; then
+    echo "BLOCKED: $UNRESOLVED_MSG" >&2
+    exit 2
+  fi
+  ROOT=$(git -C "$TARGET_DIR" rev-parse --show-toplevel 2>/dev/null)
+  # 同じコマンド内で git add される前に呼ばれるため、staged に限らず作業ツリーの変更を対象にする。
+  HCL_FILES=()
+  if [ -n "$ROOT" ]; then
+    while IFS= read -r f; do
+      [[ -n "$f" && "${f##*/}" != ".terraform.lock.hcl" ]] && HCL_FILES+=("$f")
+    done < <({ git -C "$ROOT" diff --name-only --diff-filter=d HEAD -- '*.hcl'; git -C "$ROOT" ls-files --others --exclude-standard -- '*.hcl'; } 2>/dev/null | sort -u)
+  fi
+  # pre-commit と同じく、terragrunt を解決できない環境では黙って通す。
+  if [ ${#HCL_FILES[@]} -gt 0 ] && command -v mise >/dev/null 2>&1 && mise -C "$ROOT" which terragrunt >/dev/null 2>&1; then
+    UNFORMATTED=()
+    for f in "${HCL_FILES[@]}"; do
+      mise -C "$ROOT" exec -- terragrunt hcl fmt --check --file "$ROOT/$f" >/dev/null 2>&1 || UNFORMATTED+=("$f")
+    done
+    if [ ${#UNFORMATTED[@]} -gt 0 ]; then
+      echo "BLOCKED: unformatted HCL in $ROOT: ${UNFORMATTED[*]}" >&2
+      echo "Run 'terragrunt hcl fmt --file <path>' for each file, then commit again." >&2
+      exit 2
     fi
   fi
 fi

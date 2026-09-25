@@ -2,168 +2,86 @@
 
 ## Development Environment
 
-- ローカルリポジトリの管理には `ghq` を使用する（`git clone` は PreToolUse hook でブロックされる）
-  - リポジトリ取得: `ghq get <repo>`
-  - リポジトリ一覧: `ghq list`
-  - リポジトリパス: `ghq root`/`ghq list --full-path`
-  - リポジトリは `~/ghq/` 配下に配置される
+- ローカルリポジトリは `ghq` で `~/ghq/` 配下に管理している
 - 複数リポジトリにまたがる調査時は、対象リポジトリのローカルパスをユーザーに確認してから作業する
-- **公開リポジトリ（dotfiles等）には会社名・サービス名・内部リポジトリ名を書かない**。コミットメッセージ・PR説明・コメント・設定ファイルの例も含む。汎用的な表現に置き換える
 
 ## Dotfiles / chezmoi
 
-- dotfilesの管理には `chezmoi` を使用する
-- chezmoi ソースディレクトリは ghq 管理のリポジトリへのシンボリックリンク:
-  - `~/.local/share/chezmoi` → `~/ghq/github.com/ginbear/dotfiles`
-  - どちらのパスでもアクセス可能だが、ghq 側のパスを使う
-- `~/` 配下のdotfilesを直接編集しない。必ずchezmoiのソースディレクトリで編集する
-- `~/.claude/` 配下の直接編集は permissions deny でブロックされる。`~/ghq/github.com/ginbear/dotfiles/dot_claude/` を編集すること
-  - テスト時は `Bash(cp ...)` で一時デプロイ可能（deny は Edit/Write ツールのみ対象）
-- **ワークフロー**: ソース編集 → gitコミット → `chezmoi apply`（この順序を厳守）
-- `chezmoi apply` はユーザーの確認なしに実行しない
+- dotfiles は chezmoi で管理している。ソースは `~/ghq/github.com/ginbear/dotfiles`（`~/.local/share/chezmoi` はここへの symlink）
+- `~/` 配下の管理対象ファイルは直接編集せず、ソースを編集する（対応は `chezmoi source-path <file>` で確認できる）
+- ソース編集 → git コミット → `chezmoi apply` の順で進める。`chezmoi apply` はユーザーが実行する
 
 ## Git Worktree
 
 - 同じリポジトリで並行してPRを進める場合、branchごとに `git worktree add` で作業ディレクトリを分ける
 - 命名規則: `<repo>-worktrees/<branch-name>`（ghq root 配下に置く。`ghq list` に出るのは意図通り — branchへすぐ切り替えられる利点を優先する）
 - dotfiles リポジトリは worktree 対象外にする（`~/.local/share/chezmoi` は ghq 上の main checkout を指すシンボリックリンクのため、worktree で編集しても `chezmoi apply` に反映されない）
-- PRがマージされたら、対応する worktree を `git worktree remove` で削除する。session が落ちて消し忘れることはあり得るので、気づいた時点で棚卸しして削除する
 
 ## Timezone
 
-- Kubernetes CronJob や schedule 設定は **UTC** で記述する
-- ユーザーが JST で時刻を指定した場合、**必ず UTC に変換**してから設定ファイルに記述する
-- 変換結果はユーザーに確認を取る（例: JST 09:00 → UTC 00:00）
+- schedule は UTC で書き、ユーザーに見せるときは JST を併記する（例: `0 0 * * *` = JST 09:00）
 
 ## Git Commit Style
 
 - **Commit titles**: Write in English (first line)
 - **Commit body**: Write explanations in Japanese
 - Use conventional commits format when appropriate: `feat/fix/docs/refactor/test`
-- Always include Co-Authored-By: Claude
-
-### Example format:
-```
-Fix kernel headers and modprobe issues
-
-カーネルヘッダーとmodprobeの問題を修正：
-- kmodパッケージをインストール
-- /lib/modulesをマウント
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
 
 ## PR Style
 
-- Do NOT include "Generated with Claude Code" in PR description
 - PR作成前に `git diff` の全体を確認し、意図した変更のみが含まれていることを検証する
 - 複数環境（dev/stg/prd）にまたがる変更では、各環境の現在値を git 上で確認してから diff を作成する（実態と乖離していないか検証）
-- 機密ファイル（`.env`, `*.tfvars`, `settings.local.json`）の `git add` は PreToolUse hook で機械的にブロックされる
-- `git add -A` / `git add .` を使わない。ステージは**ファイルをパス指定で個別に `git add`** する（hook 対象外の認証情報・生成物の巻き込みを防ぐ）
-- PR にレビューコメントが付いている場合、「対応した」と報告する前に未解決コメントを 0 にする。対応しないと判断したものは理由をコメントして resolve する
 - ブランチを作る前に `git fetch origin` する。起点は fetch 直後の `origin/<base>` を明示的に指定する（古いローカル ref を起点にすると後で conflict になる）
 
-## 回答の正確性
-
-- ツールの機能・設定項目について確信がない場合は「未確認」と明示し、公式ドキュメントや `--help` で確認してから回答する
-- 「できない」「存在しない」と断言する前に、実際にコマンドやドキュメントで検証する
-- AWS/Datadog 等の料金・インスタンスタイプ・設定上限値を提示する際は、Web検索または公式ドキュメントで検証してから回答する。未検証の場合は「未検証」と明記する
-
 ## Investigation Workflow
-
-K8sリソースやインフラの調査時は以下の順序で実施する:
-1. `kubectl get/describe` で現在の状態を確認
-2. `kubectl logs` でエラー詳細を確認
-3. **ローカルマニフェスト/Terraformを Grep/Read で検索**し、設定の意図を把握
-4. 必要に応じて Datadog でメトリクス/ログを確認
-   - ログクエリでは **faceted なフィールドのみ** 使用する。0 件の場合、フィールドが faceted か確認してからクエリを再構築する
-5. 調査結果をまとめてからアクション提案（勝手に修正しない）
 
 ### 結論の述べ方
 - 根本原因は根拠（Datadog/kubectl/docs）で検証してから断定する。弱いシグナル1つで環境・対象を早期に絞り込まない
 - 仮説には「何が観測されれば反証されるか」を併記し、確信度をキャリブレーションして述べる
+- 検証していないことは「未確認」と明示し、確認コマンドか公式ソース（docs / NVD / GitHub Advisory 等）を併記する
 
 ### リソース変更の安全確認
-- 既存リソースの置換・修正を提案する前に、現在の実装を必ず読んで機能等価性を確認する
-- image / templateRef / kustomize overlay の差し替えは「同じ動作をする」ことを検証してから提案する
-- 確認せずに「これで置き換えられます」と断言しない
+- 既存リソースの置換・修正（image / templateRef / kustomize overlay の差し替え等）を提案する前に、現在の実装を読んで同じ動作をすることを確認する
 
 ### リソース状態の報告ルール
 - kubectl の出力を部分的に見て「正常」と断言しない。STATUS/READY カラムを必ず確認する
 - 「動いている」と報告する前に、Pod の STATUS が Running かつ READY が期待値であることを確認する
-- 不確かな場合は「未確認」と明示し、確認コマンドを提示する
-
-### 調査結果の記録
-- 調査結果は基本的に **GitHub Issue に記録する前提** で整理する（実際に書き込むかはユーザーが判断する）
-- 10行以上の出力は `<details>` タグで折りたたむ
-- 内容は**事実と推測を明確に書き分ける**
 
 ### セキュリティ調査の注意事項
 - ユーザーが指定した CVE 番号は正確にそのまま使う。類似の CVE に勝手に置き換えない
-- CVE の詳細を調べる際は、公式ソース（NVD, GitHub Advisory）を参照して正確性を検証する
 
 ## Kubernetes/DevOps Workflow
 
 - Always validate manifests with `kubectl kustomize` before committing
-- After Dockerfile changes, remind to run build.sh
-- **変更作業の前に必ず調査を先行する**: 関連ファイル/リポジトリの特定 → 現状の理解 → 変更計画の提示 → ユーザー承認後に実行
-- **複雑な変更の提案前に前提を明示する**: 解決策を提案する前に (1) 対象のリソース/ワークロード種別, (2) リポジトリ内の既存パターン, (3) 自分の前提条件 を列挙し、ユーザーに確認を取る。前提が間違っていると解決策全体が手戻りになる
-- PRにブランチ・コミットを作成する前に、diff概要をユーザーに見せて確認を取る
+- **変更前に計画の承認を取る**: 対象リソース・リポジトリ内の既存パターン・自分の前提を示した変更計画を出し、承認後に実行する
 - **正規の修正を優先**: 問題の調査時、ワークアラウンドを先に提案しない。まず正規・推奨の修正方法を特定し、それが不可能な場合のみワークアラウンドを提案する
-- 手順書に「一時的に設定値を変更する」「一時的なリソースを作る」ステップを書いたら、完了チェックリストに**戻ったこと・消えたことの確認**も同時に書く
 
 ## Production Safety
 
 - prd 環境への exec / write / 破壊的コマンド（`kubectl exec`, `delete`, `apply` 等）は**実行前に必ずユーザーへ確認**する。先に dev/stg または read-only の代替を提示する
-- PR に prd スコープを含める場合は明示的に確認を取る。デフォルトは非prd（dev/stg）優先
 
 ## Terraform/Terragrunt Workflow
 
-- **Terragrunt 変更時は push 前に必ずフォーマットチェックを実行**:
-  ```bash
-  cd <terragrunt-root-dir>
-  terragrunt hclfmt --check
-  ```
-- フォーマットエラーがあれば `terragrunt hclfmt` で自動修正してからコミット
-- **期待と異なる結果での停止**: terraform/terragrunt の plan/apply が 0 changes を返したが変更が期待される場合、次の環境やコメント作成に進まずユーザーに報告して指示を仰ぐ。「既に適用済み」と自己判断しない
 - **plan/apply の実行は `/terraform-plan`, `/terraform-apply` skill を使用する**（ログ保存・検証・記録投稿を一貫して行うため）
-- **実行前のスコープ確認**: `terragrunt plan/apply` や `terragrunt run-all` を実行する前に、対象のモジュール・ディレクトリをユーザーに確認する。「全モジュール」に対する `run-all` は特に確認必須
-
-## Bash コマンドのルール
-
-- 既存ファイルの書き換えには **Edit / Write ツールを使う**。`python3 - <<'PY'` や `sed -i` のような heredoc / インプレース置換でファイルを書き換えない（差分がレビューできず、`cd` を伴って許可パターンからも外れる）
-- 他リポジトリや別ディレクトリを参照する際は、原則 `cd` せず**絶対パスを引数に渡す**
-  - これにより `settings.json` の許可パターン（`Bash(grep *)`, `Bash(ls *)` 等）が正しくマッチし、不要な確認プロンプトを回避できる
-  - 例: `grep -r 'pattern' /absolute/path/to/repo/` (NOT `cd /path && grep -r 'pattern' .`)
-  - git は `git -C <absolute-path> <subcommand>` を使う（`status` / `diff` / `log` / `branch` は許可済み）
-- `cd` が必要なケース（ツールが cwd 依存、相対パス出力が必要等）ではやむを得ず使ってよいが、理由がない限り絶対パスを優先する
-- **並列実行時の cd 明示**: 複数の Bash コマンドを並列実行する際、全てのコマンドに `cd <absolute-path> &&` を含める。片方だけ cd して片方は省略するパターンを禁止
 
 ## コマンド実行ポリシー
 
 - **参照系コマンドは Claude Code が実行**して内容を確認する（`kubectl get/describe`, `aws ... describe`, `git log/diff` 等）
-- **更新系コマンドは原則ユーザーが実行**する。**コピペしやすい形**でコマンドを提示する（`kubectl apply/delete`, `git push` 等）。内容によっては Claude に対応を依頼してもよい（例: terraform/terragrunt apply は `/terraform-apply` skill 経由）
+- 更新系コマンドは原則ユーザーが実行する（`kubectl apply/delete`, `git push` 等）。内容によっては Claude に対応を依頼してもよい（例: terraform/terragrunt apply は `/terraform-apply` skill 経由）
 - 破壊的・インフラ変更は、レビューして1つずつ実行できるよう**リソースごとの個別コマンド**で提示する。依頼がない限りスクリプトにまとめない
-- コマンドで何かを確認したら、ユーザーが再確認できるよう**実行したコマンドをコピペしやすい形で必ず併記**する
+- 回答中のコマンドはコピペしてそのまま実行できる形で書く。更新系はユーザーが実行する分を、参照系は確認に使ったものを必ず併記する
 
 ## Code Style
 
-- Use 2-space indentation for YAML
-- Use 4-space indentation for Python
-- Prefer explicit over implicit in configuration files
 - **コメントの原則**（[t_wadaの整理](https://x.com/t_wada/status/904916106153828352)）: コードには How、テストコードには What、コミットログには Why、コードコメントには Why not
   - コメントアウトはコードを読めばわかることを書かない。過去の経緯も書かない（背景は PR description に書く）。コードを読んでもわからないことに限定して簡潔に記載する
-- **コメントは1行にする。2行が必要なら書く前に相談する。3行以上は書かない**
+- **コメントは最大1行**。収まらない分はコミットメッセージか PR 説明に書く
 - 既存コメントを消せるなら、追記より削除を先に検討する
 - 使い捨ての整形・パース（JSON/YAML の抽出等）は言語を問わずワンライナーでよい
-- **リポジトリに残すスクリプトは shell を優先**する。運用手順書から呼ぶスクリプトは、実行環境に処理系を追加せず読めることを優先する
-  - shell で書くと処理が入り組む場合は Ruby、次に Python。どれを選んだかと理由を PR 説明に1行書く
 
 ## Output Style
 
-- 書き出す成果物（PR 説明・手順書・docs 等）の分量と根拠の規範は output style `Concise Artifacts`（`dot_claude/output-styles/concise-artifacts.md`）に置いている。ここには重複して書かない
-- コマンド出力や raw output は要約・整形せずそのまま貼る。整形はユーザーが明示的に要求した場合のみ
-- **出力・コンテンツの捏造禁止**: コマンド出力を一から捏造しない。別環境・別コマンドの出力を書き換えて報告しない。出力が得られなかった場合はコマンドを再実行する。技術記事でも、検証していない技術的主張を事実として記述しない
+- **コマンド出力は実際に得たものをそのまま貼る**。要約・整形・別環境の出力の流用をしない。得られなければ再実行する
 - ターミナルへの応答で PR / issue に言及するときはクリックできるリンクにする。複数リポジトリを並行して扱うため、番号だけではどのリポジトリか判別できない
   - 形式: `[org/repo#1234](https://github.com/org/repo/issues/1234)`
   - 同一リポジトリの話が続く文脈では表示名を `#1234` に短縮してよいが、URL は必ず付ける
