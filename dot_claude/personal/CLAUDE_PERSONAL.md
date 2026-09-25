@@ -121,8 +121,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Code Style
 
-- Use 2-space indentation for YAML
-- Use 4-space indentation for Python
 - Prefer explicit over implicit in configuration files
 - **コメントの原則**（[t_wadaの整理](https://x.com/t_wada/status/904916106153828352)）: コードには How、テストコードには What、コミットログには Why、コードコメントには Why not
   - コメントアウトはコードを読めばわかることを書かない。過去の経緯も書かない（背景は PR description に書く）。コードを読んでもわからないことに限定して簡潔に記載する
