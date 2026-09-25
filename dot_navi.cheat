@@ -196,6 +196,53 @@ $ secret_value: echo ""
 $ secret_name: echo ""
 $ namespace: echo "backend-dev" --- --fzf-overrides '--no-sort'
 
+# secret の値を晒さずに hash で確認する（環境間の値の一致確認用）
+kubectl --context <context> -n <namespace> get secret <secret> -o jsonpath="{.data.<key>}" | base64 -d | shasum -a 256 | cut -c1-12
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+$ secret: kubectl --context <context> -n <namespace> get secret --no-headers -o custom-columns=":metadata.name"
+$ key: kubectl --context <context> -n <namespace> get secret <secret> -o json | jq -r '.data | keys[]'
+
+# deployment を rollout restart する
+kubectl --context <context> -n <namespace> rollout restart deployment <deployment>
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+$ deployment: kubectl --context <context> -n <namespace> get deployment --no-headers -o custom-columns=":metadata.name"
+
+# deployment 単位で全 pod のログを追う
+stern --context <context> -n <namespace> -l "$(kubectl --context <context> -n <namespace> get deployment <deployment> -o json | jq -r '.spec.selector.matchLabels | to_entries | map("\(.key)=\(.value)") | join(",")')" --tail 50
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+$ deployment: kubectl --context <context> -n <namespace> get deployment --no-headers -o custom-columns=":metadata.name"
+
+# namespace の event を確認する
+kubectl --context <context> -n <namespace> get events --sort-by=.lastTimestamp
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+
+# pod ごとのリソース使用量
+kubectl --context <context> -n <namespace> top pods
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+
+# 再起動回数の多い pod を探す
+kubectl --context <context> -n <namespace> get pods --sort-by='.status.containerStatuses[0].restartCount'
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+
+# ALB Ingress の annotation/状態を確認する
+kubectl --context <context> -n <namespace> describe ingress <ingress>
+
+$ context: kubectl config get-contexts -o name
+$ namespace: kubectl --context <context> get ns --no-headers -o custom-columns=":metadata.name"
+$ ingress: kubectl --context <context> -n <namespace> get ingress --no-headers -o custom-columns=":metadata.name"
+
 % terraform
 
 # 特定リソースのみ plan
