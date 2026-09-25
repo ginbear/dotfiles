@@ -1,87 +1,56 @@
 # Personal Preferences
 
-## Development Environment
+## Environment
 
 - ローカルリポジトリは `ghq` で `~/ghq/` 配下に管理している
-- 複数リポジトリにまたがる調査時は、対象リポジトリのローカルパスをユーザーに確認してから作業する
-
-## Dotfiles / chezmoi
-
 - dotfiles は chezmoi で管理している。ソースは `~/ghq/github.com/ginbear/dotfiles`（`~/.local/share/chezmoi` はここへの symlink）
 - `~/` 配下の管理対象ファイルは直接編集せず、ソースを編集する（対応は `chezmoi source-path <file>` で確認できる）
 - ソース編集 → git コミット → `chezmoi apply` の順で進める。`chezmoi apply` はユーザーが実行する
 
-## Git Worktree
+## Git
 
-- 同じリポジトリで並行してPRを進める場合、branchごとに `git worktree add` で作業ディレクトリを分ける
-- 命名規則: `<repo>-worktrees/<branch-name>`（ghq root 配下に置く。`ghq list` に出るのは意図通り — branchへすぐ切り替えられる利点を優先する）
-- dotfiles リポジトリは worktree 対象外にする（`~/.local/share/chezmoi` は ghq 上の main checkout を指すシンボリックリンクのため、worktree で編集しても `chezmoi apply` に反映されない）
-
-## Timezone
-
-- schedule は UTC で書き、ユーザーに見せるときは JST を併記する（例: `0 0 * * *` = JST 09:00）
-
-## Git Commit Style
-
-- **Commit titles**: Write in English (first line)
-- **Commit body**: Write explanations in Japanese
-- Use conventional commits format when appropriate: `feat/fix/docs/refactor/test`
-
-## PR Style
-
+- Commit title は英語、body は日本語で書く。適宜 conventional commits（`feat/fix/docs/refactor/test`）を使う
+- ブランチを作る前に `git fetch origin` する。起点は fetch 直後の `origin/<base>` を明示的に指定する（古いローカル ref を起点にすると後で conflict になる）
 - PR作成前に `git diff` の全体を確認し、意図した変更のみが含まれていることを検証する
 - 複数環境（dev/stg/prd）にまたがる変更では、各環境の現在値を git 上で確認してから diff を作成する（実態と乖離していないか検証）
-- ブランチを作る前に `git fetch origin` する。起点は fetch 直後の `origin/<base>` を明示的に指定する（古いローカル ref を起点にすると後で conflict になる）
+- 同じリポジトリで並行してPRを進める場合、branchごとに `git worktree add` で作業ディレクトリを分ける
+- worktree の命名規則: `<repo>-worktrees/<branch-name>`（ghq root 配下に置く。`ghq list` に出るのは意図通り — branchへすぐ切り替えられる利点を優先する）
+- dotfiles リポジトリは worktree 対象外にする（`~/.local/share/chezmoi` は ghq 上の main checkout を指すシンボリックリンクのため、worktree で編集しても `chezmoi apply` に反映されない）
 
-## Investigation Workflow
+## Investigation
 
-### 結論の述べ方
 - 根本原因は根拠（Datadog/kubectl/docs）で検証してから断定する。弱いシグナル1つで環境・対象を早期に絞り込まない
 - 仮説には「何が観測されれば反証されるか」を併記し、確信度をキャリブレーションして述べる
 - 検証していないことは「未確認」と明示し、確認コマンドか公式ソース（docs / NVD / GitHub Advisory 等）を併記する
-
-### リソース変更の安全確認
-- 既存リソースの置換・修正（image / templateRef / kustomize overlay の差し替え等）を提案する前に、現在の実装を読んで同じ動作をすることを確認する
-
-### リソース状態の報告ルール
-- kubectl の出力を部分的に見て「正常」と断言しない。STATUS/READY カラムを必ず確認する
-- 「動いている」と報告する前に、Pod の STATUS が Running かつ READY が期待値であることを確認する
-
-### セキュリティ調査の注意事項
+- kubectl の出力を部分的に見て「正常」と断言しない。「動いている」と報告する前に、Pod の STATUS が Running かつ READY が期待値であることを確認する
 - ユーザーが指定した CVE 番号は正確にそのまま使う。類似の CVE に勝手に置き換えない
+- 問題の調査時、ワークアラウンドを先に提案しない。まず正規・推奨の修正方法を特定し、それが不可能な場合のみワークアラウンドを提案する
 
-## Kubernetes/DevOps Workflow
+## Infrastructure Changes
 
+- 変更前に、対象リソース・リポジトリ内の既存パターン・自分の前提を示した変更計画を出し、承認後に実行する
+- 既存リソースの置換・修正（image / templateRef / kustomize overlay の差し替え等）を提案する前に、現在の実装を読んで同じ動作をすることを確認する
 - Always validate manifests with `kubectl kustomize` before committing
-- **変更前に計画の承認を取る**: 対象リソース・リポジトリ内の既存パターン・自分の前提を示した変更計画を出し、承認後に実行する
-- **正規の修正を優先**: 問題の調査時、ワークアラウンドを先に提案しない。まず正規・推奨の修正方法を特定し、それが不可能な場合のみワークアラウンドを提案する
-
-## Production Safety
-
-- prd 環境への exec / write / 破壊的コマンド（`kubectl exec`, `delete`, `apply` 等）は**実行前に必ずユーザーへ確認**する。先に dev/stg または read-only の代替を提示する
-
-## Terraform/Terragrunt Workflow
-
-- **plan/apply の実行は `/terraform-plan`, `/terraform-apply` skill を使用する**（ログ保存・検証・記録投稿を一貫して行うため）
-
-## コマンド実行ポリシー
-
-- **参照系コマンドは Claude Code が実行**して内容を確認する（`kubectl get/describe`, `aws ... describe`, `git log/diff` 等）
+- Terraform/Terragrunt の plan/apply は `/terraform-plan`, `/terraform-apply` skill を使用する（ログ保存・検証・記録投稿を一貫して行うため）
+- 参照系コマンドは Claude Code が実行して内容を確認する（`kubectl get/describe`, `aws ... describe`, `git log/diff` 等）
 - 更新系コマンドは原則ユーザーが実行する（`kubectl apply/delete`, `git push` 等）。内容によっては Claude に対応を依頼してもよい（例: terraform/terragrunt apply は `/terraform-apply` skill 経由）
-- 破壊的・インフラ変更は、レビューして1つずつ実行できるよう**リソースごとの個別コマンド**で提示する。依頼がない限りスクリプトにまとめない
-- 回答中のコマンドはコピペしてそのまま実行できる形で書く。更新系はユーザーが実行する分を、参照系は確認に使ったものを必ず併記する
+- prd 環境への exec / write / 破壊的コマンド（`kubectl exec`, `delete`, `apply` 等）は実行前に必ずユーザーへ確認する。先に dev/stg または read-only の代替を提示する
+- 破壊的・インフラ変更は、レビューして1つずつ実行できるようリソースごとの個別コマンドで提示する。依頼がない限りスクリプトにまとめない
 
 ## Code Style
 
-- **コメントの原則**（[t_wadaの整理](https://x.com/t_wada/status/904916106153828352)）: コードには How、テストコードには What、コミットログには Why、コードコメントには Why not
+- コメントの原則（[t_wadaの整理](https://x.com/t_wada/status/904916106153828352)）: コードには How、テストコードには What、コミットログには Why、コードコメントには Why not
   - コメントアウトはコードを読めばわかることを書かない。過去の経緯も書かない（背景は PR description に書く）。コードを読んでもわからないことに限定して簡潔に記載する
-- **コメントは最大1行**。収まらない分はコミットメッセージか PR 説明に書く
+- コメントは最大1行。収まらない分はコミットメッセージか PR 説明に書く
 - 既存コメントを消せるなら、追記より削除を先に検討する
 - 使い捨ての整形・パース（JSON/YAML の抽出等）は言語を問わずワンライナーでよい
 
 ## Output Style
 
-- **コマンド出力は実際に得たものをそのまま貼る**。要約・整形・別環境の出力の流用をしない。得られなければ再実行する
+- 書き出す成果物（PR 説明・手順書・docs 等）の分量と根拠の規範は output style [Concise Artifacts](../output-styles/concise-artifacts.md) に置いている
+- コマンド出力は実際に得たものをそのまま貼る。要約・整形・別環境の出力の流用をしない。得られなければ再実行する
+- 回答中のコマンドはコピペしてそのまま実行できる形で書く。更新系はユーザーが実行する分を、参照系は確認に使ったものを必ず併記する
+- schedule は UTC で書き、ユーザーに見せるときは JST を併記する（例: `0 0 * * *` = JST 09:00）
 - ターミナルへの応答で PR / issue に言及するときはクリックできるリンクにする。複数リポジトリを並行して扱うため、番号だけではどのリポジトリか判別できない
   - 形式: `[org/repo#1234](https://github.com/org/repo/issues/1234)`
   - 同一リポジトリの話が続く文脈では表示名を `#1234` に短縮してよいが、URL は必ず付ける
