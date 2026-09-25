@@ -16,7 +16,6 @@
 - 同じリポジトリで並行してPRを進める場合、branchごとに `git worktree add` で作業ディレクトリを分ける
 - 命名規則: `<repo>-worktrees/<branch-name>`（ghq root 配下に置く。`ghq list` に出るのは意図通り — branchへすぐ切り替えられる利点を優先する）
 - dotfiles リポジトリは worktree 対象外にする（`~/.local/share/chezmoi` は ghq 上の main checkout を指すシンボリックリンクのため、worktree で編集しても `chezmoi apply` に反映されない）
-- PRがマージされたら、対応する worktree を `git worktree remove` で削除する。session が落ちて消し忘れることはあり得るので、気づいた時点で棚卸しして削除する
 
 ## Timezone
 
