@@ -112,6 +112,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/protect-branches.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/kube-exec-guard.sh"
           }
         ]
       }
