@@ -1,0 +1,46 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "open-org-repo",
+  "title": "Open Org Repo",
+  "description": "Pick a repository of your GitHub org and open it, using the gh CLI for auth",
+  "icon": "icon.png",
+  "author": "ginbear",
+  "license": "MIT",
+  "platforms": [
+    "macOS"
+  ],
+  "categories": [
+    "Developer Tools"
+  ],
+  "commands": [
+    {
+      "name": "open-org-repo",
+      "title": "Open Org Repo",
+      "description": "Search repositories of the org and open one",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "org",
+          "type": "textfield",
+          "required": true,
+          "title": "Organization",
+          "description": "GitHub organization to list",
+          "placeholder": "your-org"
+        }
+      ]
+    }
+  ],
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop"
+  },
+  "dependencies": {
+    "@raycast/api": "^1.104.12",
+    "@raycast/utils": "^2.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
