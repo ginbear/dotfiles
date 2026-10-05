@@ -1,0 +1,46 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "open-aws-console",
+  "title": "Open AWS Console",
+  "description": "Pick an account and role from the AWS access portal and open the console, using the aws CLI SSO session for listing",
+  "icon": "icon.png",
+  "author": "ginbear",
+  "license": "MIT",
+  "platforms": [
+    "macOS"
+  ],
+  "categories": [
+    "Developer Tools"
+  ],
+  "commands": [
+    {
+      "name": "open-aws-console",
+      "title": "Open AWS Console",
+      "description": "Search accounts and roles of the AWS access portal and open the console",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "ssoSession",
+          "type": "textfield",
+          "required": true,
+          "title": "SSO Session",
+          "description": "Name of the [sso-session] in ~/.aws/config used for listing accounts and `aws sso login`",
+          "placeholder": "my-sso"
+        }
+      ]
+    }
+  ],
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop"
+  },
+  "dependencies": {
+    "@raycast/api": "^1.104.12",
+    "@raycast/utils": "^2.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
