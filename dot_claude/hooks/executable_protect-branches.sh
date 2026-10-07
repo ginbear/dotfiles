@@ -128,6 +128,44 @@ if [[ "$SCAN_NORM" == *"git clone"* ]]; then
   exit 2
 fi
 
+# gh の --repo/-R は対象リポジトリを cd 先より強く決めるので、そちらを非公開 org 判定に使う。
+# 引用符付きの本文（-b "..." 等）に書かれた --repo を拾わないよう、値を外した後で残りの引用符付き文字列を捨てる。
+GH_REPO_SLUGS=()
+GH_TRIGGERS=0
+GH_UNANCHORED=0
+# gh 本体ではなくサブコマンド列で引っ掛ける。絶対パス起動を取りこぼすと未検査のまま素通りするため。
+GH_SUBCMD_RE='(^|[[:space:]])(pr|issue|release)[[:space:]]+(create|edit|comment)([[:space:]]|$)'
+collect_gh_repo_slugs() {
+  local cmd="$1" seg val nflags bsnl=$'\\\n'
+  # 行継続を先に畳む。行単位で見るため、\ 改行の先にある2つ目の --repo を見落とすと未検査で素通りする。
+  cmd="${cmd//"$bsnl"/ }"
+  cmd=$(printf '%s' "$cmd" | sed -E "s/(--repo|-R)([[:space:]]+|=)\"([^\"]*)\"/\1 \3/g; s/(--repo|-R)([[:space:]]+|=)'([^']*)'/\1 \3/g")
+  cmd=$(printf '%s' "$cmd" | sed -E "s/\"[^\"]*\"//g; s/'[^']*'//g")
+  while IFS= read -r seg; do
+    seg="${seg#"${seg%%[![:space:]]*}"}"
+    [[ "$seg" =~ $GH_SUBCMD_RE ]] || continue
+    # 行頭の素の gh 以外（env 前置・絶対パス・xargs 等）は引数の対応が取れないので、cd 先での検査に落とす。
+    if [[ ! "$seg" =~ ^gh[[:space:]] ]]; then
+      GH_UNANCHORED=1
+      continue
+    fi
+    GH_TRIGGERS=$((GH_TRIGGERS + 1))
+    val=""
+    if [[ "$seg" =~ (^|[[:space:]])--repo[=[:space:]][[:space:]]*([^[:space:]]+) ]]; then
+      val="${BASH_REMATCH[2]}"
+    elif [[ "$seg" =~ (^|[[:space:]])-R=?[[:space:]]*([^[:space:]]+) ]]; then
+      val="${BASH_REMATCH[2]}"
+    fi
+    [[ -z "$val" ]] && continue
+    # gh は重複フラグの最後の値を採るが、ここでは最初しか見ない。重複時は判定に使わず必ず検査させる。
+    nflags=$(printf '%s' "$seg" | grep -o -E '(^|[[:space:]])(--repo[=[:space:]]|-R)' | wc -l | tr -d '[:space:]')
+    [[ "$nflags" -gt 1 ]] && val=""
+    # 変数展開などで静的に解決できない値は、非公開 org 判定に使わず必ず検査させる。
+    [[ "$val" =~ [^A-Za-z0-9._/-] ]] && val=""
+    GH_REPO_SLUGS+=("$val")
+  done < <(printf '%s\n' "$cmd" | tr ';&|()' $'\n\n\n\n\n')
+}
+
 # Check 4: Block org / internal repo names reaching a public repo.
 if command -v org-term-scan >/dev/null 2>&1; then
   # pre-commit only sees staged files, so the PR body and issue comments are covered here.
@@ -136,14 +174,33 @@ if command -v org-term-scan >/dev/null 2>&1; then
      || "$NORMALIZED" == *"gh pr comment"* || "$NORMALIZED" == *"gh issue create"* \
      || "$NORMALIZED" == *"gh issue edit"* || "$NORMALIZED" == *"gh issue comment"* \
      || "$NORMALIZED" == *"gh release create"* ]]; then
-    # 未解決時は $TARGET_DIR がダミーパスなので、org-term-scan 側の非公開 org 判定は必ず失敗し無条件でスキャンされる。
-    if ! HITS=$(printf '%s' "$COMMAND" | org-term-scan --text --repo "$TARGET_DIR" 2>&1); then
-      echo "BLOCKED: $HITS" >&2
-      if [[ $REPO_UNRESOLVED -eq 1 ]]; then
-        echo "" >&2
-        echo "HINT: -C/cd の指定先 '${RAW_TARGET}' を解決できなかったため、非公開 org の除外なしで検査しました。実パスを指定するか、同じコマンド内で変数を代入してから実行してください。" >&2
+    collect_gh_repo_slugs "$SCAN_CMD"
+
+    # 対象ごとに1回ずつ検査し、1つでも引っかかればブロックする。全ての対象が非公開 org のときだけ素通りする。
+    DIR_SCAN=1
+    if [[ $GH_TRIGGERS -gt 0 && $GH_UNANCHORED -eq 0 \
+       && ${#GH_REPO_SLUGS[@]} -eq $GH_TRIGGERS \
+       && "$NORMALIZED" != *"git commit"* ]]; then
+      DIR_SCAN=0
+    fi
+
+    for SLUG in ${GH_REPO_SLUGS[@]+"${GH_REPO_SLUGS[@]}"}; do
+      if ! HITS=$(printf '%s' "$COMMAND" | org-term-scan --text --repo-slug "$SLUG" 2>&1); then
+        echo "BLOCKED: $HITS" >&2
+        exit 2
       fi
-      exit 2
+    done
+
+    # 未解決時は $TARGET_DIR がダミーパスなので、org-term-scan 側の非公開 org 判定は必ず失敗し無条件でスキャンされる。
+    if [[ $DIR_SCAN -eq 1 ]]; then
+      if ! HITS=$(printf '%s' "$COMMAND" | org-term-scan --text --repo "$TARGET_DIR" 2>&1); then
+        echo "BLOCKED: $HITS" >&2
+        if [[ $REPO_UNRESOLVED -eq 1 ]]; then
+          echo "" >&2
+          echo "HINT: -C/cd の指定先 '${RAW_TARGET}' を解決できなかったため、非公開 org の除外なしで検査しました。実パスを指定するか、同じコマンド内で変数を代入してから実行してください。" >&2
+        fi
+        exit 2
+      fi
     fi
   fi
 

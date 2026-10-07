@@ -14,7 +14,10 @@
 #   org-term-scan --files <path>...   ファイルを検査する。.pre-commit-config.yaml から呼ばれる
 #   org-term-scan --text              標準入力を検査する。Claude Code の PreToolUse フックから呼ばれる
 #
-#   --repo <dir> で判定に使うリポジトリを指定する。省略時は cwd。
+#   --repo <dir>              判定に使うリポジトリを作業ディレクトリで指定する。省略時は cwd。
+#   --repo-slug [host/]<owner>/<name>
+#                             判定に使うリポジトリを slug で指定する。gh の --repo 相当。
+#                             指定時は git remote を見ない。解釈できない値は検査する（fail-closed）。
 #
 # 回避:
 #   恒久的に許す行は ~/.claude/org-terms-allow に書く。一度だけなら ALLOW_ORG_TERMS=1（直接シェル/--files 限定）。
@@ -29,19 +32,22 @@ PRIVATE_ORGS_FILE="${ORG_PRIVATE_ORGS_FILE:-$HOME/.claude/private-orgs}"
 
 MODE=""
 REPO_DIR="."
+REPO_SLUG=""
+SLUG_GIVEN=0
 FILES=()
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --files) MODE="files"; shift ;;
-    --text)  MODE="text";  shift ;;
-    --repo)  REPO_DIR="${2:-.}"; shift 2 ;;
-    *)       FILES+=("$1"); shift ;;
+    --files)      MODE="files"; shift ;;
+    --text)       MODE="text";  shift ;;
+    --repo)       REPO_DIR="${2:-.}"; shift 2 ;;
+    --repo-slug)  REPO_SLUG="${2:-}"; SLUG_GIVEN=1; shift 2 ;;
+    *)            FILES+=("$1"); shift ;;
   esac
 done
 
 if [ -z "$MODE" ]; then
-  echo "usage: org-term-scan --files <path>... | --text [--repo <dir>]" >&2
+  echo "usage: org-term-scan --files <path>... | --text [--repo <dir> | --repo-slug <owner>/<name>]" >&2
   exit 64
 fi
 
@@ -54,10 +60,33 @@ fi
 PATTERN=$(grep -vE '^[[:space:]]*(#|$)' "$TERMS_FILE" | paste -sd'|' -)
 [ -z "$PATTERN" ] && exit 0
 
+# owner/name, host/owner/name, https://host/owner/name を受ける。それ以外は空を返し、検査させる。
+org_from_slug() {
+  local slug="$1" name rest owner
+  slug="${slug#*://}"
+  slug="${slug%/}"
+  slug="${slug%.git}"
+  case "$slug" in
+    *[!A-Za-z0-9._/-]*) return 0 ;;
+  esac
+  rest="${slug%/*}"
+  name="${slug##*/}"
+  [ "$rest" = "$slug" ] && return 0
+  owner="${rest##*/}"
+  { [ -z "$owner" ] || [ -z "$name" ]; } && return 0
+  printf '%s' "$owner" | tr '[:upper:]' '[:lower:]'
+}
+
 # 非公開 org 配下なら検査しない。
-ORIGIN=$(git -C "$REPO_DIR" remote get-url origin 2>/dev/null || echo "")
-if [ -n "$ORIGIN" ] && [ -f "$PRIVATE_ORGS_FILE" ]; then
-  ORG=$(printf '%s' "$ORIGIN" | sed -E 's#\.git$##; s#^.*[:/]([^/:]+)/[^/]+$#\1#' | tr '[:upper:]' '[:lower:]')
+# slug 指定時は呼び出し側が対象を決めている。cwd の remote で代用すると別リポジトリに非公開扱いを与えかねない。
+if [ "$SLUG_GIVEN" = "1" ]; then
+  ORG=$(org_from_slug "$REPO_SLUG")
+else
+  ORIGIN=$(git -C "$REPO_DIR" remote get-url origin 2>/dev/null || echo "")
+  ORG=""
+  [ -n "$ORIGIN" ] && ORG=$(printf '%s' "$ORIGIN" | sed -E 's#\.git$##; s#^.*[:/]([^/:]+)/[^/]+$#\1#' | tr '[:upper:]' '[:lower:]')
+fi
+if [ -n "$ORG" ] && [ -f "$PRIVATE_ORGS_FILE" ]; then
   while IFS= read -r private_org; do
     [[ -z "$private_org" || "$private_org" == \#* ]] && continue
     if [ "$ORG" = "$(printf '%s' "$private_org" | tr '[:upper:]' '[:lower:]')" ]; then
