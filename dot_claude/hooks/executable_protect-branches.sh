@@ -136,7 +136,9 @@ GH_UNANCHORED=0
 # gh 本体ではなくサブコマンド列で引っ掛ける。絶対パス起動を取りこぼすと未検査のまま素通りするため。
 GH_SUBCMD_RE='(^|[[:space:]])(pr|issue|release)[[:space:]]+(create|edit|comment)([[:space:]]|$)'
 collect_gh_repo_slugs() {
-  local cmd="$1" seg val nflags
+  local cmd="$1" seg val nflags bsnl=$'\\\n'
+  # 行継続を先に畳む。行単位で見るため、\ 改行の先にある2つ目の --repo を見落とすと未検査で素通りする。
+  cmd="${cmd//"$bsnl"/ }"
   cmd=$(printf '%s' "$cmd" | sed -E "s/(--repo|-R)([[:space:]]+|=)\"([^\"]*)\"/\1 \3/g; s/(--repo|-R)([[:space:]]+|=)'([^']*)'/\1 \3/g")
   cmd=$(printf '%s' "$cmd" | sed -E "s/\"[^\"]*\"//g; s/'[^']*'//g")
   while IFS= read -r seg; do
