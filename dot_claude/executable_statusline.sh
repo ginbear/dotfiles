@@ -151,8 +151,70 @@ if [ -n "$SEVEN_D_PCT" ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
+# Prompt cache: time left until the cached prefix goes cold
+# ─────────────────────────────────────────────────────────────
+ICON_CACHE=$(printf "\xef\x83\xa7")   # U+F0E7 nf-fa-bolt
+ICON_COLD=$(printf "\xef\x8b\x9c")    # U+F2DC nf-fa-snowflake_o
+
+CACHE_STR=""
+CACHE_WARM=$(echo "$input" | jq -r '.prompt_cache.warm')
+if [ "$CACHE_WARM" = "true" ]; then
+    CACHE_EXP=$(echo "$input" | jq -r '.prompt_cache.expires_at // 0 | floor')
+    CACHE_TTL=$(echo "$input" | jq -r '.prompt_cache.ttl // "?"')
+    CACHE_STR="${ICON_CACHE} $(format_reset "$CACHE_EXP")/${CACHE_TTL}"
+    [ $((CACHE_EXP - $(date +%s))) -lt 300 ] && CACHE_STR="${CLR_YELLOW}${CACHE_STR}${CLR_RESET}"
+elif [ "$CACHE_WARM" = "false" ]; then
+    RECACHE=$(echo "$input" | jq -r '.prompt_cache.recache_tokens_if_cold // 0')
+    CACHE_STR="${ICON_COLD} cold"
+    [ "$RECACHE" -gt 0 ] && CACHE_STR="${CACHE_STR}(+$(format_tokens "$RECACHE"))"
+fi
+
+# ─────────────────────────────────────────────────────────────
+# AWS: time left on each SSO profile's cached role credentials
+# Commands run on these cached role credentials until they expire; the SSO
+# access token beside them lasts only ~1h and is not what a command checks first.
+# Profiles come from ~/.claude/statusline-aws-profiles ("<label> <profile>" per line).
+# ─────────────────────────────────────────────────────────────
+ICON_AWS=$(printf "\xef\x83\x82")     # U+F0C2 nf-fa-cloud
+
+aws_creds_expiry() {
+    local profile=$1 account role session key file
+    read -r account role session < <(awk -v p="[profile ${profile}]" '
+        /^\[/ { inside = ($0 == p) }
+        inside && $1 == "sso_account_id" { a = $3 }
+        inside && $1 == "sso_role_name"  { r = $3 }
+        inside && $1 == "sso_session"    { s = $3 }
+        END { print a, r, s }' ~/.aws/config 2>/dev/null)
+    [ -z "$role" ] && return
+    # Same key the AWS CLI derives for its SSO credential cache.
+    key=$(printf '{"accountId":"%s","roleName":"%s","sessionName":"%s"}' "$account" "$role" "$session" | shasum | cut -c1-40)
+    file="$HOME/.aws/cli/cache/${key}.json"
+    [ -f "$file" ] && jq -r '.Credentials.Expiration | sub("\\+00:00$"; "Z") | fromdateiso8601' "$file" 2>/dev/null
+}
+
+AWS_STR=""
+AWS_PROFILES_FILE="$HOME/.claude/statusline-aws-profiles"
+if [ -f "$AWS_PROFILES_FILE" ]; then
+    NOW=$(date +%s)
+    while read -r label profile; do
+        [ -z "$profile" ] && continue
+        EXP=$(aws_creds_expiry "$profile")
+        if [ -z "$EXP" ] || [ "$EXP" -le "$NOW" ]; then
+            ITEM="${CLR_RED}${label}:expired${CLR_RESET}"
+        elif [ $((EXP - NOW)) -lt 1800 ]; then
+            ITEM="${CLR_YELLOW}${label}:$(format_reset "$EXP")${CLR_RESET}"
+        else
+            ITEM="${label}:$(format_reset "$EXP")"
+        fi
+        AWS_STR="${AWS_STR:+${AWS_STR} }${ITEM}"
+    done < "$AWS_PROFILES_FILE"
+fi
+
+# ─────────────────────────────────────────────────────────────
 # Output
 # ─────────────────────────────────────────────────────────────
 OUTPUT="${ICON_MODEL} ${MODEL}  ${ICON_DIR} ${DIR_NAME}${GIT_BRANCH}  ${CTX_STR}"
+[ -n "$CACHE_STR" ] && OUTPUT="${OUTPUT}  ${CACHE_STR}"
 [ -n "$RATE_STR" ] && OUTPUT="${OUTPUT}  ${ICON_RATE} ${RATE_STR}"
+[ -n "$AWS_STR" ] && OUTPUT="${OUTPUT}  ${ICON_AWS} ${AWS_STR}"
 echo "$OUTPUT"

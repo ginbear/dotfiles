@@ -1,0 +1,6 @@
+{
+  "name": "session-links",
+  "version": "0.1.0",
+  "description": "Lists the branch's PR and the GitHub issues/PRs this session mentioned, and opens them in the browser",
+  "types": "./types/index.d.ts"
+}
