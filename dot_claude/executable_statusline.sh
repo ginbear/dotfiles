@@ -171,8 +171,8 @@ fi
 
 # ─────────────────────────────────────────────────────────────
 # AWS: time left on each SSO profile's cached role credentials
-# The SSO access token lasts ~1h and is refreshed silently; the role
-# credentials are what expire under a running command.
+# Commands run on these cached role credentials until they expire; the SSO
+# access token beside them lasts only ~1h and is not what a command checks first.
 # Profiles come from ~/.claude/statusline-aws-profiles ("<label> <profile>" per line).
 # ─────────────────────────────────────────────────────────────
 ICON_AWS=$(printf "\xef\x83\x82")     # U+F0C2 nf-fa-cloud
