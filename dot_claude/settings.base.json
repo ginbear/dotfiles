@@ -116,6 +116,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/kube-exec-guard.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/workflow-guard.sh"
           }
         ]
       }
