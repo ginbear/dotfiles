@@ -49,7 +49,7 @@ fi
 
 # ─────────────────────────────────────────────────────────────
 # Context usage: absolute value with warning thresholds
-# Resuming a large session after cache expiry (5min TTL)
+# Resuming a large session after the prompt cache expires
 # consumes rate limits proportional to context size.
 # ─────────────────────────────────────────────────────────────
 CTX_WARN_THRESHOLD=150000   # ⚠ consider /compact before stepping away
@@ -156,13 +156,29 @@ fi
 ICON_CACHE=$(printf "\xef\x83\xa7")   # U+F0E7 nf-fa-bolt
 ICON_COLD=$(printf "\xef\x8b\x9c")    # U+F2DC nf-fa-snowflake_o
 
+CACHE_WARN_PCT=30   # yellow below this share of the TTL left
+CACHE_CRIT_PCT=10   # red below this share of the TTL left
+
 CACHE_STR=""
 CACHE_WARM=$(echo "$input" | jq -r '.prompt_cache.warm')
 if [ "$CACHE_WARM" = "true" ]; then
     CACHE_EXP=$(echo "$input" | jq -r '.prompt_cache.expires_at // 0 | floor')
     CACHE_TTL=$(echo "$input" | jq -r '.prompt_cache.ttl // "?"')
     CACHE_STR="${ICON_CACHE} $(format_reset "$CACHE_EXP")/${CACHE_TTL}"
-    [ $((CACHE_EXP - $(date +%s))) -lt 300 ] && CACHE_STR="${CLR_YELLOW}${CACHE_STR}${CLR_RESET}"
+    case "$CACHE_TTL" in
+        5m) CACHE_TTL_SEC=300 ;;
+        1h) CACHE_TTL_SEC=3600 ;;
+        *)  CACHE_TTL_SEC=0 ;;
+    esac
+    # Thresholds are a share of the TTL, which is 5m or 1h depending on the session.
+    CACHE_LEFT=$((CACHE_EXP - $(date +%s)))
+    if [ "$CACHE_TTL_SEC" -gt 0 ]; then
+        if [ $((CACHE_LEFT * 100)) -lt $((CACHE_TTL_SEC * CACHE_CRIT_PCT)) ]; then
+            CACHE_STR="${CLR_RED}${CACHE_STR}${CLR_RESET}"
+        elif [ $((CACHE_LEFT * 100)) -lt $((CACHE_TTL_SEC * CACHE_WARN_PCT)) ]; then
+            CACHE_STR="${CLR_YELLOW}${CACHE_STR}${CLR_RESET}"
+        fi
+    fi
 elif [ "$CACHE_WARM" = "false" ]; then
     RECACHE=$(echo "$input" | jq -r '.prompt_cache.recache_tokens_if_cold // 0')
     CACHE_STR="${ICON_COLD} cold"
