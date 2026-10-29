@@ -31,7 +31,7 @@ fi
 
 # Datadog (remote managed MCP server)
 echo "Adding Datadog MCP server..."
-claude mcp add -s user --transport http datadog https://mcp.datadoghq.com/mcp
+claude mcp add -s user --transport http datadog https://mcp.datadoghq.com/v1/mcp
 
 # Notion (HTTP transport)
 echo "Adding Notion MCP server..."
