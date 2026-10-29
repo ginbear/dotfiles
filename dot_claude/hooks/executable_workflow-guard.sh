@@ -72,7 +72,10 @@ fi
 # 本文は heredoc や --body-file にあるので、メンションだけは元のコマンドと本文ファイルを走査する。
 gh_body_re="${START}gh[[:space:]]+((pr|issue)[[:space:]]+(create|edit|comment|review)|api)([[:space:]]|$)"
 if [[ "$COMMAND" =~ $gh_body_re ]]; then
+  # --jq / -q の式（`@tsv` 等）は本文ではないので除く。
   BODY="$COMMAND"
+  jq_re="(^|[[:space:]])(--jq|-q)[=[:space:]]+('[^']*'|\"[^\"]*\"|[^[:space:]]+)"
+  while [[ "$BODY" =~ $jq_re ]]; do BODY="${BODY/"${BASH_REMATCH[0]}"/ }"; done
   file_re="(--body-file|-F)[=[:space:]]+[\"']?([^[:space:]\"']+)"
   rest="$COMMAND"
   while [[ "$rest" =~ $file_re ]]; do
