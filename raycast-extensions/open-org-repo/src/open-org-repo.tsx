@@ -2,6 +2,7 @@ import { Action, ActionPanel, Icon, List, getPreferenceValues } from "@raycast/a
 import { useCachedPromise, useFrecencySorting } from "@raycast/utils";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { useState } from "react";
 
 const run = promisify(execFile);
 
@@ -63,17 +64,24 @@ export default function Command() {
   const { org } = getPreferenceValues<{ org: string }>();
   const { data, isLoading } = useCachedPromise(listRepos, [org]);
   const { data: sorted, visitItem } = useFrecencySorting(data, { key: (repo) => repo.url });
+  const [query, setQuery] = useState("");
+
+  // 組み込みフィルタはマッチ度順に並べ替えて frecency を打ち消すため、自前で絞り込む
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const filtered = sorted.filter((repo) => {
+    const haystack = `${repo.name} ${repo.description ?? ""}`.toLowerCase();
+    return terms.every((t) => haystack.includes(t));
+  });
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder="Search repositories">
-      {sorted.map((repo) => {
+    <List isLoading={isLoading} filtering={false} onSearchTextChange={setQuery} searchBarPlaceholder="Search repositories">
+      {filtered.map((repo) => {
         const onVisit = () => visitItem(repo);
         return (
           <List.Item
             key={repo.url}
             title={repo.name}
             subtitle={repo.description ?? undefined}
-            keywords={repo.description ? [repo.description] : []}
             icon={repo.isPrivate ? Icon.Lock : Icon.Book}
             accessories={[{ date: new Date(repo.pushedAt) }]}
             actions={
