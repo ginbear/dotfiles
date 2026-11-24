@@ -79,7 +79,7 @@
       "Edit(~/.claude/**)"
     ]
   },
-  "model": "opus[1m]",
+  "language": "Japanese",
   "hooks": {
     "Notification": [
       {
