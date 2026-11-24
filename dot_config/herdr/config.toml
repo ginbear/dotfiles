@@ -3,8 +3,11 @@ onboarding = false
 prefix = "ctrl+t"
 
 [theme]
-name = "terminal"
-auto_switch = true
+name = "tokyo-night"
+auto_switch = false
+
+[ui]
+tab_bar_position = "top"
 
 [ui.toast]
 delivery = "system"
